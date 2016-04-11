@@ -12,39 +12,28 @@ using std::vector;
 namespace nn {
 
 NeuralNet::NeuralNet(const InputLayer input, const OutputLayer output,
-                     vector<Layer> hidden, bool gradcheck) :
-                     eps(1e-5), check(gradcheck),
-                     cost(output.getcost()), costd(output.getcostd()),
+                     vector<Layer> hidden) :
+                     eps(1e-5), cost(output.getcost()), costd(output.getcostd()),
                      input(input), hidden(hidden), output(output) {}
 
 void NeuralNet::feeddata(const mat x, const mat y) {
-  if (check) {
-    // cache the value for gradient checking
-    this->x = x;
-    this->y = y;
-  }
+  this->x = x;
+  this->y = y;
 
   // forward propagation
-  cout << "forward propagation..." << endl;
   mat current = input.forwardprop(x);
   for (uint32_t i = 0 ; i < hidden.size() ; ++i) {
-    cout << "current layer: " << i + 1 << endl;
     mat n = hidden[i].forwardprop(current);
     current = n;
   }
   result = output.forwardprop(current);
 
   // backpropagation
-  cout << "back-propagation..." << endl;
   mat currentdelta = output.backprop(y);
   for (int i = hidden.size()-1 ; i >= 0 ; --i) {
-    cout << "current layer: " << i + 1 << endl;
     mat p = hidden[i].backprop(currentdelta);
     currentdelta = p;
   }
-
-  if (check)
-    gradcheck();
 
   // update parameters
   output.update();
@@ -82,6 +71,24 @@ void NeuralNet::gradcheck() {
     cout << computengrad(w.n_rows, w.n_cols, i) << endl;
   }
 #endif
+}
+
+double NeuralNet::computecost() {
+  // forward propagation
+  mat current = input.forwardprop(x);
+  for (uint32_t i = 0 ; i < hidden.size() ; ++i) {
+    mat n = hidden[i].forwardprop(current);
+    current = n;
+  }
+  mat out = output.forwardprop(current);
+  mat J = cost(y, out);
+  double val = 0;
+  for (uint32_t i = 0 ; i < J.n_rows ; ++i) {
+    for (uint32_t j = 0 ; j < J.n_cols ; ++j) {
+      val += J(i, j);
+    }
+  }
+  return val;
 }
 
 double NeuralNet::computecost(const mat perturb, const uint32_t idx) {

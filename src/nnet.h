@@ -11,17 +11,17 @@ namespace nn {
 class NeuralNet {
  public:
   NeuralNet(const InputLayer input, const OutputLayer output,
-            std::vector<Layer> layers, bool gradcheck);
+            std::vector<Layer> layers);
   void feeddata(const mat x, const mat y);
   mat predict(const mat sample);
   void gradcheck();
+  double computecost();
 
  private:
   double computecost(const mat perturb, const uint32_t idx);
   mat computengrad(const int nrows, const int ncols, const int idx);
 
   const double eps;
-  bool check;
   mat x, y;
   mat result;
   mat (*cost)(mat,mat);
