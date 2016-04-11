@@ -1,4 +1,8 @@
 #include "layer.h"
+#include <iostream>
+
+using std::cout;
+using std::endl;
 
 namespace nn {
 
@@ -7,6 +11,17 @@ mat funcop(const mat m, double (*f)(double)) {
   for (uint32_t i = 0 ; i < m.n_rows ; ++i) {
     for (uint32_t j = 0 ; j < m.n_cols ; ++j) {
       newmat(i, j) = f(m(i, j));
+    }
+  }
+  return newmat;
+}
+
+mat addcol(const mat m, const double val) {
+  mat newmat(m.n_rows, m.n_cols+1);
+  for (uint32_t i = 0 ; i < m.n_rows ; ++i) {
+    newmat(i, 0) = val;
+    for (uint32_t j = 0 ; j < m.n_cols ; ++j) {
+      newmat(i, j+1) = m(i, j);
     }
   }
   return newmat;
@@ -23,6 +38,8 @@ Layer::Layer(const Layer &l) : nnodes(l.getnnodes()), lrate(l.getlrate()) {
   a = l.geta();
   W = l.getw();
   grad = l.getgrad();
+  act = l.getact();
+  actd = l.getactd();
 }
 
 Layer::Layer(const int nnodes, const int nextnnodes, const double lrate,
@@ -50,16 +67,25 @@ void Layer::operator= (const Layer &l) {
 }
 
 mat Layer::forwardprop(const mat pa) {
-  z = pa * W;
+  this->pa = addcol(pa, 1);
+  z = this->pa * W;
   a = funcop(z, act);
 
   return a;
 }
 
-mat Layer::backprop(const mat delta) {
-  grad = a.t() * delta;
+mat Layer::backprop(const mat d) {
+  // compute this delta and grad
   mat actdz = funcop(z, actd);
-  return delta * W.t() % actdz;
+  mat delta = d;
+  delta = delta % addcol(actdz, 1);
+
+  delta.shed_col(0);
+  grad = pa.t() * delta;
+
+  // compute new delta to throw to next layer
+  mat newdelta = delta * W.t();
+  return newdelta;
 }
 
 void Layer::update() {
@@ -102,6 +128,10 @@ func Layer::getactd() const {
   return actd;
 }
 
+void Layer::setw(const mat w) {
+  this->W = w;
+}
+
 // InputLayer implementation
 InputLayer::InputLayer() {}
 
@@ -109,12 +139,11 @@ InputLayer::InputLayer(const InputLayer &input) :
     Layer(input.getnnodes(), input.getw().n_cols, input.getlrate(),
           input.getact(), input.getactd()) {}
 
-InputLayer::InputLayer(const int innodes, const double lrate,
-                       double (*act)(double), double (*actd)(double)) {
+InputLayer::InputLayer(const int innodes) {
   nnodes = innodes;
-  this->lrate = lrate;
-  this->act = act;
-  this->actd = actd;
+  lrate = 1;
+  this->act = [](double x) {return x;};
+  this->actd = [](double x) {return (x=1);};
   // not using W and grad for input layer
 }
 
@@ -139,9 +168,16 @@ mat InputLayer::forwardprop(const mat input) {
 // OutputLayer implementation
 OutputLayer::OutputLayer() {}
 
-OutputLayer::OutputLayer(const OutputLayer &output) :
-    Layer(output.getnnodes(), output.getw().n_cols, output.getlrate(),
-          output.getact(), output.getactd()) {
+OutputLayer::OutputLayer(const OutputLayer &output) {
+  nnodes = output.getnnodes();
+  lrate = output.getlrate();
+  act = output.getact();
+  actd = output.getactd();
+  z = output.getz();
+  a = output.geta();
+  W = output.getw();
+  grad = output.getgrad();
+  delta = output.getdelta();
   cost = output.getcost();
   costd = output.getcostd();
 }
@@ -184,7 +220,9 @@ void OutputLayer::operator= (const OutputLayer &output) {
 mat OutputLayer::backprop(const mat label) {
   y = label;
   delta = costd(y, a, z);
-  return delta;
+  grad = pa.t() * delta;
+  mat newdelta = delta * W.t();
+  return newdelta;
 }
 
 mat OutputLayer::argmax() const {

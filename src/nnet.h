@@ -11,10 +11,7 @@ namespace nn {
 class NeuralNet {
  public:
   NeuralNet(const InputLayer input, const OutputLayer output,
-            std::vector<Layer> layers,
-            mat (*cost)(mat,mat),
-            mat (*costd)(mat,mat), bool gradcheck);
-  ~NeuralNet();
+            std::vector<Layer> layers, bool gradcheck);
   void feeddata(const mat x, const mat y);
   mat predict(const mat sample);
   void gradcheck();
@@ -28,7 +25,7 @@ class NeuralNet {
   mat x, y;
   mat result;
   mat (*cost)(mat,mat);
-  mat (*costd)(mat,mat);
+  mat (*costd)(mat,mat,mat);
   InputLayer input;
   std::vector<Layer> hidden;
   OutputLayer output;

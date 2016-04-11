@@ -7,6 +7,7 @@
 namespace nn {
 
 mat funcop(const mat m, double (*f)(double));
+mat addcol(const mat m, const double val);
 
 class Layer {
  public:
@@ -25,16 +26,16 @@ class Layer {
   mat getw() const;
   mat getgrad() const;
   mat getdelta() const;
-  void setw(mat perturb);
   func getact() const;
   func getactd() const;
+  void setw(mat w);
 
  protected:
   int nnodes;
   double lrate;
   double (*act)(double);
   double (*actd)(double);
-  mat z, a;
+  mat pa, z, a;
   mat W, grad, delta;
 };
 
@@ -42,8 +43,7 @@ class InputLayer : public Layer {
  public:
   InputLayer();
   InputLayer(const InputLayer &input);
-  InputLayer(const int innodes, const double lrate,
-             double (*act)(double), double (*actd)(double));
+  InputLayer(const int innodes);
   virtual void operator=(const InputLayer &input);
   virtual mat forwardprop(const mat input);
 };
@@ -69,7 +69,6 @@ class OutputLayer : public Layer {
   mat (*costd)(mat,mat,mat);
   mat y;
 };
-
 
 }
 
