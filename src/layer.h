@@ -13,13 +13,13 @@ class Layer {
  public:
   Layer();
   Layer(const Layer &l);
-  Layer(const int nnodes, const int nextnnodes, const double lrate,
+  Layer(const int pnnodes, const int nnodes, const double lrate,
         double (*act)(double), double (*actd)(double));
   virtual void operator=(const Layer &l);
   virtual mat forwardprop(const mat pa);
   virtual mat backprop(const mat delta);
   virtual void update();
-  int getnnodes() const;
+  int getpnnodes() const;
   double getlrate() const;
   mat getz() const;
   mat geta() const;
@@ -31,7 +31,7 @@ class Layer {
   void setw(mat w);
 
  protected:
-  int nnodes;
+  int pnnodes;
   double lrate;
   double (*act)(double);
   double (*actd)(double);
