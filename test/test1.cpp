@@ -6,6 +6,7 @@
 
 #include <opencv2/core.hpp>
 #include <opencv2/highgui.hpp>
+#include <opencv2/shape.hpp>
 
 using std::vector;
 using std::cout;
@@ -15,6 +16,14 @@ using nn::InputLayer;
 using nn::OutputLayer;
 using nn::NeuralNet;
 using nn::mat;
+
+double rectifier(double z) {
+  return z >= 0 ? z : 0;
+}
+
+double rectifiergrad(double z) {
+  return z >= 0 ? 1 : 0;
+}
 
 double sigmoid(double z) {
   return 1.0 / (1.0 + exp(-z));
@@ -31,22 +40,23 @@ mat cost(mat y, mat h) {
   return J;
 }
 
-mat costd(mat y, mat a, mat z) {
+mat costd(mat y, mat a, mat) {
   mat grad = (a - y);
   return grad;
 }
 
 void load(mat &x, mat &y) {
-  std::ifstream xinput("/home/joseph/C/basic/src/nnet/samplex2.data", std::ios::in);
-  std::ifstream yinput("/home/joseph/C/basic/src/nnet/sampley2.data", std::ios::in);
+  std::ifstream xinput("/home/joseph/C/basic/src/nnet/samplex.data", std::ios::in);
+  std::ifstream yinput("/home/joseph/C/basic/src/nnet/sampley.data", std::ios::in);
   x = mat(100, 2);
   y = mat(100, 2);
   y.zeros();
   if (xinput.is_open() && yinput.is_open()) {
     cout << "reading data..." << endl;
     for (uint32_t i = 0 ; i < 100 ; i ++) {
-      double x1 = 0, x2 = 0;
+      double x0 = 0, x1 = 0, x2 = 0;
       int yi = 0;
+      xinput >> x0;
       xinput >> x1;
       xinput >> x2;
       yinput >> yi;
@@ -59,8 +69,8 @@ void load(mat &x, mat &y) {
 void loadsample(mat &sample, const int w, const int h) {
   sample = mat(w * h, 2);
   for (int i = 0 ; i < h * w ; ++i) {
-    sample(i, 0) = i / w;
-    sample(i, 1) = i % w;
+    sample(i, 0) = static_cast<double>(1.0 * (i % w) / w);
+    sample(i, 1) = static_cast<double>(1.0 * (i / w) / h);
   }
 }
 
@@ -71,27 +81,37 @@ int main() {
 
   InputLayer input(2);
   vector<Layer> hidden = {
-    Layer(2, 11, lrate, sigmoid, sigmoidgrad),
-    Layer(11, 15, lrate, sigmoid, sigmoidgrad),
-    Layer(15, 21, lrate, sigmoid, sigmoidgrad),
-    Layer(21, 3, lrate, sigmoid, sigmoidgrad),
-    Layer(3, 5, lrate, sigmoid, sigmoidgrad),
-    Layer(5, 10, lrate, sigmoid, sigmoidgrad)
+    Layer(2, 3, lrate, atan, [](double x) {return 1.0/(1.0+x*x);}),
+    Layer(3, 10, lrate, rectifier, rectifiergrad),
+    Layer(10, 2, lrate, atan, [](double x) {return 1.0/(1.0+x*x);}),
+    Layer(2, 15, lrate, sigmoid, sigmoidgrad),
   };
-  OutputLayer output(10, 2, lrate, sigmoid, sigmoidgrad, cost, costd);
+  OutputLayer output(15, 2, lrate, sigmoid, sigmoidgrad, cost, costd);
   NeuralNet nnet(input, output, hidden);
 
   mat x, y, sample;
   load(x, y); loadsample(sample, w, h);
   for (int i = 0 ; i < 30000 ; ++i) {
-    nnet.feeddata(x, y);
+    nnet.feeddata(x, y, false);
     cout << "\rcost: " << nnet.computecost();
   }
   cout << endl;
   mat result = nnet.predict(sample);
 
-  cv::Mat canvas = cv::Mat::zeros(h, w, CV_32FC1);
+  cv::Mat canvas = cv::Mat::zeros(h, w, CV_8UC1);
+  for (uint32_t i = 0 ; i < result.n_rows ; ++i) {
+    canvas.at<uchar>(i/w, i%w) = result(i, 0) == 1 ? 128 : 0;
+  }
+  for (uint32_t i = 0 ; i < x.n_rows ; ++i) {
+    if (y(i,0) == 0) {
+      cv::circle(canvas, cv::Point(x(i,0)*w, x(i,1)*h), 3, cv::Scalar(255));
+    } else {
+      cv::circle(canvas, cv::Point(x(i,0)*w, x(i,1)*h), 3, cv::Scalar(100));
+    }
+  }
+
   cv::imshow("demo", canvas);
+  cv::waitKey(0);
 
   return 0;
 }
