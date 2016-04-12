@@ -12,7 +12,7 @@ class NeuralNet {
  public:
   NeuralNet(const InputLayer input, const OutputLayer output,
             std::vector<Layer> layers);
-  void feeddata(const mat x, const mat y);
+  void feeddata(const mat x, const mat y, const bool check);
   mat predict(const mat sample);
   void gradcheck();
   double computecost();

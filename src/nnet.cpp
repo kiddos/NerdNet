@@ -13,10 +13,10 @@ namespace nn {
 
 NeuralNet::NeuralNet(const InputLayer input, const OutputLayer output,
                      vector<Layer> hidden) :
-                     eps(1e-5), cost(output.getcost()), costd(output.getcostd()),
+                     eps(1e-9), cost(output.getcost()), costd(output.getcostd()),
                      input(input), hidden(hidden), output(output) {}
 
-void NeuralNet::feeddata(const mat x, const mat y) {
+void NeuralNet::feeddata(const mat x, const mat y, const bool check) {
   this->x = x;
   this->y = y;
 
@@ -35,6 +35,8 @@ void NeuralNet::feeddata(const mat x, const mat y) {
     currentdelta = p;
   }
 
+  if (check) gradcheck();
+
   // update parameters
   output.update();
   for (uint32_t i = 0 ; i < hidden.size() ; ++i) {
@@ -50,7 +52,8 @@ mat NeuralNet::predict(const mat sample) {
     current = n;
   }
   result = output.forwardprop(current);
-  return result;
+  mat argmax = output.argmax();
+  return argmax;
 }
 
 void NeuralNet::gradcheck() {
