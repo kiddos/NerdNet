@@ -65,14 +65,14 @@ void Layer::operator= (const Layer &l) {
 mat Layer::forwardprop(const mat pa) {
   this->pa = addcol(pa, 1);
   z = this->pa * W;
-  a = z.transform(act);
+  a = funcop(z, act);
 
   return a;
 }
 
 mat Layer::backprop(const mat d) {
   // compute this delta and grad
-  mat actdz = z.transform(actd);
+  mat actdz = funcop(z, actd);
   mat delta = d;
   delta = delta % addcol(actdz, 1);
 

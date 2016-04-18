@@ -13,7 +13,7 @@ namespace nn {
 
 NeuralNet::NeuralNet(const InputLayer input, const OutputLayer output,
                      vector<Layer> hidden) :
-                     eps(1e-9), cost(output.getcost()), costd(output.getcostd()),
+                     eps(1e-5), cost(output.getcost()), costd(output.getcostd()),
                      input(input), hidden(hidden), output(output) {}
 
 void NeuralNet::feeddata(const mat x, const mat y, const bool check) {
@@ -59,20 +59,47 @@ mat NeuralNet::predict(const mat sample) {
 void NeuralNet::gradcheck() {
   // back prop result from output to input
 #ifdef DEBUG
-  cout << "back propagation gradients:" << endl;
-  cout << output.getgrad() << endl;
-  for (int i = hidden.size()-1 ; i >= 0 ; --i) {
-    cout << hidden[i].getgrad() << endl;
-  }
-  cout << endl << endl;
-
+  const double diff = 1e-3;
   mat w = output.getw();
-  cout << "numeric gradients:" << endl;
-  cout << computengrad(w.n_rows, w.n_cols, hidden.size()) << endl;
+  mat ngrad = computengrad(w.n_rows, w.n_cols, hidden.size());
+  mat grad = output.getgrad();
+  for (uint32_t i = 0 ; i < grad.n_rows ; ++i) {
+    for (uint32_t j = 0 ; j < grad.n_cols ; ++j) {
+      if (ngrad(i, j) > grad(i, j)) {
+        if (ngrad(i, j) - grad(i, j) >= diff) {
+          cout << "gradient check failed" << endl;
+          return;
+        }
+      } else {
+        if (grad(i, j) - ngrad(i, j) >= diff) {
+          cout << "gradient check failed" << endl;
+          return;
+        }
+      }
+    }
+  }
   for (int i = hidden.size()-1 ; i >= 0 ; --i) {
     w = hidden[i].getw();
-    cout << computengrad(w.n_rows, w.n_cols, i) << endl;
+    ngrad = computengrad(w.n_rows, w.n_cols, i);
+    grad = hidden[i].getgrad();
+
+    for (uint32_t i = 0 ; i < grad.n_rows ; ++i) {
+      for (uint32_t j = 0 ; j < grad.n_cols ; ++j) {
+        if (ngrad(i, j) > grad(i, j)) {
+          if (ngrad(i, j) - grad(i, j) >= diff) {
+            cout << "gradient check failed" << endl;
+            return;
+          }
+        } else {
+          if (grad(i, j) - ngrad(i, j) >= diff) {
+            cout << "gradient check failed" << endl;
+            return;
+          }
+        }
+      }
+    }
   }
+  cout << "gradient check passed." << endl;
 #endif
 }
 
