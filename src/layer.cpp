@@ -45,7 +45,7 @@ Layer::Layer(const int pnnodes, const int nnodes, const double lrate,
   grad = mat(this->pnnodes, nnodes);
 
 #ifndef LIBMAT
-  W.randn();
+  W.imbue([] () {return rand() % 10000 / 10000.0;});
 #else
 #endif
 }
@@ -65,14 +65,14 @@ void Layer::operator= (const Layer &l) {
 mat Layer::forwardprop(const mat pa) {
   this->pa = addcol(pa, 1);
   z = this->pa * W;
-  a = funcop(z, act);
+  a = z.transform(act);
 
   return a;
 }
 
 mat Layer::backprop(const mat d) {
   // compute this delta and grad
-  mat actdz = funcop(z, actd);
+  mat actdz = z.transform(actd);
   mat delta = d;
   delta = delta % addcol(actdz, 1);
 
