@@ -19,6 +19,8 @@ using nn::OutputLayer;
 using nn::NeuralNet;
 using nn::mat;
 
+#define DATA_SIZE 42000
+
 double rectifier(double z) {
   return z >= 0 ? z : 0;
 }
@@ -48,24 +50,25 @@ mat costd(mat y, mat a, mat) {
 }
 
 void load(mat &x, mat &y) {
-  std::ifstream xinput("/home/joseph/C/basic/src/nnet/samplex.data", std::ios::in);
-  std::ifstream yinput("/home/joseph/C/basic/src/nnet/sampley.data", std::ios::in);
-  x = mat(100, 2);
-  y = mat(100, 2);
+  std::ifstream input("/home/joseph/Python/competition/digits/train.raw",
+          std::ios::in);
+  const int datasize = 42000;
+  x = mat(datasize, 784);
+  y = mat(datasize, 10);
   y.zeros();
-  if (xinput.is_open() && yinput.is_open()) {
+  if (input.is_open()) {
     cout << "reading data..." << endl;
-    for (uint32_t i = 0 ; i < 100 ; i ++) {
-      double x0 = 0, x1 = 0, x2 = 0;
+    for (uint32_t i = 0 ; i < datasize ; ++i) {
       int yi = 0;
-      xinput >> x0;
-      xinput >> x1;
-      xinput >> x2;
-      yinput >> yi;
-      x(i, 0) = x1;
-      x(i, 1) = x2;
+      input >> yi;
       y(i, yi) = 1;
+      for (int j = 0 ; j < 784 ; ++j) {
+        int xi = 0;
+        input >> xi;
+        x(i, j) = xi;
+      }
     }
+    cout << "done loading data." << endl;
   }
 }
 void loadsample(mat &sample, const int w, const int h) {
@@ -83,40 +86,38 @@ int main() {
 
   srand(time(NULL));
 
-  InputLayer input(2);
+  InputLayer input(784);
   vector<Layer> hidden = {
-    Layer(2, 3, lrate, atan, [](double x) {return 1.0/(1.0+x*x);}),
-    Layer(3, 10, lrate, rectifier, rectifiergrad),
-    Layer(10, 2, lrate, atan, [](double x) {return 1.0/(1.0+x*x);}),
-    Layer(2, 15, lrate, sigmoid, sigmoidgrad),
+    Layer(784, 64, lrate, sigmoid, sigmoidgrad),
   };
-  OutputLayer output(15, 2, lrate, sigmoid, sigmoidgrad, cost, costd);
+  OutputLayer output(64, 10, lrate, sigmoid, sigmoidgrad, cost, costd);
   NeuralNet nnet(input, output, hidden);
 
   mat x, y, sample;
   load(x, y); loadsample(sample, w, h);
-  for (int i = 0 ; i < 30000 ; ++i) {
-    nnet.feeddata(x, y, false);
-    //nnet.feeddata(x, y, true);
-    cout << "\riteration: " << i+1 << " cost: " << nnet.computecost();
-  }
-  cout << endl;
-  mat result = nnet.predict(sample);
+  cout << "training start..." << endl;
 
-  cv::Mat canvas = cv::Mat::zeros(h, w, CV_8UC1);
-  for (uint32_t i = 0 ; i < result.n_rows ; ++i) {
-    canvas.at<uchar>(i/w, i%w) = result(i, 0) == 1 ? 128 : 0;
+  for (int i = 0 ; i < DATA_SIZE * 3000 ; ++i) {
+    nnet.feeddata(x.row(i % DATA_SIZE), y.row(i % DATA_SIZE), false);
+    cout << "\riteration: " << i + 1 << " cost: " << nnet.computecost();
   }
-  for (uint32_t i = 0 ; i < x.n_rows ; ++i) {
-    if (y(i,0) == 0) {
-      cv::circle(canvas, cv::Point(x(i,0)*w, x(i,1)*h), 3, cv::Scalar(255));
-    } else {
-      cv::circle(canvas, cv::Point(x(i,0)*w, x(i,1)*h), 3, cv::Scalar(100));
-    }
-  }
+  cout << endl << "training completed" << endl;
+  mat result = nnet.predict(x);
 
-  cv::imshow("demo", canvas);
-  cv::waitKey(0);
+  //cv::Mat canvas = cv::Mat::zeros(h, w, CV_8UC1);
+  //for (uint32_t i = 0 ; i < result.n_rows ; ++i) {
+    //canvas.at<uchar>(i/w, i%w) = result(i, 0) == 1 ? 128 : 0;
+  //}
+  //for (uint32_t i = 0 ; i < x.n_rows ; ++i) {
+    //if (y(i,0) == 0) {
+      //cv::circle(canvas, cv::Point(x(i,0)*w, x(i,1)*h), 3, cv::Scalar(255));
+    //} else {
+      //cv::circle(canvas, cv::Point(x(i,0)*w, x(i,1)*h), 3, cv::Scalar(100));
+    //}
+  //}
+
+  //cv::imshow("demo", canvas);
+  //cv::waitKey(0);
 
   return 0;
 }
