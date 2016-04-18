@@ -3,6 +3,8 @@
 
 #ifndef LIBMAT
 #include <armadillo>
+#include <stdlib.h>
+#include <time.h>
 namespace nn {
   typedef arma::mat mat;
 }
