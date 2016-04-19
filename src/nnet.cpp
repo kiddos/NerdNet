@@ -105,13 +105,13 @@ void NeuralNet::gradcheck() {
 
 double NeuralNet::computecost() {
   // forward propagation
-  mat current = input.forwardprop(x);
-  for (uint32_t i = 0 ; i < hidden.size() ; ++i) {
-    mat n = hidden[i].forwardprop(current);
-    current = n;
-  }
-  mat out = output.forwardprop(current);
-  mat J = cost(y, out);
+  //mat current = input.forwardprop(x);
+  //for (uint32_t i = 0 ; i < hidden.size() ; ++i) {
+    //mat n = hidden[i].forwardprop(current);
+    //current = n;
+  //}
+  //mat out = output.forwardprop(current);
+  mat J = cost(y, result);
   double val = 0;
   for (uint32_t i = 0 ; i < J.n_rows ; ++i) {
     for (uint32_t j = 0 ; j < J.n_cols ; ++j) {
@@ -119,6 +119,10 @@ double NeuralNet::computecost() {
     }
   }
   return val;
+}
+
+mat NeuralNet::getresult() const {
+  return result;
 }
 
 double NeuralNet::computecost(const mat perturb, const uint32_t idx) {

@@ -16,6 +16,7 @@ class NeuralNet {
   mat predict(const mat sample);
   void gradcheck();
   double computecost();
+  mat getresult() const;
 
  private:
   double computecost(const mat perturb, const uint32_t idx);
