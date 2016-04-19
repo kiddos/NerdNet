@@ -24,12 +24,13 @@ mat addcol(const mat m, const double val) {
 }
 
 // Layer implementation
-Layer::Layer() : pnnodes(0), lrate(0) {
+Layer::Layer() : pnnodes(0), lrate(0), lambda(0) {
   act = [] (double x) {return x;};
   actd = [] (double x) {return (x=1);};
 }
 
-Layer::Layer(const Layer &l) : pnnodes(l.getpnnodes()), lrate(l.getlrate()) {
+Layer::Layer(const Layer &l) :
+    pnnodes(l.getpnnodes()), lrate(l.getlrate()), lambda(l.getlambda()) {
   z = l.getz();
   a = l.geta();
   W = l.getw();
@@ -39,8 +40,8 @@ Layer::Layer(const Layer &l) : pnnodes(l.getpnnodes()), lrate(l.getlrate()) {
 }
 
 Layer::Layer(const int pnnodes, const int nnodes, const double lrate,
-             double (*act)(double), double (*actd)(double)) :
-             pnnodes(pnnodes+1), lrate(lrate), act(act), actd(actd) {
+             const double lambda, double (*act)(double), double (*actd)(double)) :
+             pnnodes(pnnodes+1), lrate(lrate), lambda(lambda), act(act), actd(actd) {
   W = mat(this->pnnodes, nnodes);
   grad = mat(this->pnnodes, nnodes);
 
@@ -53,6 +54,7 @@ Layer::Layer(const int pnnodes, const int nnodes, const double lrate,
 void Layer::operator= (const Layer &l) {
   pnnodes = l.getpnnodes();
   lrate = l.getlrate();
+  lambda = l.getlambda();
   act = l.getact();
   actd = l.getactd();
   z = l.getz();
@@ -78,6 +80,8 @@ mat Layer::backprop(const mat d) {
 
   delta.shed_col(0);
   grad = pa.t() * delta;
+  // regularization
+  grad = grad + lambda * W;
 
   // compute new delta to throw to next layer
   mat newdelta = delta * W.t();
@@ -94,6 +98,10 @@ int Layer::getpnnodes() const {
 
 double Layer::getlrate() const {
   return lrate;
+}
+
+double Layer::getlambda() const {
+  return lambda;
 }
 
 mat Layer::getz() const {
@@ -133,7 +141,7 @@ InputLayer::InputLayer() {}
 
 InputLayer::InputLayer(const InputLayer &input) :
     Layer(input.getpnnodes(), input.getw().n_cols, input.getlrate(),
-          input.getact(), input.getactd()) {}
+          input.getlambda(), input.getact(), input.getactd()) {}
 
 InputLayer::InputLayer(const int innodes) {
   pnnodes = innodes;
@@ -146,6 +154,7 @@ InputLayer::InputLayer(const int innodes) {
 void InputLayer::operator= (const InputLayer &input) {
   pnnodes = input.getpnnodes();
   lrate = input.getlrate();
+  lambda = input.getlambda();
   act = input.getact();
   actd = input.getactd();
   z = input.getz();
@@ -183,7 +192,7 @@ OutputLayer::OutputLayer(const int pnnodes, const int outputnodes,
                          double (*act)(double),
                          double (*actd)(double),
                          mat (*cost)(mat,mat),
-                         mat (*costd)(mat,mat,mat)) {
+                         mat (*costd)(mat,mat,mat,mat)) {
   this->pnnodes = pnnodes + 1;
   this->lrate = lrate;
   this->act = act;
@@ -203,6 +212,7 @@ OutputLayer::OutputLayer(const int pnnodes, const int outputnodes,
 void OutputLayer::operator= (const OutputLayer &output) {
   pnnodes = output.getpnnodes();
   lrate = output.getlrate();
+  lambda = output.getlambda();
   act = output.getact();
   actd = output.getactd();
   z = output.getz();
@@ -216,8 +226,11 @@ void OutputLayer::operator= (const OutputLayer &output) {
 
 mat OutputLayer::backprop(const mat label) {
   y = label;
-  delta = costd(y, a, z);
+  delta = costd(y, a, z, pa);
   grad = pa.t() * delta;
+  // regularization
+  grad = grad + lambda * W;
+  // compute next layer delta
   mat newdelta = delta * W.t();
   return newdelta;
 }

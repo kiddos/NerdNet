@@ -26,7 +26,7 @@ class NeuralNet {
   mat x, y;
   mat result;
   mat (*cost)(mat,mat);
-  mat (*costd)(mat,mat,mat);
+  mat (*costd)(mat,mat,mat,mat);
   InputLayer input;
   std::vector<Layer> hidden;
   OutputLayer output;

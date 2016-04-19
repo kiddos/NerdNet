@@ -9,18 +9,26 @@ namespace nn {
 mat funcop(const mat m, double (*f)(double));
 mat addcol(const mat m, const double val);
 
+struct LayerParam {
+  int pnnodes, nnodes;
+  double lrate, lambda;
+  double (*act)(double);
+  double (*actd)(double);
+};
+
 class Layer {
  public:
   Layer();
   Layer(const Layer &l);
   Layer(const int pnnodes, const int nnodes, const double lrate,
-        double (*act)(double), double (*actd)(double));
+        const double lambda, double (*act)(double), double (*actd)(double));
   virtual void operator=(const Layer &l);
   virtual mat forwardprop(const mat pa);
   virtual mat backprop(const mat delta);
   virtual void update();
   int getpnnodes() const;
   double getlrate() const;
+  double getlambda() const;
   mat getz() const;
   mat geta() const;
   mat getw() const;
@@ -33,6 +41,7 @@ class Layer {
  protected:
   int pnnodes;
   double lrate;
+  double lambda;
   double (*act)(double);
   double (*actd)(double);
   mat pa, z, a;
@@ -56,7 +65,7 @@ class OutputLayer : public Layer {
               double (*act)(double),
               double (*actd)(double),
               mat (*cost)(mat,mat),
-              mat (*costd)(mat,mat,mat));
+              mat (*costd)(mat,mat,mat,mat));
   virtual void operator=(const OutputLayer &output);
   virtual mat backprop(const mat label);
   mat argmax() const;
@@ -66,7 +75,7 @@ class OutputLayer : public Layer {
 
  private:
   mat (*cost)(mat,mat);
-  mat (*costd)(mat,mat,mat);
+  mat (*costd)(mat,mat,mat,mat);
   mat y;
 };
 

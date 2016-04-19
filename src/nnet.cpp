@@ -59,20 +59,25 @@ mat NeuralNet::predict(const mat sample) {
 void NeuralNet::gradcheck() {
   // back prop result from output to input
 #ifdef DEBUG
-  const double diff = 1e-3;
+  const double diff = 1e-6;
   mat w = output.getw();
   mat ngrad = computengrad(w.n_rows, w.n_cols, hidden.size());
   mat grad = output.getgrad();
+  cout << "gradient checking ......";
   for (uint32_t i = 0 ; i < grad.n_rows ; ++i) {
     for (uint32_t j = 0 ; j < grad.n_cols ; ++j) {
       if (ngrad(i, j) > grad(i, j)) {
         if (ngrad(i, j) - grad(i, j) >= diff) {
-          cout << "gradient check failed" << endl;
+          cout << " failed" << endl;
+          cout << grad;
+          cout << ngrad;
           return;
         }
       } else {
         if (grad(i, j) - ngrad(i, j) >= diff) {
-          cout << "gradient check failed" << endl;
+          cout << " failed" << endl;
+          cout << grad;
+          cout << ngrad;
           return;
         }
       }
@@ -87,19 +92,23 @@ void NeuralNet::gradcheck() {
       for (uint32_t j = 0 ; j < grad.n_cols ; ++j) {
         if (ngrad(i, j) > grad(i, j)) {
           if (ngrad(i, j) - grad(i, j) >= diff) {
-            cout << "gradient check failed" << endl;
+            cout << " failed" << endl;
+            cout << grad;
+            cout << ngrad;
             return;
           }
         } else {
           if (grad(i, j) - ngrad(i, j) >= diff) {
-            cout << "gradient check failed" << endl;
+            cout << " failed" << endl;
+            cout << grad;
+            cout << ngrad;
             return;
           }
         }
       }
     }
   }
-  cout << "gradient check passed." << endl;
+  cout << " passed." << endl;
 #endif
 }
 
@@ -158,6 +167,21 @@ double NeuralNet::computecost(const mat perturb, const uint32_t idx) {
   for (uint32_t i = 0 ; i < J.n_rows ; ++i) {
     for (uint32_t j = 0 ; j < J.n_cols ; ++j) {
       val += J(i, j);
+    }
+  }
+
+  // regularization
+  for (uint32_t i = 0 ; i < hidden.size() ; ++i) {
+    mat tempw = hidden[i].getw();
+    if (i == idx) {
+      tempw = tempw + perturb;
+    }
+
+    const mat regterm = (hidden[i].getlambda() / 2.0) * (tempw % tempw);
+    for (uint32_t j = 0 ; j < regterm.n_rows ; ++j) {
+      for (uint32_t k = 0 ; k < regterm.n_cols ; ++k) {
+        val += regterm(j, k);
+      }
     }
   }
   return val;

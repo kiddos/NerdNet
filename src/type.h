@@ -18,7 +18,7 @@ namespace nn {
 namespace nn {
   typedef double (*func)(double);
   typedef mat (*mfunc)(mat,mat);
-  typedef mat (*mfuncd)(mat,mat,mat);
+  typedef mat (*mfuncd)(mat,mat,mat,mat);
 }
 
 #endif /* end of include guard: TYPES_H */
