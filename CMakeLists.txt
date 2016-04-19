@@ -5,4 +5,6 @@ enable_testing()
 add_subdirectory(src)
 add_subdirectory(test)
 
+file(COPY ${CMAKE_SOURCE_DIR}/data DESTINATION ${CMAKE_BINARY_DIR})
+
 
