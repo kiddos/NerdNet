@@ -38,18 +38,18 @@ double sigmoidgrad(double z) {
 }
 
 mat cost(mat y, mat h) {
-  mat J = -(y % h.transform(log) + (1-y) % nn::funcop(1-h, log));
+  mat J = -(y % nn::funcop(h, log) + (1-y) % nn::funcop(1-h, log));
   return J;
 }
 
-mat costd(mat y, mat a, mat) {
+mat costd(mat y, mat a, mat,mat) {
   mat grad = (a - y);
   return grad;
 }
 
 void load(mat &x, mat &y) {
-  std::ifstream xinput("/home/joseph/C/basic/src/nnet/samplex.data", std::ios::in);
-  std::ifstream yinput("/home/joseph/C/basic/src/nnet/sampley.data", std::ios::in);
+  std::ifstream xinput("./data/samplex.data", std::ios::in);
+  std::ifstream yinput("./data/sampley.data", std::ios::in);
   x = mat(100, 2);
   y = mat(100, 2);
   y.zeros();
@@ -78,6 +78,7 @@ void loadsample(mat &sample, const int w, const int h) {
 
 int main() {
   const double lrate = 1e-3;
+  const double lambda = 1e-2;
   const int w = 800;
   const int h = 600;
 
@@ -85,20 +86,27 @@ int main() {
 
   InputLayer input(2);
   vector<Layer> hidden = {
-    Layer(2, 3, lrate, atan, [](double x) {return 1.0/(1.0+x*x);}),
-    Layer(3, 10, lrate, rectifier, rectifiergrad),
-    Layer(10, 2, lrate, atan, [](double x) {return 1.0/(1.0+x*x);}),
-    Layer(2, 15, lrate, sigmoid, sigmoidgrad),
+    //Layer(2, 2, lrate, rectifier, rectifiergrad),
+    //Layer(2, 6, lrate, atan, [](double x) {return 1.0/(1.0+x*x);}),
+    Layer(2, 6, lrate, lambda, atan, [](double x) {return 1.0/(1.0+x*x);}),
+    Layer(6, 6, lrate, lambda, rectifier, rectifiergrad),
+    Layer(6, 6, lrate, lambda, sigmoid, sigmoidgrad),
+    Layer(6, 6, lrate, lambda, atan, [](double x) {return 1.0/(1.0+x*x);}),
+    //Layer(2, 6, lrate, sigmoid, sigmoidgrad),
+    //Layer(6, 6, lrate, sigmoid, sigmoidgrad),
+    //Layer(6, 6, lrate, sigmoid, sigmoidgrad),
+    //Layer(6, 6, lrate, sigmoid, sigmoidgrad),
   };
-  OutputLayer output(15, 2, lrate, sigmoid, sigmoidgrad, cost, costd);
+  OutputLayer output(6, 2, lrate, sigmoid, sigmoidgrad, cost, costd);
   NeuralNet nnet(input, output, hidden);
 
   mat x, y, sample;
   load(x, y); loadsample(sample, w, h);
-  for (int i = 0 ; i < 30000 ; ++i) {
+  nnet.feeddata(x, y, true);
+  for (int i = 0 ; i < 120000 ; ++i) {
     nnet.feeddata(x, y, false);
     //nnet.feeddata(x, y, true);
-    cout << "\riteration: " << i+1 << " cost: " << nnet.computecost();
+    cout << "\riteration: " << i << " | cost: " << nnet.computecost();
   }
   cout << endl;
   mat result = nnet.predict(sample);

@@ -44,7 +44,7 @@ mat cost(mat y, mat h) {
   return J;
 }
 
-mat costd(mat y, mat a, mat) {
+mat costd(mat y, mat a, mat,mat) {
   mat grad = (a - y);
   return grad;
 }
@@ -79,6 +79,7 @@ void loadsample(mat &sample, const int w, const int h) {
 
 int main() {
   const double lrate = 1e-3;
+  const double lambda = 1e-3;
   const int w = 800;
   const int h = 600;
 
@@ -86,10 +87,10 @@ int main() {
 
   InputLayer input(2);
   vector<Layer> hidden = {
-    Layer(2, 3, lrate, atan, [](double x) {return 1.0/(1.0+x*x);}),
-    Layer(3, 10, lrate, rectifier, rectifiergrad),
-    Layer(10, 2, lrate, atan, [](double x) {return 1.0/(1.0+x*x);}),
-    Layer(2, 15, lrate, sigmoid, sigmoidgrad),
+    Layer(2, 3, lrate, lambda, atan, [](double x) {return 1.0/(1.0+x*x);}),
+    Layer(3, 10, lrate, lambda, rectifier, rectifiergrad),
+    Layer(10, 2, lrate, lambda, atan, [](double x) {return 1.0/(1.0+x*x);}),
+    Layer(2, 15, lrate, lambda, sigmoid, sigmoidgrad),
   };
   OutputLayer output(15, 2, lrate, sigmoid, sigmoidgrad, cost, costd);
   NeuralNet nnet(input, output, hidden);
