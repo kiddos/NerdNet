@@ -19,7 +19,8 @@ using nn::OutputLayer;
 using nn::NeuralNet;
 using nn::mat;
 
-#define DATA_SIZE 42000
+const int datasize = 42000;
+const int n = 784;
 
 double rectifier(double z) {
   return z >= 0 ? z : 0;
@@ -52,8 +53,7 @@ mat costd(mat y, mat a, mat) {
 void load(mat &x, mat &y) {
   std::ifstream input("/home/joseph/Python/competition/digits/train.raw",
           std::ios::in);
-  const int datasize = 42000;
-  x = mat(datasize, 784);
+  x = mat(datasize, n);
   y = mat(datasize, 10);
   y.zeros();
   if (input.is_open()) {
@@ -62,62 +62,81 @@ void load(mat &x, mat &y) {
       int yi = 0;
       input >> yi;
       y(i, yi) = 1;
-      for (int j = 0 ; j < 784 ; ++j) {
+      for (int j = 0 ; j < n ; ++j) {
         int xi = 0;
         input >> xi;
         x(i, j) = xi;
       }
     }
-    cout << "done loading data." << endl;
+    cout << "done loading training data." << endl;
   }
 }
-void loadsample(mat &sample, const int w, const int h) {
-  sample = mat(w * h, 2);
-  for (int i = 0 ; i < h * w ; ++i) {
-    sample(i, 0) = static_cast<double>(1.0 * (i % w) / w);
-    sample(i, 1) = static_cast<double>(1.0 * (i / w) / h);
+void loadsample(mat &sample) {
+  const int samplesize = 28000;
+  std::ifstream input("/home/joseph/Python/competition/digits/test.raw",
+          std::ios::in);
+  if (input.is_open()) {
+    cout << "reading testing data..." << endl;
+    sample = mat(samplesize, n);
+    for (int i = 0 ; i < samplesize ; ++i) {
+      int xi = 0;
+      for (int j = 0 ; j < n ; ++j) {
+        input >> xi;
+        sample(i, j) = xi;
+      }
+    }
+    cout << "done loading testing samples." << endl;
   }
 }
 
 int main() {
-  const double lrate = 1e-3;
-  const int w = 800;
-  const int h = 600;
+  const double lrate = 1e-1;
+  const int batchsize = 5;
+  const int imagesize = 28;
 
   srand(time(NULL));
 
-  InputLayer input(784);
+  InputLayer input(n);
   vector<Layer> hidden = {
-    Layer(784, 64, lrate, sigmoid, sigmoidgrad),
+    Layer(n, 2, lrate, sigmoid, sigmoidgrad),
   };
-  OutputLayer output(64, 10, lrate, sigmoid, sigmoidgrad, cost, costd);
+  OutputLayer output(2, 10, lrate, sigmoid, sigmoidgrad, cost, costd);
   NeuralNet nnet(input, output, hidden);
 
   mat x, y, sample;
-  load(x, y); loadsample(sample, w, h);
+  load(x, y);
+  loadsample(sample);
   cout << "training start..." << endl;
 
-  for (int i = 0 ; i < DATA_SIZE * 3000 ; ++i) {
-    nnet.feeddata(x.row(i % DATA_SIZE), y.row(i % DATA_SIZE), false);
-    cout << "\riteration: " << i + 1 << " cost: " << nnet.computecost();
+  for (int i = 0 ; i < 100000000 ; ++i) {
+    const int start = i % (datasize-batchsize);
+    const int end = start + batchsize;
+    nnet.feeddata(x.rows(start, end), y.rows(start, end), false);
+    if (i % datasize == 0)
+      cout << "iteration: " << i << " cost: " << nnet.computecost();
   }
   cout << endl << "training completed" << endl;
-  mat result = nnet.predict(x);
 
-  //cv::Mat canvas = cv::Mat::zeros(h, w, CV_8UC1);
-  //for (uint32_t i = 0 ; i < result.n_rows ; ++i) {
-    //canvas.at<uchar>(i/w, i%w) = result(i, 0) == 1 ? 128 : 0;
-  //}
-  //for (uint32_t i = 0 ; i < x.n_rows ; ++i) {
-    //if (y(i,0) == 0) {
-      //cv::circle(canvas, cv::Point(x(i,0)*w, x(i,1)*h), 3, cv::Scalar(255));
-    //} else {
-      //cv::circle(canvas, cv::Point(x(i,0)*w, x(i,1)*h), 3, cv::Scalar(100));
-    //}
-  //}
+  for (uint32_t i = 0 ; i < x.n_rows ; ++i) {
+    const mat xi = x.row(i);
+    const mat result = nnet.predict(xi);
 
-  //cv::imshow("demo", canvas);
-  //cv::waitKey(0);
+    cv::Mat image = cv::Mat::zeros(imagesize, imagesize, CV_8UC1);
+    for (uint32_t i = 0 ; i < xi.n_cols ; ++i) {
+      image.at<uchar>(i/imagesize, i%imagesize) = xi(i);
+    }
 
+    int answer = 0;
+    for (uint32_t j = 0 ; j < 10 ; j ++) {
+      if (y(i, j) == 1) {
+        answer = j;
+        break;
+      }
+    }
+    cv::imshow("Hand Written digits", image);
+    cout << "prediction: " << result(0, 0) << " answer: " << answer << endl;
+    int c = cv::waitKey(0);
+    if (c == 'q' || c == 'Q') break;
+  }
   return 0;
 }
