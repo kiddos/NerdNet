@@ -41,7 +41,7 @@ double sigmoidgrad(double z) {
 }
 
 mat cost(mat y, mat h) {
-  mat J = -(y % h.transform(log) + (1-y) % nn::funcop(1-h, log));
+  mat J = -(y % nn::funcop(h, log) + (1-y) % nn::funcop(1-h, log));
   return J;
 }
 
@@ -90,17 +90,19 @@ void loadsample(mat &sample) {
 }
 
 int main() {
-  const double lrate = 1e-1;
-  const int batchsize = 5;
+  const double lrate = 1e-6;
+  const int batchsize = 0;
   const int imagesize = 28;
 
   srand(time(NULL));
 
   InputLayer input(n);
   vector<Layer> hidden = {
-    Layer(n, 2, lrate, sigmoid, sigmoidgrad),
+    Layer(n, 16, lrate, sigmoid, sigmoidgrad),
+    //Layer(256, 64, lrate, sigmoid, sigmoidgrad),
+    //Layer(64, 16, lrate, sigmoid, sigmoidgrad),
   };
-  OutputLayer output(2, 10, lrate, sigmoid, sigmoidgrad, cost, costd);
+  OutputLayer output(16, 10, lrate, sigmoid, sigmoidgrad, cost, costd);
   NeuralNet nnet(input, output, hidden);
 
   mat x, y, sample;
@@ -108,12 +110,16 @@ int main() {
   loadsample(sample);
   cout << "training start..." << endl;
 
-  for (int i = 0 ; i < 100000000 ; ++i) {
+  for (int i = 0 ; i < datasize * 30 ; ++i) {
     const int start = i % (datasize-batchsize);
     const int end = start + batchsize;
     nnet.feeddata(x.rows(start, end), y.rows(start, end), false);
-    if (i % datasize == 0)
-      cout << "iteration: " << i << " cost: " << nnet.computecost();
+
+    if (i % datasize == 0) {
+      cout << "iteration: " << i << " cost: " << nnet.computecost() << endl;
+      cout << nnet.getresult() << endl;
+      cout << y.rows(start, end) << endl;
+    }
   }
   cout << endl << "training completed" << endl;
 
