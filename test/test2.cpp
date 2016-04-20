@@ -41,14 +41,14 @@ double sigmoidgrad(double z) {
 }
 
 mat cost(mat y, mat h) {
-  //mat J = -(y % nn::funcop(h, log) + (1-y) % nn::funcop(1-h, log));
-  mat J = -(y % h);
+  mat J = -(y % nn::funcop(h, log) + (1-y) % nn::funcop(1-h, log));
+  //mat J = -(y % h);
   return J;
 }
 
-mat costd(mat y, mat , mat z, mat) {
-  //mat grad = (a - y);
-  mat grad = -(y % nn::funcop(z, sigmoidgrad));
+mat costd(mat y, mat a, mat , mat) {
+  mat grad = (a - y);
+  //mat grad = -(y % nn::funcop(z, sigmoidgrad));
   return grad;
 }
 
@@ -92,8 +92,8 @@ void loadsample(mat &sample) {
 }
 
 int main() {
-  const double lrate = 1e-3;
-  const double lambda = 1e-1;
+  const double lrate = 1e-5;
+  const double lambda = 1e1;
   const int batchsize = 0;
   const int imagesize = 28;
 
@@ -101,9 +101,9 @@ int main() {
 
   InputLayer input(n);
   vector<Layer> hidden = {
-    Layer(n, 32, lrate, lambda, sigmoid, sigmoidgrad),
+    Layer(n, 64, lrate, lambda, sigmoid, sigmoidgrad),
   };
-  OutputLayer output(32, 10, lrate, sigmoid, sigmoidgrad, cost, costd);
+  OutputLayer output(64, 10, lrate, sigmoid, sigmoidgrad, cost, costd);
   NeuralNet nnet(input, output, hidden);
 
   mat x, y, sample;
@@ -112,7 +112,7 @@ int main() {
   //nnet.feeddata(x.row(0), y.row(0), true);
 
   cout << "training start..." << endl;
-  for (int i = 0 ; i < datasize * 30 ; ++i) {
+  for (int i = 0 ; i < datasize * 30; ++i) {
     const int start = i % (datasize-batchsize);
     const int end = start + batchsize;
     nnet.feeddata(x.rows(start, end), y.rows(start, end), false);
