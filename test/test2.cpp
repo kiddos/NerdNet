@@ -8,6 +8,7 @@
 
 #include <opencv2/core.hpp>
 #include <opencv2/highgui.hpp>
+#include <opencv2/imgproc.hpp>
 #include <opencv2/shape.hpp>
 
 using std::vector;
@@ -101,9 +102,9 @@ int main() {
 
   InputLayer input(n);
   vector<Layer> hidden = {
-    Layer(n, 64, lrate, lambda, sigmoid, sigmoidgrad),
+    Layer(n, 100, lrate, lambda, sigmoid, sigmoidgrad),
   };
-  OutputLayer output(64, 10, lrate, sigmoid, sigmoidgrad, cost, costd);
+  OutputLayer output(100, 10, lrate, sigmoid, sigmoidgrad, cost, costd);
   NeuralNet nnet(input, output, hidden);
 
   mat x, y, sample;
@@ -118,7 +119,9 @@ int main() {
     nnet.feeddata(x.rows(start, end), y.rows(start, end), false);
 
     if (i % datasize == 0) {
-      cout << "iteration: " << i << " cost: " << nnet.computecost() << endl;
+      const double cost = nnet.computecost();
+      if (cost < 0.01) break;
+      cout << "iteration: " << i << " cost: " << cost << endl;
       cout << nnet.getresult() << endl;
       cout << y.rows(start, end) << endl;
     }
@@ -142,7 +145,9 @@ int main() {
         break;
       }
     }
-    cv::imshow("Hand Written digits", image);
+    cv::Mat large;
+    cv::resize(image, large, cv::Size(512, 512));
+    cv::imshow("Hand Written digits", large);
     cout << "prediction: " << result(0, 0) << " answer: " << answer << endl;
     int c = cv::waitKey(0);
     if (c == 'q' || c == 'Q') break;
