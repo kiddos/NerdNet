@@ -53,7 +53,7 @@ mat costd(mat y, mat a, mat,mat) {
 void load(mat &x, mat &y) {
   std::ifstream input("./data/dataset2", std::ios::in);
   x = mat(datasize, 4);
-  y = mat(datasize, 2);
+  y = mat(datasize, 3);
   y.zeros();
 
   if (input.is_open()) {
@@ -68,8 +68,10 @@ void load(mat &x, mat &y) {
       input >> label;
       if (strcmp(label.c_str(), "Iris-setosa") == 0)
         y(i, 0) = 1;
-      else
+      else if (strcmp(label.c_str(), "Iris-versicolor") == 0)
         y(i, 1) = 1;
+      else if (strcmp(label.c_str(), "Iris-virginica") == 0)
+        y(i, 2) = 1;
     }
   }
 }
@@ -86,7 +88,7 @@ int main() {
     Layer(3, 3, lrate, lambda, rectifier, rectifiergrad),
     Layer(3, 6, lrate, lambda, sigmoid, sigmoidgrad),
   };
-  OutputLayer output(6, 2, lrate, sigmoid, sigmoidgrad, cost, costd);
+  OutputLayer output(6, 3, lrate, sigmoid, sigmoidgrad, cost, costd);
   NeuralNet nnet(input, output, hidden);
 
   mat x, y;
@@ -104,8 +106,14 @@ int main() {
     for (uint32_t j = 0 ; j < x.n_cols ; ++j) {
       cout << x(i, j) << " ";
     }
-    cout << "prediction: " << (result(i, 0) == 0 ? "Iris-setosa":"Iris-versicolor");
-    cout << " answer: " << (y(i, 1) == 0 ? "Iris-setosa":"Iris-versicolor");
+    cout << "prediction: ";
+    if (result(i, 0) == 0) cout << "Iris-setosa";
+    if (result(i, 0) == 1) cout << "Iris-vericolor";
+    if (result(i, 0) == 2) cout << "Iris-virginica";
+    cout << " answer: ";
+    if (y(i, 0) == 1) cout << "Iris-setosa";
+    if (y(i, 1) == 1) cout << "Iris-vericolor";
+    if (y(i, 2) == 1) cout << "Iris-virginica";
     cout << endl;
   }
 

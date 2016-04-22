@@ -113,7 +113,7 @@ int main() {
   //nnet.feeddata(x.row(0), y.row(0), true);
 
   cout << "training start..." << endl;
-  for (int i = 0 ; i < datasize * 30; ++i) {
+  for (int i = 0 ; i < datasize * 26; ++i) {
     const int start = i % (datasize-batchsize);
     const int end = start + batchsize;
     nnet.feeddata(x.rows(start, end), y.rows(start, end), false);
@@ -146,7 +146,7 @@ int main() {
       }
     }
     cv::Mat large;
-    cv::resize(image, large, cv::Size(512, 512));
+    cv::resize(image, large, cv::Size(256, 256));
     cv::imshow("Hand Written digits", large);
     cout << "prediction: " << result(0, 0) << " answer: " << answer << endl;
     int c = cv::waitKey(0);
