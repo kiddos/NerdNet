@@ -119,7 +119,7 @@ int main() {
   vector<Layer> hidden = {
     Layer(2, 100, lrate, lambda, sigmoid, sigmoidgrad),
   };
-  OutputLayer output(100, 1, lrate, identity, identitygrad, cost, costd);
+  OutputLayer output(100, 1, lrate, lambda, identity, identitygrad, cost, costd);
   NeuralNet nnet(input, output, hidden);
 
   mat x, y;

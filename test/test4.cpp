@@ -88,7 +88,7 @@ int main() {
     Layer(3, 3, lrate, lambda, rectifier, rectifiergrad),
     Layer(3, 6, lrate, lambda, sigmoid, sigmoidgrad),
   };
-  OutputLayer output(6, 3, lrate, sigmoid, sigmoidgrad, cost, costd);
+  OutputLayer output(6, 3, lrate, lambda, sigmoid, sigmoidgrad, cost, costd);
   NeuralNet nnet(input, output, hidden);
 
   mat x, y;

@@ -21,6 +21,9 @@ using nn::OutputLayer;
 using nn::NeuralNet;
 using nn::mat;
 
+const int datasize = 5404;
+const int n = 5;
+
 double rectifier(double z) {
   return z >= 0 ? z : 0;
 }
@@ -54,13 +57,12 @@ mat costd(mat y, mat a, mat,mat) {
 }
 
 void load(mat &x, mat &y) {
-  std::ifstream input("/home/joseph/C/data/iris.dat", std::ios::in);
+  std::ifstream input("/home/joseph/C/data/phoneme.dat", std::ios::in);
   std::string line;
-  const int datasize = 150;
 
   if (input.is_open()) {
-    x = mat(datasize, 4);
-    y = mat(datasize, 3);
+    x = mat(datasize, n);
+    y = mat(datasize, 2);
     y.zeros();
 
     for (; std::getline(input, line) ;) {
@@ -71,23 +73,19 @@ void load(mat &x, mat &y) {
     }
 
     for (uint32_t i = 0 ; i < datasize ; ++i) {
-      for (int j = 0 ; j < 4 ; ++j) {
+      for (int j = 0 ; j < n ; ++j) {
         double xi = 0;
         char c;
         input >> xi;
         x(i, j) = xi;
 
+        // read ,
         input >> c;
       }
 
-      std::string label;
-      input >> label;
-      if (strcmp(label.c_str(), "Iris-setosa") == 0)
-        y(i, 0) = 1;
-      else if (strcmp(label.c_str(), "Iris-versicolor") == 0)
-        y(i, 1) = 1;
-      else if (strcmp(label.c_str(), "Iris-virginica") == 0)
-        y(i, 2) = 1;
+      double val = 0;
+      input >> val;
+      y(i, val) = 1;
     }
   }
 }
@@ -104,19 +102,21 @@ double accuracy(mat answer, mat prediction) {
 }
 
 int main() {
-  const double lrate = 1e-3;
-  const double lambda = 1e-5;
+  double lrate = 1e-2;
+  const double lratedecay = 0.6;
+  const double lambda = 9e-1;
+  const int batchsize = 100;
 
   srand(time(NULL));
 
-  InputLayer input(4);
+  InputLayer input(5);
   vector<Layer> hidden = {
-    Layer(4, 3, lrate, lambda, sigmoid, sigmoidgrad),
-    Layer(3, 3, lrate, lambda, sigmoid, sigmoidgrad),
-    Layer(3, 3, lrate, lambda, sigmoid, sigmoidgrad),
-    Layer(3, 6, lrate, lambda, sigmoid, sigmoidgrad),
+    Layer(5, 64, lrate, lambda, sigmoid, sigmoidgrad),
+    Layer(64, 16, lrate, lambda, sigmoid, sigmoidgrad),
+    Layer(16, 4, lrate, lambda, sigmoid, sigmoidgrad),
+    //Layer(16, 8, lrate, lambda, atan, [](double x) {return 1.0/(1.0+x*x);}),
   };
-  OutputLayer output(6, 3, lrate, lambda, sigmoid, sigmoidgrad, cost, costd);
+  OutputLayer output(4, 2, lrate, lambda, sigmoid, sigmoidgrad, cost, costd);
   NeuralNet nnet(input, output, hidden);
 
   mat x, y;
@@ -124,10 +124,19 @@ int main() {
   //cout << x << endl;
   //cout << y << endl;
 
-  nnet.feeddata(x, y, true);
+  //nnet.feeddata(x, y, true);
   for (int i = 0 ; i < 160000 ; ++i) {
-    nnet.feeddata(x, y, false);
+    nnet.feeddata(x.rows(i%(datasize-batchsize), i%(datasize-batchsize)+batchsize-1),
+                  y.rows(i%(datasize-batchsize), i%(datasize-batchsize)+batchsize-1),
+                  false);
     cout << "\riteration: " << i+1 << " cost: " << nnet.computecost();
+    if (i % datasize == 0) {
+      cout << endl << "iteration: " << i+1 << " cost: " << nnet.computecost();
+    }
+    if (i % 1000 == 0) {
+      lrate *= lratedecay;
+      nnet.setlrate(lrate);
+    }
   }
   cout << endl;
   mat result = nnet.predict(x);
