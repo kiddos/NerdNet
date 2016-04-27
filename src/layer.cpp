@@ -199,11 +199,12 @@ OutputLayer::OutputLayer(const OutputLayer &output) {
 }
 
 OutputLayer::OutputLayer(const int pnnodes, const int outputnodes,
-                         const double lrate,
+                         const double lrate, const double lambda,
                          double (*act)(double),
                          double (*actd)(double),
                          mat (*cost)(mat,mat),
                          mat (*costd)(mat,mat,mat,mat)) {
+  this->lambda = lambda;
   this->lrate = lrate;
   this->act = act;
   this->actd = actd;
