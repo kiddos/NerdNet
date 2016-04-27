@@ -3,18 +3,12 @@
 
 #include <stdint.h>
 #include "type.h"
+#include "act.h"
 
 namespace nn {
 
 mat funcop(const mat m, double (*f)(double));
 mat addcol(const mat m, const double val);
-
-struct LayerParam {
-  int pnnodes, nnodes;
-  double lrate, lambda;
-  double (*act)(double);
-  double (*actd)(double);
-};
 
 class Layer {
  public:
@@ -22,6 +16,8 @@ class Layer {
   Layer(const Layer &l);
   Layer(const int pnnodes, const int nnodes, const double lrate,
         const double lambda, double (*act)(double), double (*actd)(double));
+  Layer(const int pnnodes, const int nnodes, const double lrate,
+        const double lambda, ActFunc act);
   virtual void operator=(const Layer &l);
   virtual mat forwardprop(const mat pa);
   virtual mat backprop(const mat delta);
@@ -63,7 +59,9 @@ class OutputLayer : public Layer {
  public:
   OutputLayer();
   OutputLayer(const OutputLayer &output);
-  OutputLayer(const int nnodes, const int outputnodes, const double lrate,
+  OutputLayer(const int nnodes, const int outputnodes,
+              const double lrate,
+              const double lambda,
               double (*act)(double),
               double (*actd)(double),
               mat (*cost)(mat,mat),
@@ -75,10 +73,48 @@ class OutputLayer : public Layer {
   mfunc getcost() const;
   mfuncd getcostd() const;
 
- private:
+ protected:
   mat (*cost)(mat,mat);
   mat (*costd)(mat,mat,mat,mat);
   mat y;
+};
+
+class SoftmaxOutput : public OutputLayer {
+ public:
+  SoftmaxOutput();
+  SoftmaxOutput(const OutputLayer &output);
+  SoftmaxOutput(const int nnodes, const int outputnodes,
+                const double lrate, const double lambda);
+
+};
+
+class QuadraticOutput : public OutputLayer {
+  QuadraticOutput();
+  QuadraticOutput(const QuadraticOutput &output);
+  QuadraticOutput(const int nnodes, const int outputnodes,
+                  const double lrate, const double lambda);
+};
+
+class CrossEntropyOutput : public OutputLayer {
+  CrossEntropyOutput();
+  CrossEntropyOutput(const CrossEntropyOutput &output);
+  CrossEntropyOutput(const int nnodes, const int outputnodes,
+                     const double lrate, const double lambda);
+};
+
+class ExponentialOutput : public OutputLayer {
+  ExponentialOutput();
+  ExponentialOutput(const CrossEntropyOutput &output);
+  ExponentialOutput(const int nnodes, const int outputnodes,
+                     const double lrate, const double lambda,
+                     const double tou);
+};
+
+class KullbackLeiblerOutput : public OutputLayer {
+  KullbackLeiblerOutput();
+  KullbackLeiblerOutput(const KullbackLeiblerOutput &output);
+  KullbackLeiblerOutput(const int nnodes, const int outputnodes,
+                        const double lrate, const double lambda);
 };
 
 }
