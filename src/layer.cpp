@@ -24,13 +24,13 @@ mat addcol(const mat m, const double val) {
 }
 
 // Layer implementation
-Layer::Layer() : pnnodes(0), lrate(0), lambda(0) {
+Layer::Layer() : lrate(0), lambda(0) {
   act = [] (double x) {return x;};
   actd = [] (double x) {return (x=1);};
 }
 
 Layer::Layer(const Layer &l) :
-    pnnodes(l.getpnnodes()), lrate(l.getlrate()), lambda(l.getlambda()) {
+    lrate(l.getlrate()), lambda(l.getlambda()) {
   z = l.getz();
   a = l.geta();
   W = l.getw();
@@ -41,9 +41,9 @@ Layer::Layer(const Layer &l) :
 
 Layer::Layer(const int pnnodes, const int nnodes, const double lrate,
              const double lambda, double (*act)(double), double (*actd)(double)) :
-             pnnodes(pnnodes+1), lrate(lrate), lambda(lambda), act(act), actd(actd) {
-  W = mat(this->pnnodes, nnodes);
-  grad = mat(this->pnnodes, nnodes);
+             lrate(lrate), lambda(lambda), act(act), actd(actd) {
+  W = mat(pnnodes+1, nnodes);
+  grad = mat(pnnodes+1, nnodes);
 
 #ifndef LIBMAT
   W.imbue([] () {return rand() % 10000 / 10000.0;});
@@ -52,7 +52,6 @@ Layer::Layer(const int pnnodes, const int nnodes, const double lrate,
 }
 
 void Layer::operator= (const Layer &l) {
-  pnnodes = l.getpnnodes();
   lrate = l.getlrate();
   lambda = l.getlambda();
   act = l.getact();
@@ -156,15 +155,16 @@ InputLayer::InputLayer(const InputLayer &input) :
           input.getlambda(), input.getact(), input.getactd()) {}
 
 InputLayer::InputLayer(const int innodes) {
-  pnnodes = innodes;
-  lrate = 1;
+  lrate = 0;
+  lambda = 0;
   this->act = [](double x) {return x;};
-  this->actd = [](double x) {return (x=1);};
+  this->actd = [](double) {return 1.0;};
+  W = mat(innodes, innodes);
+  grad = mat(innodes, innodes);
   // not using W and grad for input layer
 }
 
 void InputLayer::operator= (const InputLayer &input) {
-  pnnodes = input.getpnnodes();
   lrate = input.getlrate();
   lambda = input.getlambda();
   act = input.getact();
@@ -186,7 +186,6 @@ mat InputLayer::forwardprop(const mat input) {
 OutputLayer::OutputLayer() {}
 
 OutputLayer::OutputLayer(const OutputLayer &output) {
-  pnnodes = output.getpnnodes();
   lrate = output.getlrate();
   act = output.getact();
   actd = output.getactd();
@@ -205,15 +204,14 @@ OutputLayer::OutputLayer(const int pnnodes, const int outputnodes,
                          double (*actd)(double),
                          mat (*cost)(mat,mat),
                          mat (*costd)(mat,mat,mat,mat)) {
-  this->pnnodes = pnnodes + 1;
   this->lrate = lrate;
   this->act = act;
   this->actd = actd;
   this->cost = cost;
   this->costd = costd;
 
-  W = mat(this->pnnodes, outputnodes);
-  grad = mat(this->pnnodes, outputnodes);
+  W = mat(pnnodes+1, outputnodes);
+  grad = mat(pnnodes+1, outputnodes);
 
 #ifndef LIBMAT
   W.randn();
@@ -222,7 +220,6 @@ OutputLayer::OutputLayer(const int pnnodes, const int outputnodes,
 }
 
 void OutputLayer::operator= (const OutputLayer &output) {
-  pnnodes = output.getpnnodes();
   lrate = output.getlrate();
   lambda = output.getlambda();
   act = output.getact();

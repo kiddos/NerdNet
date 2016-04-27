@@ -42,7 +42,6 @@ class Layer {
   void setlambda(const double lambda);
 
  protected:
-  int pnnodes;
   double lrate;
   double lambda;
   double (*act)(double);
