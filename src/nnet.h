@@ -17,6 +17,10 @@ class NeuralNet {
   void gradcheck();
   double computecost();
   mat getresult() const;
+  InputLayer getinput() const;
+  Layer gethidden(const uint32_t index) const;
+  OutputLayer getoutput() const;
+  void setlrate(const double lrate);
 
  private:
   double computecost(const mat perturb, const uint32_t idx);

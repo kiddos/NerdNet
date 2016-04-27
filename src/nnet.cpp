@@ -134,6 +134,28 @@ mat NeuralNet::getresult() const {
   return result;
 }
 
+InputLayer NeuralNet::getinput() const {
+  return input;
+}
+
+Layer NeuralNet::gethidden(const uint32_t index) const {
+  if (index < hidden.size()) {
+    return hidden[index];
+  }
+  return Layer();
+}
+
+OutputLayer NeuralNet::getoutput() const {
+  return output;
+}
+
+void NeuralNet::setlrate(const double lrate) {
+  input.setlrate(lrate);
+  for (uint32_t i = 0 ; i < hidden.size() ; ++i)
+    hidden[i].setlrate(lrate);
+  output.setlrate(lrate);
+}
+
 double NeuralNet::computecost(const mat perturb, const uint32_t idx) {
   if (idx > hidden.size()) return DBL_MAX;
 
