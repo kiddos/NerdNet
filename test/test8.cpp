@@ -42,18 +42,51 @@ double sigmoidgrad(double z) {
   return e / (b * b);
 }
 
+double identity(double z) {
+  return z;
+}
+
+double identitygrad(double) {
+  return 1;
+}
+
+
+mat colsum(const mat m) {
+  mat result(m.n_rows, m.n_cols);
+  result.zeros();
+
+  for (uint32_t i = 0 ; i < m.n_rows ; ++i) {
+    double sum = 0;
+    for (uint32_t j = 0 ; j < m.n_cols ; ++j) {
+      sum += m(i, j);
+    }
+    for (uint32_t j = 0 ; j < m.n_cols ; ++j) {
+      result(i, j) = sum;
+    }
+  }
+  return result;
+}
+
 mat cost(mat y, mat h) {
-  mat J = -(y % h.transform(log) + (1-y) % nn::funcop(1-h, log));
+  const mat exponential = nn::funcop(h, exp);
+  const mat sum = colsum(exponential);
+  const mat p = exponential % (1 / sum);
+  const mat J = - (y % nn::funcop(p, log));
+  //mat J = -(y % h.transform(log) + (1-y) % nn::funcop(1-h, log));
   //mat J = -(y % h.transform(log) + (1-y) % nn::funcop(1-h, log)) / y.n_rows;
   //mat J = -(y % h);
   return J;
 }
 
 mat costd(mat y, mat a, mat,mat) {
-  mat grad = (a - y);
+  const mat exponential = nn::funcop(a, exp);
+  const mat sum = colsum(exponential);
+  const mat p = exponential % (1.0 / sum);
+  const mat delta = p - y;
+  //mat grad = (a - y);
   //mat grad = (a - y) / y.n_rows;
   //mat grad = -(y % nn::funcop(z, sigmoidgrad));
-  return grad;
+  return delta;
 }
 
 void load(mat &x, mat &y) {
@@ -102,21 +135,18 @@ double accuracy(mat answer, mat prediction) {
 }
 
 int main() {
-  double lrate = 1e-2;
-  const double lratedecay = 0.6;
-  const double lambda = 9e-1;
+  double lrate = 1e-3;
+  const double lratedecay = 0.66;
+  const double lambda = 1e-1;
   const int batchsize = 100;
 
   srand(time(NULL));
 
   InputLayer input(5);
   vector<Layer> hidden = {
-    Layer(5, 64, lrate, lambda, sigmoid, sigmoidgrad),
-    Layer(64, 16, lrate, lambda, sigmoid, sigmoidgrad),
-    Layer(16, 4, lrate, lambda, sigmoid, sigmoidgrad),
-    //Layer(16, 8, lrate, lambda, atan, [](double x) {return 1.0/(1.0+x*x);}),
+    Layer(5, 32, lrate, lambda, sigmoid, sigmoidgrad),
   };
-  OutputLayer output(4, 2, lrate, lambda, sigmoid, sigmoidgrad, cost, costd);
+  OutputLayer output(32, 2, lrate, 0, identity, identitygrad, cost, costd);
   NeuralNet nnet(input, output, hidden);
 
   mat x, y;
@@ -126,14 +156,15 @@ int main() {
 
   //nnet.feeddata(x, y, true);
   for (int i = 0 ; i < 160000 ; ++i) {
-    nnet.feeddata(x.rows(i%(datasize-batchsize), i%(datasize-batchsize)+batchsize-1),
-                  y.rows(i%(datasize-batchsize), i%(datasize-batchsize)+batchsize-1),
+    nnet.feeddata(x.rows(i%(datasize-batchsize), i%(datasize-batchsize)+batchsize),
+                  y.rows(i%(datasize-batchsize), i%(datasize-batchsize)+batchsize),
                   false);
+    //nnet.feeddata(x, y, false);
     cout << "\riteration: " << i+1 << " cost: " << nnet.computecost();
     if (i % datasize == 0) {
       cout << endl << "iteration: " << i+1 << " cost: " << nnet.computecost();
     }
-    if (i % 1000 == 0) {
+    if (i % 5000 == 0) {
       lrate *= lratedecay;
       nnet.setlrate(lrate);
     }
