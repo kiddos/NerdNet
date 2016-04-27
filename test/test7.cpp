@@ -113,7 +113,7 @@ double accuracy(mat answer, mat prediction) {
 }
 
 int main() {
-  const double lrate = 1e-4;
+  const double lrate = 1e-5;
   const double lambda = 9e-1;
 
   srand(time(NULL));
@@ -121,8 +121,6 @@ int main() {
   InputLayer input(K);
   vector<Layer> hidden = {
     Layer(K, K, lrate, lambda, atan, [](double x) {return 1.0 / (1.0+x*x);}),
-    Layer(K, K*10, lrate, lambda, identity, identity),
-    Layer(K*10, K, lrate, lambda, atan, [](double x) {return 1.0 / (1.0+x*x);}),
   };
   OutputLayer output(K, 1, lrate, identity, identitygrad, cost, costd);
   NeuralNet nnet(input, output, hidden);
@@ -132,7 +130,7 @@ int main() {
   //cout << x << endl;
   //cout << y << endl;
 
-  //nnet.feeddata(x, y, true);
+  nnet.feeddata(x, y, true);
   for (int i = 0 ; i < 160000 ; ++i) {
     //nnet.feeddata(x.row(i % (datasize-K-1)), y.row(i % (datasize-K-1)), false);
     nnet.feeddata(x, y, false);
