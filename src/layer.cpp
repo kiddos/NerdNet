@@ -93,7 +93,11 @@ void Layer::update() {
 }
 
 int Layer::getpnnodes() const {
-  return pnnodes;
+  return W.n_rows;
+}
+
+int Layer::getnnodes() const {
+  return W.n_cols;
 }
 
 double Layer::getlrate() const {
@@ -134,6 +138,14 @@ func Layer::getactd() const {
 
 void Layer::setw(const mat w) {
   this->W = w;
+}
+
+void Layer::setlrate(const double lrate) {
+  this->lrate = lrate;
+}
+
+void Layer::setlambda(const double lambda) {
+  this->lambda = lambda;
 }
 
 // InputLayer implementation

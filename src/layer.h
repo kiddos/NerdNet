@@ -27,6 +27,7 @@ class Layer {
   virtual mat backprop(const mat delta);
   virtual void update();
   int getpnnodes() const;
+  int getnnodes() const;
   double getlrate() const;
   double getlambda() const;
   mat getz() const;
@@ -37,6 +38,8 @@ class Layer {
   func getact() const;
   func getactd() const;
   void setw(mat w);
+  void setlrate(const double lrate);
+  void setlambda(const double lambda);
 
  protected:
   int pnnodes;
