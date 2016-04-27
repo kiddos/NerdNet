@@ -11,6 +11,7 @@ add_executable(diabetes test6.cpp)
 add_executable(pigsslaughter test7.cpp)
 add_executable(phoneme test8.cpp)
 add_executable(softmaxtest test9.cpp)
+add_executable(abalone test10.cpp)
 
 set(LIBS nnet armadillo opencv_core opencv_highgui opencv_imgproc)
 
@@ -23,6 +24,7 @@ target_link_libraries(diabetes ${LIBS})
 target_link_libraries(pigsslaughter ${LIBS})
 target_link_libraries(phoneme ${LIBS})
 target_link_libraries(softmaxtest ${LIBS})
+target_link_libraries(abalone ${LIBS})
 
 add_test(XORProblem ./test1)
 add_test(MNIST ./test2)
@@ -33,4 +35,5 @@ add_test(diabetes ./test6)
 add_test(pigsslaughter ./test6)
 add_test(phoneme ./test6)
 add_test(softmaxtest ./test6)
+add_test(abalone ./test6)
 

@@ -116,7 +116,7 @@ int main() {
     Layer(3, 3, lrate, lambda, sigmoid, sigmoidgrad),
     Layer(3, 6, lrate, lambda, sigmoid, sigmoidgrad),
   };
-  OutputLayer output(6, 3, lrate, lambda, sigmoid, sigmoidgrad, cost, costd);
+  OutputLayer output(6, 3, lrate, 0, sigmoid, sigmoidgrad, cost, costd);
   NeuralNet nnet(input, output, hidden);
 
   mat x, y;
