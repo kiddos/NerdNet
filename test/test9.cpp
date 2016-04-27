@@ -37,6 +37,14 @@ double sigmoidgrad(double z) {
   return e / (b * b);
 }
 
+double identity(double z) {
+  return z;
+}
+
+double identitygrad(double) {
+  return 1;
+}
+
 mat colsum(const mat m) {
   mat result(m.n_rows, m.n_cols);
   result.zeros();
@@ -57,7 +65,7 @@ mat cost(mat y, mat h) {
   const mat exponential = nn::funcop(h, exp);
   const mat sum = colsum(exponential);
   const mat p = exponential % (1 / sum);
-  const mat J = y % nn::funcop(p, log);
+  const mat J = - (y % nn::funcop(p, log));
   //mat J = -(y % nn::funcop(h, log) + (1-y) % nn::funcop(1-h, log));
   return J;
 }
@@ -66,9 +74,9 @@ mat costd(mat y, mat a, mat,mat) {
   const mat exponential = nn::funcop(a, exp);
   const mat sum = colsum(exponential);
   const mat p = exponential % (1.0 / sum);
-  const mat grad = y - p;
+  const mat delta = p - y;
   //mat grad = (a - y);
-  return grad;
+  return delta;
 }
 
 void load(mat &x, mat &y) {
@@ -121,34 +129,34 @@ int main() {
     //Layer(6, 6, lrate, sigmoid, sigmoidgrad),
     //Layer(6, 6, lrate, sigmoid, sigmoidgrad),
   };
-  OutputLayer output(6, 2, lrate, lambda, sigmoid, sigmoidgrad, cost, costd);
+  OutputLayer output(6, 2, lrate, lambda, identity, identitygrad, cost, costd);
   NeuralNet nnet(input, output, hidden);
 
   mat x, y, sample;
   load(x, y); loadsample(sample, w, h);
   nnet.feeddata(x, y, true);
-  //for (int i = 0 ; i < 120000 ; ++i) {
-    //nnet.feeddata(x, y, false);
-    ////nnet.feeddata(x, y, true);
-    //cout << "\riteration: " << i << " | cost: " << nnet.computecost();
-  //}
-  //cout << endl;
-  //mat result = nnet.predict(sample);
+  for (int i = 0 ; i < 120000 ; ++i) {
+    nnet.feeddata(x, y, false);
+    //nnet.feeddata(x, y, true);
+    cout << "\riteration: " << i << " | cost: " << nnet.computecost();
+  }
+  cout << endl;
+  mat result = nnet.predict(sample);
 
-  //cv::Mat canvas = cv::Mat::zeros(h, w, CV_8UC1);
-  //for (uint32_t i = 0 ; i < result.n_rows ; ++i) {
-    //canvas.at<uchar>(i/w, i%w) = result(i, 0) == 1 ? 128 : 0;
-  //}
-  //for (uint32_t i = 0 ; i < x.n_rows ; ++i) {
-    //if (y(i,0) == 0) {
-      //cv::circle(canvas, cv::Point(x(i,0)*w, x(i,1)*h), 3, cv::Scalar(255));
-    //} else {
-      //cv::circle(canvas, cv::Point(x(i,0)*w, x(i,1)*h), 3, cv::Scalar(100));
-    //}
-  //}
+  cv::Mat canvas = cv::Mat::zeros(h, w, CV_8UC1);
+  for (uint32_t i = 0 ; i < result.n_rows ; ++i) {
+    canvas.at<uchar>(i/w, i%w) = result(i, 0) == 1 ? 128 : 0;
+  }
+  for (uint32_t i = 0 ; i < x.n_rows ; ++i) {
+    if (y(i,0) == 0) {
+      cv::circle(canvas, cv::Point(x(i,0)*w, x(i,1)*h), 3, cv::Scalar(255));
+    } else {
+      cv::circle(canvas, cv::Point(x(i,0)*w, x(i,1)*h), 3, cv::Scalar(100));
+    }
+  }
 
-  //cv::imshow("demo", canvas);
-  //cv::waitKey(0);
+  cv::imshow("demo", canvas);
+  cv::waitKey(0);
 
   return 0;
 }
