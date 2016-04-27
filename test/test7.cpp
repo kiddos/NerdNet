@@ -23,7 +23,8 @@ using nn::mat;
 
 const int K = 10;
 const int datasize = 188;
-const double scale = 15000;
+const double scale = 5000;
+const double tou = 1000;
 
 double rectifier(double z) {
   return z >= 0 ? z : 0;
@@ -52,8 +53,12 @@ double identitygrad(double) {
 }
 
 mat cost(mat y, mat h) {
-  const mat diff = y - h;
-  const mat J = (diff % diff) / 2.0;
+  const mat diff = h - y;
+  const mat squared = (diff % diff) / tou;
+  mat J = tou * nn::funcop(squared, exp);
+
+  //const mat diff = y - h;
+  //const mat J = (diff % diff) / 2.0;
   //mat J = -(y % h.transform(log) + (1-y) % nn::funcop(1-h, log));
   //mat J = -(y % h.transform(log) + (1-y) % nn::funcop(1-h, log)) / y.n_rows;
   //mat J = -(y % h);
@@ -61,7 +66,11 @@ mat cost(mat y, mat h) {
 }
 
 mat costd(mat y, mat a, mat,mat) {
-  const mat grad = (a - y);
+  const mat diff = a - y;
+  const mat squared = (diff % diff) / tou;
+  const mat J = tou * nn::funcop(squared, exp);
+  const mat grad = (2.0/tou) * diff % J;
+  //const mat grad = (a - y);
   //mat grad = (a - y);
   //mat grad = (a - y) / y.n_rows;
   //mat grad = -(y % nn::funcop(z, sigmoidgrad));
@@ -113,8 +122,9 @@ double accuracy(mat answer, mat prediction) {
 }
 
 int main() {
-  const double lrate = 1e-5;
-  const double lambda = 9e-1;
+  double lrate = 1e-5;
+  const double lratedecay = 1e-9;
+  const double lambda = 999e-3;
 
   srand(time(NULL));
 
@@ -130,10 +140,15 @@ int main() {
   //cout << x << endl;
   //cout << y << endl;
 
-  nnet.feeddata(x, y, true);
-  for (int i = 0 ; i < 160000 ; ++i) {
+  //nnet.feeddata(x, y, true);
+  for (int i = 0 ; i < 260000 ; ++i) {
     //nnet.feeddata(x.row(i % (datasize-K-1)), y.row(i % (datasize-K-1)), false);
     nnet.feeddata(x, y, false);
+    if (i > 80000) {
+      nnet.setlrate(lrate);
+      if (lrate > 1e-7)
+        lrate -= lratedecay;
+    }
     cout << "\riteration: " << i+1 << " cost: " << nnet.computecost();
   }
   cout << endl;
