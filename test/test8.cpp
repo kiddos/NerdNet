@@ -6,10 +6,6 @@
 #include <time.h>
 #include <string>
 
-#include <opencv2/core.hpp>
-#include <opencv2/highgui.hpp>
-#include <opencv2/shape.hpp>
-
 #include "../src/nnet.h"
 
 using std::vector;
@@ -72,7 +68,7 @@ mat cost(mat y, mat h) {
   const mat sum = colsum(exponential);
   const mat p = exponential % (1 / sum);
   const mat J = - (y % nn::funcop(p, log));
-  //mat J = -(y % h.transform(log) + (1-y) % nn::funcop(1-h, log));
+  //mat J = -(y % nn::funcop(h, log) + (1-y) % nn::funcop(1-h, log));
   //mat J = -(y % h.transform(log) + (1-y) % nn::funcop(1-h, log)) / y.n_rows;
   //mat J = -(y % h);
   return J;
@@ -83,7 +79,7 @@ mat costd(mat y, mat a, mat,mat) {
   const mat sum = colsum(exponential);
   const mat p = exponential % (1.0 / sum);
   const mat delta = p - y;
-  //mat grad = (a - y);
+  //mat delta = (a - y);
   //mat grad = (a - y) / y.n_rows;
   //mat grad = -(y % nn::funcop(z, sigmoidgrad));
   return delta;
@@ -120,6 +116,25 @@ void load(mat &x, mat &y) {
       input >> val;
       y(i, val) = 1;
     }
+
+    cout << "shuffle data..." << endl;
+    for (uint32_t i = 0 ; i < x.n_rows ; ++i) {
+      int index1 = rand() % x.n_rows;
+      int index2 = rand() % x.n_rows;
+      mat xrow1 = x.row(index1);
+      mat xrow2 = x.row(index2);
+      mat yrow1 = y.row(index1);
+      mat yrow2 = y.row(index2);
+      for (uint32_t j = 0 ; j < x.n_cols ; ++j) {
+        x(index1, j) = xrow2(0, j);
+        x(index2, j) = xrow1(0, j);
+      }
+
+      for (uint32_t j = 0 ; j < y.n_cols ; ++j) {
+        y(index1, j) = yrow2(0, j);
+        y(index2, j) = yrow1(0, j);
+      }
+    }
   }
 }
 
@@ -135,39 +150,44 @@ double accuracy(mat answer, mat prediction) {
 }
 
 int main() {
-  double lrate = 1e-3;
-  const double lratedecay = 0.66;
-  const double lambda = 1e-1;
-  const int batchsize = 100;
+  double lrate = 8e-3;
+  //const double lratedecay = 0.66;
+  const double lambda = 1e-5;
 
   srand(time(NULL));
 
   InputLayer input(5);
   vector<Layer> hidden = {
-    Layer(5, 32, lrate, lambda, sigmoid, sigmoidgrad),
+    Layer(5, 32, lrate, lambda, atan, [](double x) {return 1.0 / (1.0+x*x);}),
+    //Layer(16, 16, lrate, lambda, sigmoid, sigmoidgrad),
   };
   OutputLayer output(32, 2, lrate, 0, identity, identitygrad, cost, costd);
   NeuralNet nnet(input, output, hidden);
 
   mat x, y;
   load(x, y);
-  //cout << x << endl;
-  //cout << y << endl;
+  cout << x.n_rows << endl;
+  cout << y.n_rows << endl;
 
-  //nnet.feeddata(x, y, true);
-  for (int i = 0 ; i < 160000 ; ++i) {
-    nnet.feeddata(x.rows(i%(datasize-batchsize), i%(datasize-batchsize)+batchsize),
-                  y.rows(i%(datasize-batchsize), i%(datasize-batchsize)+batchsize),
-                  false);
+  //const int batchsize = x.n_rows / 50;
+  //const int batchsize = x.n_rows / 50;
+  //nnet.feeddata(x.row(0), y.row(0), true);
+  for (uint32_t i = 0 ; i < x.n_rows * 160 ; ++i) {
+    //const int start = i % (x.n_rows-batchsize);
+    //const int end = start + batchsize;
+    //nnet.feeddata(x.rows(start, end), y.rows(start, end), false);
     //nnet.feeddata(x, y, false);
-    cout << "\riteration: " << i+1 << " cost: " << nnet.computecost();
+    nnet.feeddata(x.row(i % x.n_rows), y.row(i % x.n_rows), false);
+    cout << "\riteration: " << i+1 << " cost: " << nnet.computecost()
+          << "          ";
     if (i % datasize == 0) {
-      cout << endl << "iteration: " << i+1 << " cost: " << nnet.computecost();
+      cout << endl << "iteration: " << i+1 << " cost: " << nnet.computecost()
+          << "          ";
     }
-    if (i % 5000 == 0) {
-      lrate *= lratedecay;
-      nnet.setlrate(lrate);
-    }
+    //if (i % 5000 == 0) {
+      //lrate *= lratedecay;
+      //nnet.setlrate(lrate);
+    //}
   }
   cout << endl;
   mat result = nnet.predict(x);
