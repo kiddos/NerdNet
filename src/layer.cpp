@@ -51,6 +51,18 @@ Layer::Layer(const int pnnodes, const int nnodes, const double lrate,
 #endif
 }
 
+Layer::Layer(const int pnnodes, const int nnodes, const double lrate,
+             const double lambda, ActFunc actfunc) :
+             lrate(lrate), lambda(lambda), act(actfunc.act), actd(actfunc.actd) {
+  W = mat(pnnodes+1, nnodes);
+  grad = mat(pnnodes+1, nnodes);
+
+#ifndef LIBMAT
+  W.imbue([] () {return rand() % 10000 / 10000.0;});
+#else
+#endif
+}
+
 void Layer::operator= (const Layer &l) {
   lrate = l.getlrate();
   lambda = l.getlambda();
@@ -208,6 +220,27 @@ OutputLayer::OutputLayer(const int pnnodes, const int outputnodes,
   this->lrate = lrate;
   this->act = act;
   this->actd = actd;
+  this->cost = cost;
+  this->costd = costd;
+
+  W = mat(pnnodes+1, outputnodes);
+  grad = mat(pnnodes+1, outputnodes);
+
+#ifndef LIBMAT
+  W.randn();
+#else
+#endif
+}
+
+OutputLayer::OutputLayer(const int pnnodes, const int outputnodes,
+                         const double lrate, const double lambda,
+                         const ActFunc actfunc,
+                         mat (*cost)(mat,mat),
+                         mat (*costd)(mat,mat,mat,mat)) {
+  this->lambda = lambda;
+  this->lrate = lrate;
+  this->act = actfunc.act;
+  this->actd = actfunc.actd;
   this->cost = cost;
   this->costd = costd;
 
