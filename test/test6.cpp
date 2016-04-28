@@ -6,9 +6,8 @@
 #include <time.h>
 #include <string>
 
-#include <opencv2/core.hpp>
-#include <opencv2/highgui.hpp>
-#include <opencv2/shape.hpp>
+#include <mgl2/qt.h>
+#include <mgl2/mgl.h>
 
 #include "../src/nnet.h"
 
@@ -109,6 +108,19 @@ double accuracy(mat answer, mat prediction) {
   return correct / static_cast<double>(answer.n_rows);
 }
 
+mglData prediction;
+mglData answer;
+int sample(mglGraph* graph) {
+  graph->AddLegend("prediction", "r");
+  graph->AddLegend("answer", "b");
+  graph->SetRanges(0, prediction.nx + 10, 0, 7);
+  graph->Axis("y");
+  graph->Label('y', "C peptide");
+  graph->Plot(prediction, "-r5");
+  graph->Plot(answer, "-b5");
+  return 0;
+}
+
 int main() {
   const double lrate = 1e-3;
   const double lambda = 0;
@@ -127,16 +139,24 @@ int main() {
   //cout << x << endl;
   //cout << y << endl;
 
-  nnet.feeddata(x, y, true);
-  for (int i = 0 ; i < 160000 ; ++i) {
+  //nnet.feeddata(x, y, true);
+  for (int i = 0 ; i < 66000 ; ++i) {
     nnet.feeddata(x, y, false);
     cout << "\riteration: " << i+1 << " cost: " << nnet.computecost();
   }
   cout << endl;
   mat result = nnet.predict(x);
-  for (uint32_t i = 0 ; i < y.n_rows ; ++i) {
-    cout << "predict: " << result(i, 1) << " | answer: " << y(i, 0) << endl;
-  }
+  //for (uint32_t i = 0 ; i < y.n_rows ; ++i) {
+    //cout << "predict: " << result(i, 1) << " | answer: " << y(i, 0) << endl;
+  //}
 
-  return 0;
+  prediction = mglData(result.n_rows);
+  answer = mglData(y.n_rows);
+  for (uint32_t i = 0 ; i < y.n_rows ; ++i) {
+    prediction.a[i] = result(i, 1);
+    answer.a[i] = y(i, 0);
+  }
+  mglQT display(sample, "diabetes");
+
+  return display.Run();
 }
