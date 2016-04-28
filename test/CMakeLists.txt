@@ -18,6 +18,7 @@ add_executable(poker test13.cpp)
 add_executable(stock test14.cpp)
 add_executable(house test15.cpp)
 add_executable(exchangerate test16.cpp)
+add_executable(nursery test17.cpp)
 
 set(LIBS nnet armadillo opencv_core opencv_highgui opencv_imgproc)
 
@@ -37,6 +38,7 @@ target_link_libraries(poker ${LIBS})
 target_link_libraries(stock ${LIBS})
 target_link_libraries(house ${LIBS})
 target_link_libraries(exchangerate ${LIBS})
+target_link_libraries(nursery ${LIBS})
 
 add_test(XORProblem ./XORProblem)
 add_test(MNIST ./MNIST)
@@ -54,4 +56,5 @@ add_test(poker ./poker)
 add_test(stock ./stock)
 add_test(house ./house)
 add_test(exchangerate ./exchangerate)
+add_test(nursery ./nursery)
 
