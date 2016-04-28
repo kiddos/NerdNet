@@ -104,15 +104,15 @@ double accuracy(mat answer, mat prediction) {
 }
 
 int main() {
-  const double lrate = 1e-3;
-  const double lambda = 1e-5;
+  double lrate = 1e-3;
+  const double lratedecay = 0.90;
+  const double lambda = 1e-8;
 
   srand(time(NULL));
 
   InputLayer input(4);
   vector<Layer> hidden = {
     Layer(4, 3, lrate, lambda, sigmoid, sigmoidgrad),
-    Layer(3, 3, lrate, lambda, sigmoid, sigmoidgrad),
     Layer(3, 3, lrate, lambda, sigmoid, sigmoidgrad),
     Layer(3, 6, lrate, lambda, sigmoid, sigmoidgrad),
   };
@@ -125,9 +125,24 @@ int main() {
   //cout << y << endl;
 
   nnet.feeddata(x, y, true);
-  for (int i = 0 ; i < 160000 ; ++i) {
+  for (uint32_t i = 0 ; i < x.n_rows * 2000 ; ++i) {
     nnet.feeddata(x, y, false);
-    cout << "\riteration: " << i+1 << " cost: " << nnet.computecost();
+    //nnet.feeddata(x.row(i%x.n_rows), y.row(i%x.n_rows), false);
+    const double newcost = nnet.computecost();
+    cout << "\riteration: " << i+1 << " cost: " << newcost;
+
+    if (i % (x.n_rows * 10) == 0) {
+      cout << endl << "iteration: " << i+1 << " cost: " << newcost;
+    }
+
+    if (newcost < 150 && i % (x.n_rows * 10) == 0) {
+      if (newcost < 50) {
+        lrate *= 0.96;
+      } else {
+        lrate *= lratedecay;
+      }
+      nnet.setlrate(lrate);
+    }
   }
   cout << endl;
   mat result = nnet.predict(x);
