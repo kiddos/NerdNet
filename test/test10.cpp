@@ -139,19 +139,19 @@ double accuracy(mat answer, mat prediction) {
 
 int main() {
   double lrate = 1e-4;
-  //const double lratedecay = 0.66;
+  const double lratedecay = 0.96;
   const double lambda = 9e-1;
-  const int batchsize = 60;
+  const int batchsize = 1;
 
   srand(time(NULL));
 
   InputLayer input(n);
   vector<Layer> hidden = {
-    Layer(n, 4, lrate, lambda, atan, [] (double x) {return 1.0/(1.0+x*x);}),
-    Layer(4, 4, lrate, lambda, atan, [] (double x) {return 1.0/(1.0+x*x);}),
-    Layer(4, 4, lrate, lambda, atan, [] (double x) {return 1.0/(1.0+x*x);}),
+    Layer(n, 16, lrate, lambda, atan, [] (double x) {return 1.0/(1.0+x*x);}),
+    Layer(16, 2, lrate, lambda, atan, [] (double x) {return 1.0/(1.0+x*x);}),
+    Layer(2, 2, lrate, lambda * 2, identity, identitygrad),
   };
-  OutputLayer output(4, 1, lrate, lambda, identity, identitygrad, cost, costd);
+  OutputLayer output(2, 1, lrate, lambda, identity, identitygrad, cost, costd);
   NeuralNet nnet(input, output, hidden);
 
   mat x, y;
@@ -160,7 +160,7 @@ int main() {
   //cout << y << endl;
 
   //nnet.feeddata(x.row(3), y.row(3), true);
-  for (int i = 0 ; i < 160000 ; ++i) {
+  for (int i = 0 ; i < 300000 ; ++i) {
     const int start = i % (datasize-batchsize);
     const int end = start + batchsize;
     nnet.feeddata(x.rows(start, end), y.rows(start, end), false);
@@ -172,10 +172,10 @@ int main() {
       //cout << endl << nnet.getresult() << endl;
       //cout << y.row(i% datasize) << endl;
     //}
-    //if (i % 5000 == 0) {
-      //lrate *= lratedecay;
-      //nnet.setlrate(lrate);
-    //}
+    if (i % 500 == 0) {
+      lrate *= lratedecay;
+      nnet.setlrate(lrate);
+    }
   }
   cout << endl;
   mat result = nnet.predict(x);
