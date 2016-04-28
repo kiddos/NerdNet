@@ -21,11 +21,12 @@ using nn::OutputLayer;
 using nn::NeuralNet;
 using nn::mat;
 
-const int K = 10;
+const int K = 3;
 const int datasize = 304;
 const int n = K;
 const int o = 1;
-const double scale = 1;
+const double scale = 100;
+//const double tou = 1e3;
 
 double rectifier(double z) {
   return z >= 0 ? z : 0;
@@ -56,7 +57,7 @@ double identitygrad(double) {
 mat cost(mat y, mat h) {
   //const mat diff = h - y;
   //const mat squared = (diff % diff) / tou;
-  //mat J = tou * nn::funcop(squared, exp);
+  //const mat J = tou * nn::funcop(squared, exp);
 
   const mat diff = y - h;
   const mat J = (diff % diff) / 2.0;
@@ -71,10 +72,10 @@ mat costd(mat y, mat a, mat,mat) {
   //const mat squared = (diff % diff) / tou;
   //const mat J = tou * nn::funcop(squared, exp);
   //const mat grad = (2.0/tou) * diff % J;
-  const mat grad = (a - y);
-  //mat grad = (a - y);
+  //const mat grad = (a - y);
+  mat grad = (a - y);
   //mat grad = (a - y) / y.n_rows;
-  //mat grad = -(y % nn::funcop(z, sigmoidgrad));
+  //mat grad = -y;
   return grad;
 }
 
@@ -109,24 +110,24 @@ void load(mat &x, mat &y, const int k) {
     }
 
     // random the input data
-    cout << "shuffle data..." << endl;
-    for (uint32_t i = 0 ; i < x.n_rows ; ++i) {
-      int index1 = rand() % x.n_rows;
-      int index2 = rand() % x.n_rows;
-      mat xrow1 = x.row(index1);
-      mat xrow2 = x.row(index2);
-      mat yrow1 = y.row(index1);
-      mat yrow2 = y.row(index2);
-      for (uint32_t j = 0 ; j < x.n_cols ; ++j) {
-        x(index1, j) = xrow2(0, j);
-        x(index2, j) = xrow1(0, j);
-      }
+    //cout << "shuffle data..." << endl;
+    //for (uint32_t i = 0 ; i < x.n_rows ; ++i) {
+      //int index1 = rand() % x.n_rows;
+      //int index2 = rand() % x.n_rows;
+      //mat xrow1 = x.row(index1);
+      //mat xrow2 = x.row(index2);
+      //mat yrow1 = y.row(index1);
+      //mat yrow2 = y.row(index2);
+      //for (uint32_t j = 0 ; j < x.n_cols ; ++j) {
+        //x(index1, j) = xrow2(0, j);
+        //x(index2, j) = xrow1(0, j);
+      //}
 
-      for (uint32_t j = 0 ; j < y.n_cols ; ++j) {
-        y(index1, j) = yrow2(0, j);
-        y(index2, j) = yrow1(0, j);
-      }
-    }
+      //for (uint32_t j = 0 ; j < y.n_cols ; ++j) {
+        //y(index1, j) = yrow2(0, j);
+        //y(index2, j) = yrow1(0, j);
+      //}
+    //}
   }
 }
 
@@ -142,7 +143,7 @@ double accuracy(mat answer, mat prediction) {
 }
 
 int main() {
-  double lrate = 1e-5;
+  double lrate = 1e-4;
   const double lratedecay = 0.96;
   const double lambda = 9e-1;
 
@@ -150,95 +151,33 @@ int main() {
 
   InputLayer input(n);
   vector<Layer> hidden = {
-    Layer(n, K, lrate, lambda, atan, [] (double x) {return 1.0/(1.0+x*x);}),
-    Layer(K, K, lrate, lambda, rectifier, rectifiergrad),
-    Layer(K, K, lrate, lambda, sigmoid, sigmoidgrad),
-    Layer(K, K, lrate, lambda, atan, [] (double x) {return 1.0/(1.0+x*x);}),
-    Layer(K, K, lrate, lambda, rectifier, rectifiergrad),
-    Layer(K, K, lrate, lambda, sigmoid, sigmoidgrad),
-    Layer(K, K, lrate, lambda, atan, [] (double x) {return 1.0/(1.0+x*x);}),
-    Layer(K, K, lrate, lambda, rectifier, rectifiergrad),
-    Layer(K, K, lrate, lambda, sigmoid, sigmoidgrad),
-    Layer(K, K, lrate, lambda, atan, [] (double x) {return 1.0/(1.0+x*x);}),
-    Layer(K, K, lrate, lambda, rectifier, rectifiergrad),
-    Layer(K, K, lrate, lambda, sigmoid, sigmoidgrad),
-    Layer(K, K, lrate, lambda, atan, [] (double x) {return 1.0/(1.0+x*x);}),
-    Layer(K, K, lrate, lambda, rectifier, rectifiergrad),
-    Layer(K, K, lrate, lambda, sigmoid, sigmoidgrad),
-    Layer(K, K, lrate, lambda, atan, [] (double x) {return 1.0/(1.0+x*x);}),
-    Layer(K, K, lrate, lambda, rectifier, rectifiergrad),
-    Layer(K, K, lrate, lambda, sigmoid, sigmoidgrad),
-    Layer(K, K, lrate, lambda, atan, [] (double x) {return 1.0/(1.0+x*x);}),
-    Layer(K, K, lrate, lambda, rectifier, rectifiergrad),
-    Layer(K, K, lrate, lambda, sigmoid, sigmoidgrad),
-    Layer(K, K, lrate, lambda, atan, [] (double x) {return 1.0/(1.0+x*x);}),
-    Layer(K, K, lrate, lambda, rectifier, rectifiergrad),
-    Layer(K, K, lrate, lambda, sigmoid, sigmoidgrad),
-    Layer(K, K, lrate, lambda, atan, [] (double x) {return 1.0/(1.0+x*x);}),
-    Layer(K, K, lrate, lambda, rectifier, rectifiergrad),
-    Layer(K, K, lrate, lambda, sigmoid, sigmoidgrad),
-    Layer(K, K, lrate, lambda, atan, [] (double x) {return 1.0/(1.0+x*x);}),
-    Layer(K, K, lrate, lambda, rectifier, rectifiergrad),
-    Layer(K, K, lrate, lambda, sigmoid, sigmoidgrad),
-    Layer(K, K, lrate, lambda, atan, [] (double x) {return 1.0/(1.0+x*x);}),
-    Layer(K, K, lrate, lambda, rectifier, rectifiergrad),
-    Layer(K, K, lrate, lambda, sigmoid, sigmoidgrad),
-    Layer(K, K, lrate, lambda, atan, [] (double x) {return 1.0/(1.0+x*x);}),
-    Layer(K, K, lrate, lambda, rectifier, rectifiergrad),
-    Layer(K, K, lrate, lambda, sigmoid, sigmoidgrad),
-    Layer(K, K, lrate, lambda, atan, [] (double x) {return 1.0/(1.0+x*x);}),
-    Layer(K, K, lrate, lambda, rectifier, rectifiergrad),
-    Layer(K, K, lrate, lambda, sigmoid, sigmoidgrad),
-    Layer(K, K, lrate, lambda, atan, [] (double x) {return 1.0/(1.0+x*x);}),
-    Layer(K, K, lrate, lambda, rectifier, rectifiergrad),
-    Layer(K, K, lrate, lambda, sigmoid, sigmoidgrad),
-    Layer(K, K, lrate, lambda, atan, [] (double x) {return 1.0/(1.0+x*x);}),
-    Layer(K, K, lrate, lambda, rectifier, rectifiergrad),
-    Layer(K, K, lrate, lambda, sigmoid, sigmoidgrad),
-    Layer(K, K, lrate, lambda, atan, [] (double x) {return 1.0/(1.0+x*x);}),
-    Layer(K, K, lrate, lambda, rectifier, rectifiergrad),
-    Layer(K, K, lrate, lambda, sigmoid, sigmoidgrad),
-    Layer(K, K, lrate, lambda, atan, [] (double x) {return 1.0/(1.0+x*x);}),
-    Layer(K, K, lrate, lambda, rectifier, rectifiergrad),
-    Layer(K, K, lrate, lambda, sigmoid, sigmoidgrad),
-    Layer(K, K, lrate, lambda, atan, [] (double x) {return 1.0/(1.0+x*x);}),
-    Layer(K, K, lrate, lambda, rectifier, rectifiergrad),
-    Layer(K, K, lrate, lambda, sigmoid, sigmoidgrad),
-    Layer(K, K, lrate, lambda, atan, [] (double x) {return 1.0/(1.0+x*x);}),
-    Layer(K, K, lrate, lambda, rectifier, rectifiergrad),
-    Layer(K, K, lrate, lambda, sigmoid, sigmoidgrad),
-    Layer(K, K, lrate, lambda, atan, [] (double x) {return 1.0/(1.0+x*x);}),
-    Layer(K, K, lrate, lambda, rectifier, rectifiergrad),
-    Layer(K, K, lrate, lambda, sigmoid, sigmoidgrad),
-    Layer(K, K, lrate, lambda, atan, [] (double x) {return 1.0/(1.0+x*x);}),
-    Layer(K, K, lrate, lambda, rectifier, rectifiergrad),
-    Layer(K, K, lrate, lambda, sigmoid, sigmoidgrad),
+    Layer(n, 32, lrate, lambda, atan, [] (double x) {return 1.0/(1.0+x*x);}),
   };
-  OutputLayer output(K, o, lrate, lambda, identity, identitygrad, cost, costd);
+  OutputLayer output(32, o, lrate, lambda, identity, identitygrad, cost, costd);
   NeuralNet nnet(input, output, hidden);
 
   mat x, y;
   load(x, y, K);
   cout << x.n_rows << endl;
   cout << y.n_rows << endl;
-  const int batchsize = x.n_rows / 10;
+  //const int batchsize = x.n_rows / 30;
 
   //nnet.feeddata(x.row(1), y.row(1), true);
   for (uint32_t i = 0 ; i < x.n_rows * 1000 ; ++i) {
-    const int start = i % (x.n_rows-batchsize);
-    const int end = start + batchsize;
-    nnet.feeddata(x.rows(start, end), y.rows(start, end), false);
-    //nnet.feeddata(x.row(i%datasize), y.row(i%datasize), false);
+    //const int start = i % (x.n_rows-batchsize);
+    //const int end = start + batchsize;
+    //nnet.feeddata(x.rows(start, end), y.rows(start, end), false);
+    nnet.feeddata(x.row(i%x.n_rows), y.row(i%x.n_rows), false);
     //nnet.feeddata(x, y, false);
     cout << "\riteration: " << i+1 << " cost: " << nnet.computecost()
           << "       ";
-    if (i % x.n_rows*10 == 0) {
+    if (i % (x.n_rows*10) == 0) {
       cout << endl << "iteration: " << i+1 << " cost: " << nnet.computecost()
           << "     ";
       //cout << endl << nnet.getresult() << endl;
       //cout << y.row(i% datasize) << endl;
     }
-    if (i % x.n_rows == 0) {
+    if (i % (x.n_rows*10) == 0) {
       lrate *= lratedecay;
       nnet.setlrate(lrate);
     }
