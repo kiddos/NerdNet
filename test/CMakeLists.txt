@@ -20,7 +20,7 @@ add_executable(house test15.cpp)
 add_executable(exchangerate test16.cpp)
 add_executable(nursery test17.cpp)
 
-set(LIBS nnet armadillo opencv_core opencv_highgui opencv_imgproc)
+set(LIBS nnet armadillo opencv_core opencv_highgui opencv_imgproc mgl mgl-qt)
 
 target_link_libraries(XORProblem ${LIBS})
 target_link_libraries(MNIST ${LIBS})
