@@ -10,10 +10,12 @@ struct ActFunc {
   double (*actd) (double z);
 };
 
+ActFunc initactfunc(double (*act)(double), double (*actd)(double));
+
 extern ActFunc identity;
 extern ActFunc sigmoid;
 extern ActFunc arctan;
-extern ActFunc tanh;
+extern ActFunc tanhyperbolic;
 extern ActFunc bipolarsigmoid;
 extern ActFunc lecuntanh;
 extern ActFunc hardtanh;
@@ -22,7 +24,7 @@ extern ActFunc relucos;
 extern ActFunc relusin;
 extern ActFunc smoothrectifier;
 extern ActFunc logit;
-extern ActFunc cos;
+extern ActFunc cosine;
 
 } /* end of nn namespace */
 
