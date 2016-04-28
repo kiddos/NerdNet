@@ -17,7 +17,7 @@ class Layer {
   Layer(const int pnnodes, const int nnodes, const double lrate,
         const double lambda, double (*act)(double), double (*actd)(double));
   Layer(const int pnnodes, const int nnodes, const double lrate,
-        const double lambda, ActFunc act);
+        const double lambda, ActFunc actfunc);
   virtual void operator=(const Layer &l);
   virtual mat forwardprop(const mat pa);
   virtual mat backprop(const mat delta);
@@ -64,6 +64,12 @@ class OutputLayer : public Layer {
               const double lambda,
               double (*act)(double),
               double (*actd)(double),
+              mat (*cost)(mat,mat),
+              mat (*costd)(mat,mat,mat,mat));
+  OutputLayer(const int nnodes, const int outputnodes,
+              const double lrate,
+              const double lambda,
+              const ActFunc actfunc,
               mat (*cost)(mat,mat),
               mat (*costd)(mat,mat,mat,mat));
   virtual void operator=(const OutputLayer &output);
