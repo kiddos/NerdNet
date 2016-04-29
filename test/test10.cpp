@@ -6,9 +6,8 @@
 #include <time.h>
 #include <string>
 
-#include <opencv2/core.hpp>
-#include <opencv2/highgui.hpp>
-#include <opencv2/shape.hpp>
+#include <mgl2/qt.h>
+#include <mgl2/mgl.h>
 
 #include "../src/nnet.h"
 
@@ -137,51 +136,71 @@ double accuracy(mat answer, mat prediction) {
   return correct / static_cast<double>(answer.n_rows);
 }
 
+mglData prediction;
+mglData answer;
+int sample(mglGraph* graph) {
+  graph->AddLegend("prediction", "r");
+  graph->AddLegend("answer", "b");
+  graph->SetRanges(0, prediction.nx + 10, 0, 29);
+  graph->Axis("y");
+  graph->Label('y', "Rings");
+  graph->Plot(prediction, "-r5");
+  graph->Plot(answer, "-b5");
+  return 0;
+}
+
 int main() {
-  double lrate = 1e-4;
-  const double lratedecay = 0.96;
-  const double lambda = 9e-1;
-  const int batchsize = 1;
+  double lrate = 1e-2;
+  //const double lratedecay = 0.96;
+  const double lambda = 1e-6;
+  //const int batchsize = 1;
 
   srand(time(NULL));
 
   InputLayer input(n);
   vector<Layer> hidden = {
-    Layer(n, 16, lrate, lambda, atan, [] (double x) {return 1.0/(1.0+x*x);}),
-    Layer(16, 2, lrate, lambda, atan, [] (double x) {return 1.0/(1.0+x*x);}),
-    Layer(2, 2, lrate, lambda * 2, identity, identitygrad),
+    Layer(n, 64, lrate, lambda, atan, [] (double x) {return 1.0/(1.0+x*x);}),
+    Layer(64, 2, lrate, lambda, atan, [] (double x) {return 1.0/(1.0+x*x);}),
   };
   OutputLayer output(2, 1, lrate, lambda, identity, identitygrad, cost, costd);
   NeuralNet nnet(input, output, hidden);
 
   mat x, y;
   load(x, y);
-  //cout << x << endl;
-  //cout << y << endl;
+  cout << x.n_rows << endl;
+  cout << y.n_rows << endl;
 
   //nnet.feeddata(x.row(3), y.row(3), true);
-  for (int i = 0 ; i < 300000 ; ++i) {
-    const int start = i % (datasize-batchsize);
-    const int end = start + batchsize;
-    nnet.feeddata(x.rows(start, end), y.rows(start, end), false);
-    //nnet.feeddata(x.row(i%datasize), y.row(i%datasize), false);
+  for (uint32_t i = 0 ; i < x.n_rows * 100 ; ++i) {
+    //const int start = i % (datasize-batchsize);
+    //const int end = start + batchsize;
+    //nnet.feeddata(x.rows(start, end), y.rows(start, end), false);
+    nnet.feeddata(x.row(i%x.n_rows), y.row(i%y.n_rows), false);
     //nnet.feeddata(x, y, false);
     cout << "\riteration: " << i+1 << " cost: " << nnet.computecost();
-    //if (i % datasize == 0) {
-      //cout << endl << "iteration: " << i+1 << " cost: " << nnet.computecost();
+    if (i % datasize == 0) {
+      cout << endl << "iteration: " << i+1 << " cost: " << nnet.computecost();
       //cout << endl << nnet.getresult() << endl;
       //cout << y.row(i% datasize) << endl;
-    //}
-    if (i % 500 == 0) {
-      lrate *= lratedecay;
-      nnet.setlrate(lrate);
     }
+    //if (i % 500 == 0) {
+      //lrate *= lratedecay;
+      //nnet.setlrate(lrate);
+    //}
   }
   cout << endl;
   mat result = nnet.predict(x);
-  for (uint32_t i = 0 ; i < y.n_rows ; ++i) {
-    cout << "predict: " << result(i, 1) << " | answer: " << y(i, 0) << endl;
-  }
+  //for (uint32_t i = 0 ; i < y.n_rows ; ++i) {
+    //cout << "predict: " << result(i, 1) << " | answer: " << y(i, 0) << endl;
+  //}
 
-  return 0;
+  prediction = mglData(result.n_rows/100);
+  answer = mglData(y.n_rows/100);
+  for (uint32_t i = 0 ; i < y.n_rows/100 ; ++i) {
+    prediction.a[i] = result(i*100, 1);
+    answer.a[i] = y(i*100, 0);
+  }
+  mglQT display(sample, "diabetes");
+
+  return display.Run();
 }
