@@ -6,9 +6,8 @@
 #include <time.h>
 #include <string>
 
-#include <opencv2/core.hpp>
-#include <opencv2/highgui.hpp>
-#include <opencv2/shape.hpp>
+#include <mgl2/mgl.h>
+#include <mgl2/qt.h>
 
 #include "../src/nnet.h"
 
@@ -158,6 +157,19 @@ double accuracy(mat answer, mat prediction) {
   return correct / static_cast<double>(answer.n_rows);
 }
 
+mglData prediction;
+mglData answer;
+int sample(mglGraph* graph) {
+  graph->AddLegend("prediction", "r");
+  graph->AddLegend("answer", "b");
+  graph->SetRanges(0, prediction.nx + 10, 0, 62);
+  graph->Axis("y");
+  graph->Label('y', "Company 10 stock");
+  graph->Plot(prediction, "-r5");
+  graph->Plot(answer, "-b5");
+  return 0;
+}
+
 int main() {
   double lrate = 2e-4;
   const double lratedecay = 0.99;
@@ -181,7 +193,7 @@ int main() {
   cout << y.n_rows << endl;
 
   nnet.feeddata(x.row(1), y.row(1), true);
-  for (int i = 0 ; i < datasize * 360 ; ++i) {
+  for (int i = 0 ; i < datasize * 300 ; ++i) {
     const int start = i % (datasize-batchsize);
     const int end = start + batchsize;
     nnet.feeddata(x.rows(start, end), y.rows(start, end), false);
@@ -200,10 +212,19 @@ int main() {
   }
   cout << endl;
   mat result = nnet.predict(x);
-  for (uint32_t i = 0 ; i < y.n_rows ; ++i) {
-    cout << "predict: " << result(i, 1) <<
-        " | answer: " << y(i, 0) << endl;
-  }
+  //for (uint32_t i = 0 ; i < y.n_rows ; ++i) {
+    //cout << "predict: " << result(i, 1) <<
+        //" | answer: " << y(i, 0) << endl;
+  //}
 
-  return 0;
+  const int sampling = 3;
+  prediction = mglData(result.n_rows/sampling);
+  answer = mglData(y.n_rows/sampling);
+  for (uint32_t i = 0 ; i < y.n_rows/sampling ; ++i) {
+    prediction.a[i] = result(i/sampling, 1);
+    answer.a[i] = y(i/sampling, 0);
+  }
+  mglQT display(sample, "diabetes");
+
+  return display.Run();
 }
