@@ -20,7 +20,7 @@ using nn::OutputLayer;
 using nn::NeuralNet;
 using nn::mat;
 
-const int K = 10;
+const int K = 2;
 const int datasize = 188;
 const double scale = 5000;
 //const double tou = 1000;
@@ -143,9 +143,9 @@ int main() {
 
   InputLayer input(K);
   vector<Layer> hidden = {
-    Layer(K, K * 10, lrate, lambda, atan, [](double x) {return 1.0 / (1.0+x*x);}),
+    Layer(K, 100, lrate, lambda, atan, [](double x) {return 1.0 / (1.0+x*x);}),
   };
-  OutputLayer output(K * 10, 1, lrate, lambda, identity, identitygrad, cost, costd);
+  OutputLayer output(100, 1, lrate, lambda, identity, identitygrad, cost, costd);
   NeuralNet nnet(input, output, hidden);
 
   mat x, y;
@@ -194,6 +194,4 @@ int main() {
   mglQT display(sample, "monthly total number of pigs slaughter");
 
   return display.Run();
-
-  return 0;
 }
