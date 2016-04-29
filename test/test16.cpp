@@ -6,9 +6,8 @@
 #include <time.h>
 #include <string>
 
-#include <opencv2/core.hpp>
-#include <opencv2/highgui.hpp>
-#include <opencv2/shape.hpp>
+#include <mgl2/qt.h>
+#include <mgl2/mgl.h>
 
 #include "../src/nnet.h"
 
@@ -142,6 +141,21 @@ double accuracy(mat answer, mat prediction) {
   return correct / static_cast<double>(answer.n_rows);
 }
 
+mglData prediction;
+mglData answer;
+int sample(mglGraph* graph) {
+  graph->AddLegend("prediction", "r");
+  graph->AddLegend("answer", "b");
+  graph->SetRanges(1970, 1995, 0, 120);
+  graph->Axis("y");
+  graph->Axis("x");
+  graph->Label('y', "exchange rate");
+  graph->Label('x', "time");
+  graph->Plot(answer, "-b5");
+  graph->Plot(prediction, "-r5");
+  return 0;
+}
+
 int main() {
   double lrate = 1e-4;
   const double lratedecay = 0.96;
@@ -184,10 +198,18 @@ int main() {
   }
   cout << endl;
   mat result = nnet.predict(x);
-  for (uint32_t i = 0 ; i < y.n_rows ; ++i) {
-    cout << "predict: " << result(i, 1) * scale <<
-        " | answer: " << y(i, 0) * scale << endl;
-  }
+  //for (uint32_t i = 0 ; i < y.n_rows ; ++i) {
+    //cout << "predict: " << result(i, 1) * scale <<
+        //" | answer: " << y(i, 0) * scale << endl;
+  //}
 
-  return 0;
+  prediction = mglData(result.n_rows);
+  answer = mglData(y.n_rows);
+  for (uint32_t i = 0 ; i < y.n_rows ; ++i) {
+    prediction.a[i] = result(i, 1) * scale;
+    answer.a[i] = y(i, 0) * scale;
+  }
+  mglQT display(sample, "monthly total number of pigs slaughter");
+
+  return display.Run();
 }
