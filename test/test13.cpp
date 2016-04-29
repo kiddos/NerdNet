@@ -159,10 +159,10 @@ double accuracy(mat answer, mat prediction) {
 }
 
 int main() {
-  double lrate = 1e-2;
-  const double lratedecay = 0.99;
-  const double lambda = 1e-1;
-  const int batchsize = 10;
+  double lrate = 3e-1;
+  //const double lratedecay = 0.99;
+  const double lambda = 1e-8;
+  //const int batchsize = 10;
 
   srand(time(NULL));
 
@@ -170,9 +170,9 @@ int main() {
   vector<Layer> hidden = {
     //Layer(n, 32, lrate, lambda, atan, [] (double x) {return 1.0/(1.0+x*x);}),
     //Layer(32, 8, lrate, lambda, atan, [] (double x) {return 1.0/(1.0+x*x);}),
-    Layer(n, 4, lrate, lambda, sigmoid, sigmoidgrad),
+    Layer(n, 16, lrate, lambda, sigmoid, sigmoidgrad),
   };
-  OutputLayer output(4, o, lrate, lambda, identity, identitygrad, cost, costd);
+  OutputLayer output(16, o, lrate, lambda, identity, identitygrad, cost, costd);
   NeuralNet nnet(input, output, hidden);
 
   mat x, y;
@@ -180,22 +180,18 @@ int main() {
   cout << x.n_rows << endl;
   cout << y.n_rows << endl;
 
-  nnet.feeddata(x.row(1), y.row(1), true);
-  for (int i = 0 ; i < datasize * 30 ; ++i) {
-    const int start = i % (datasize-batchsize);
-    const int end = start + batchsize;
-    nnet.feeddata(x.rows(start, end), y.rows(start, end), false);
-    //nnet.feeddata(x.row(i%datasize), y.row(i%datasize), false);
+  //nnet.feeddata(x.row(1), y.row(1), true);
+  for (int i = 0 ; i < datasize * 3 ; ++i) {
+    //const int start = i % (datasize-batchsize);
+    //const int end = start + batchsize;
+    //nnet.feeddata(x.rows(start, end), y.rows(start, end), false);
+    nnet.feeddata(x.row(i%datasize), y.row(i%datasize), false);
     //nnet.feeddata(x, y, false);
     cout << "\riteration: " << i+1 << " cost: " << nnet.computecost();
     if (i % datasize == 0) {
       cout << endl << "iteration: " << i+1 << " cost: " << nnet.computecost();
       //cout << endl << nnet.getresult() << endl;
       //cout << y.row(i% datasize) << endl;
-    }
-    if (i % 500 == 0) {
-      lrate *= lratedecay;
-      nnet.setlrate(lrate);
     }
   }
   cout << endl;
