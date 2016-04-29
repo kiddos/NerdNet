@@ -64,22 +64,22 @@ mat colsum(const mat m) {
 }
 
 mat cost(mat y, mat h) {
-  const mat exponential = nn::funcop(h, exp);
-  const mat sum = colsum(exponential);
-  const mat p = exponential % (1 / sum);
-  const mat J = - (y % nn::funcop(p, log));
-  //mat J = -(y % nn::funcop(h, log) + (1-y) % nn::funcop(1-h, log));
+  //const mat exponential = nn::funcop(h, exp);
+  //const mat sum = colsum(exponential);
+  //const mat p = exponential % (1 / sum);
+  //const mat J = - (y % nn::funcop(p, log));
+  mat J = -(y % nn::funcop(h, log) + (1-y) % nn::funcop(1-h, log));
   //mat J = -(y % h.transform(log) + (1-y) % nn::funcop(1-h, log)) / y.n_rows;
   //mat J = -(y % h);
   return J;
 }
 
 mat costd(mat y, mat a, mat,mat) {
-  const mat exponential = nn::funcop(a, exp);
-  const mat sum = colsum(exponential);
-  const mat p = exponential % (1.0 / sum);
-  const mat delta = p - y;
-  //mat delta = (a - y);
+  //const mat exponential = nn::funcop(a, exp);
+  //const mat sum = colsum(exponential);
+  //const mat p = exponential % (1.0 / sum);
+  //const mat delta = p - y;
+  mat delta = (a - y);
   //mat grad = (a - y) / y.n_rows;
   //mat grad = -(y % nn::funcop(z, sigmoidgrad));
   return delta;
@@ -150,18 +150,19 @@ double accuracy(mat answer, mat prediction) {
 }
 
 int main() {
-  double lrate = 8e-3;
+  double lrate = 3e-1;
   //const double lratedecay = 0.66;
-  const double lambda = 1e-5;
+  const double lambda = 1e-9;
 
   srand(time(NULL));
 
   InputLayer input(5);
   vector<Layer> hidden = {
-    Layer(5, 32, lrate, lambda, atan, [](double x) {return 1.0 / (1.0+x*x);}),
-    //Layer(16, 16, lrate, lambda, sigmoid, sigmoidgrad),
+    //Layer(5, 9, lrate, lambda, atan, [](double x) {return 1.0 / (1.0+x*x);}),
+    Layer(5, 32, lrate, lambda, sigmoid, sigmoidgrad),
+    Layer(32, 8, lrate, lambda, sigmoid, sigmoidgrad),
   };
-  OutputLayer output(32, 2, lrate, 0, identity, identitygrad, cost, costd);
+  OutputLayer output(8, 2, lrate, 0, sigmoid, sigmoid, cost, costd);
   NeuralNet nnet(input, output, hidden);
 
   mat x, y;
@@ -170,9 +171,9 @@ int main() {
   cout << y.n_rows << endl;
 
   //const int batchsize = x.n_rows / 50;
-  //const int batchsize = x.n_rows / 50;
+  //const int batchsize = 10;
   //nnet.feeddata(x.row(0), y.row(0), true);
-  for (uint32_t i = 0 ; i < x.n_rows * 160 ; ++i) {
+  for (uint32_t i = 0 ; i < x.n_rows * 60 ; ++i) {
     //const int start = i % (x.n_rows-batchsize);
     //const int end = start + batchsize;
     //nnet.feeddata(x.rows(start, end), y.rows(start, end), false);
@@ -180,7 +181,7 @@ int main() {
     nnet.feeddata(x.row(i % x.n_rows), y.row(i % x.n_rows), false);
     cout << "\riteration: " << i+1 << " cost: " << nnet.computecost()
           << "          ";
-    if (i % datasize == 0) {
+    if (i % (x.n_rows * 10) == 0) {
       cout << endl << "iteration: " << i+1 << " cost: " << nnet.computecost()
           << "          ";
     }
