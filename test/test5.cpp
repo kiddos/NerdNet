@@ -40,7 +40,7 @@ double sigmoidgrad(double z) {
 }
 
 mat cost(mat y, mat h) {
-  mat J = -(y % h.transform(log) + (1-y) % nn::funcop(1-h, log));
+  mat J = -(y % nn::funcop(h, log) + (1-y) % nn::funcop(1-h, log));
   //mat J = -(y % h.transform(log) + (1-y) % nn::funcop(1-h, log)) / y.n_rows;
   //mat J = -(y % h);
   return J;
