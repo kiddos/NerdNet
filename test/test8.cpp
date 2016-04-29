@@ -173,7 +173,7 @@ int main() {
   //const int batchsize = x.n_rows / 50;
   //const int batchsize = 10;
   //nnet.feeddata(x.row(0), y.row(0), true);
-  for (uint32_t i = 0 ; i < x.n_rows * 60 ; ++i) {
+  for (uint32_t i = 0 ; i < x.n_rows * 100 ; ++i) {
     //const int start = i % (x.n_rows-batchsize);
     //const int end = start + batchsize;
     //nnet.feeddata(x.rows(start, end), y.rows(start, end), false);
