@@ -56,60 +56,57 @@ mat NeuralNet::predict(const mat sample) {
   return argmax;
 }
 
-void NeuralNet::gradcheck() {
+bool NeuralNet::gradcheck() {
   // back prop result from output to input
-#ifdef DEBUG
-  const double diff = 1e-6;
+  bool success = true;
   mat w = output.getw();
   mat ngrad = computengrad(w.n_rows, w.n_cols, hidden.size());
   mat grad = output.getgrad();
+
+#ifdef DEBUG
   cout << "gradient checking ......";
-  for (uint32_t i = 0 ; i < grad.n_rows ; ++i) {
-    for (uint32_t j = 0 ; j < grad.n_cols ; ++j) {
-      if (ngrad(i, j) > grad(i, j)) {
-        if (ngrad(i, j) - grad(i, j) >= diff) {
-          cout << " failed" << endl;
-          cout << grad;
-          cout << ngrad;
-          return;
-        }
-      } else {
-        if (grad(i, j) - ngrad(i, j) >= diff) {
-          cout << " failed" << endl;
-          cout << grad;
-          cout << ngrad;
-          return;
-        }
-      }
+#endif
+
+  if (!issame(grad, ngrad)) {
+    if (success) {
+#ifdef DEBUG
+      cout << "failed" << endl;
+#endif
+
+      success = false;
     }
+#ifdef DEBUG
+    cout << "backprop grad:" << endl << grad << endl;
+    cout << "numeric grad:" << endl << ngrad << endl;
+#endif
   }
+
   for (int i = hidden.size()-1 ; i >= 0 ; --i) {
     w = hidden[i].getw();
     ngrad = computengrad(w.n_rows, w.n_cols, i);
     grad = hidden[i].getgrad();
 
-    for (uint32_t i = 0 ; i < grad.n_rows ; ++i) {
-      for (uint32_t j = 0 ; j < grad.n_cols ; ++j) {
-        if (ngrad(i, j) > grad(i, j)) {
-          if (ngrad(i, j) - grad(i, j) >= diff) {
-            cout << " failed" << endl;
-            cout << grad;
-            cout << ngrad;
-            return;
-          }
-        } else {
-          if (grad(i, j) - ngrad(i, j) >= diff) {
-            cout << " failed" << endl;
-            cout << grad;
-            cout << ngrad;
-            return;
-          }
-        }
+    if (!issame(grad, ngrad)) {
+      if (success) {
+#ifdef DEBUG
+        cout << "failed" << endl;
+#endif
+
+        success = false;
       }
+#ifdef DEBUG
+      cout << "backprop grad:" << endl << grad << endl;
+      cout << "numeric grad:" << endl << ngrad << endl;
+#endif
+
     }
   }
+
+#ifdef DEBUG
   cout << " passed." << endl;
 #endif
+
+  return success;
 }
 
 double NeuralNet::computecost() {
@@ -154,6 +151,20 @@ void NeuralNet::setlrate(const double lrate) {
   for (uint32_t i = 0 ; i < hidden.size() ; ++i)
     hidden[i].setlrate(lrate);
   output.setlrate(lrate);
+}
+
+bool NeuralNet::issame(const mat m1, const mat m2) {
+  const double scale = 1e6;
+  for (uint32_t i = 0 ; i < m1.n_rows ; ++i) {
+    for (uint32_t j = 0 ; j < m1.n_cols ; ++j) {
+      const double val1 = m1(i, j) * scale;
+      const double val2 = m2(i, j) * scale;
+      if (fabs(val1 - val2) > 1.0) {
+        return false;
+      }
+    }
+  }
+  return true;
 }
 
 double NeuralNet::computecost(const mat perturb, const uint32_t idx) {
