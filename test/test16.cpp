@@ -157,17 +157,30 @@ int sample(mglGraph* graph) {
 }
 
 int main() {
-  double lrate = 1e-4;
+  double lrate = 1e-2;
   const double lratedecay = 0.96;
-  const double lambda = 9e-1;
+  const double lambda = 1e-6;
 
   srand(time(NULL));
 
   InputLayer input(n);
   vector<Layer> hidden = {
-    Layer(n, 32, lrate, lambda, atan, [] (double x) {return 1.0/(1.0+x*x);}),
+    Layer(n, 256, lrate, lambda, sigmoid, sigmoidgrad),
+    Layer(256, 16, lrate, lambda, sigmoid, sigmoidgrad),
+    Layer(16, 16, lrate, lambda, sigmoid, sigmoidgrad),
+    Layer(16, 16, lrate, lambda, sigmoid, sigmoidgrad),
+    Layer(16, 16, lrate, lambda, sigmoid, sigmoidgrad),
+    Layer(16, 16, lrate, lambda, sigmoid, sigmoidgrad),
+    Layer(16, 16, lrate, lambda, sigmoid, sigmoidgrad),
+    Layer(16, 16, lrate, lambda, sigmoid, sigmoidgrad),
+    Layer(16, 16, lrate, lambda, sigmoid, sigmoidgrad),
+    Layer(16, 16, lrate, lambda, sigmoid, sigmoidgrad),
+    Layer(16, 16, lrate, lambda, sigmoid, sigmoidgrad),
+    Layer(16, 16, lrate, lambda, sigmoid, sigmoidgrad),
+    Layer(16, 16, lrate, lambda, sigmoid, sigmoidgrad),
+    Layer(16, 16, lrate, lambda, sigmoid, sigmoidgrad),
   };
-  OutputLayer output(32, o, lrate, lambda, identity, identitygrad, cost, costd);
+  OutputLayer output(16, o, lrate, lambda, identity, identitygrad, cost, costd);
   NeuralNet nnet(input, output, hidden);
 
   mat x, y;
@@ -177,6 +190,7 @@ int main() {
   //const int batchsize = x.n_rows / 30;
 
   //nnet.feeddata(x.row(1), y.row(1), true);
+  double cost = DBL_MAX;
   for (uint32_t i = 0 ; i < x.n_rows * 1000 ; ++i) {
     //const int start = i % (x.n_rows-batchsize);
     //const int end = start + batchsize;
@@ -186,7 +200,11 @@ int main() {
     cout << "\riteration: " << i+1 << " cost: " << nnet.computecost()
           << "       ";
     if (i % (x.n_rows*10) == 0) {
-      cout << endl << "iteration: " << i+1 << " cost: " << nnet.computecost()
+      double costtemp = nnet.computecost();
+      if (costtemp > cost || costtemp < 1e-7) break;
+
+      cost = costtemp;
+      cout << endl << "iteration: " << i+1 << " cost: " << cost
           << "     ";
       //cout << endl << nnet.getresult() << endl;
       //cout << y.row(i% datasize) << endl;
