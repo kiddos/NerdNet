@@ -29,49 +29,28 @@ Layer::Layer() : lrate(0), lambda(0) {
   actd = [] (double x) {return (x=1);};
 }
 
-Layer::Layer(const Layer &l) :
-    lrate(l.getlrate()), lambda(l.getlambda()) {
-  z = l.getz();
-  a = l.geta();
-  W = l.getw();
-  grad = l.getgrad();
+Layer::Layer(const Layer &l)
+    : lrate(l.getlrate()), lambda(l.getlambda()),
+      z(l.getz()), a(l.geta()), W(l.getw()), grad(l.getgrad()) {
   act = l.getact();
   actd = l.getactd();
 }
 
 Layer::Layer(const int pnnodes, const int nnodes, const double lrate,
-             const double lambda, double (*act)(double), double (*actd)(double)) :
-             lrate(lrate), lambda(lambda), act(act), actd(actd) {
-  W = mat(pnnodes+1, nnodes);
-  grad = mat(pnnodes+1, nnodes);
-
-#ifndef LIBMAT
-  W.imbue([] () {return rand() % 10000 / 10000.0;});
-#else
-#endif
+             const double lambda, double (*act)(double), double (*actd)(double))
+    : lrate(lrate), lambda(lambda), act(act), actd(actd),
+      W(pnnodes+1, nnodes), grad(pnnodes+1, nnodes) {
+  randominit(6.0);
 }
 
 Layer::Layer(const int pnnodes, const int nnodes, const double lrate,
-             const double lambda, ActFunc actfunc) :
-             lrate(lrate), lambda(lambda), act(actfunc.act), actd(actfunc.actd) {
-  W = mat(pnnodes+1, nnodes);
-  grad = mat(pnnodes+1, nnodes);
-
-#ifndef LIBMAT
-  const int scale = 10000;
-  const double eps = 6.0;
-  for (uint32_t i = 0 ; i < W.n_rows ; ++i) {
-    for (uint32_t j = 0 ; j < W.n_cols ; ++j) {
-      W(i, j) = static_cast<double>(rand() % scale) / static_cast<double>(scale);
-      W(i, j) = W(i, j) * 2 * eps;
-      W(i, j) = W(i, j) - eps;
-    }
-  }
-#else
-#endif
+             const double lambda, ActFunc actfunc)
+    : lrate(lrate), lambda(lambda), act(actfunc.act), actd(actfunc.actd),
+      W(pnnodes+1, nnodes), grad(pnnodes+1, nnodes) {
+  randominit(6.0);
 }
 
-void Layer::operator= (const Layer &l) {
+Layer& Layer::operator= (const Layer &l) {
   lrate = l.getlrate();
   lambda = l.getlambda();
   act = l.getact();
@@ -81,6 +60,18 @@ void Layer::operator= (const Layer &l) {
   W = l.getw();
   grad = l.getgrad();
   delta = l.getdelta();
+  return *this;
+}
+
+void Layer::randominit(const double eps) {
+  const int scale = 10000;
+  for (uint32_t i = 0 ; i < W.n_rows ; ++i) {
+    for (uint32_t j = 0 ; j < W.n_cols ; ++j) {
+      W(i, j) = static_cast<double>(rand() % scale) / static_cast<double>(scale);
+      W(i, j) = W(i, j) * 2 * eps;
+      W(i, j) = W(i, j) - eps;
+    }
+  }
 }
 
 mat Layer::forwardprop(const mat pa) {
@@ -170,9 +161,9 @@ void Layer::setlambda(const double lambda) {
 // InputLayer implementation
 InputLayer::InputLayer() {}
 
-InputLayer::InputLayer(const InputLayer &input) :
-    Layer(input.getpnnodes(), input.getw().n_cols, input.getlrate(),
-          input.getlambda(), input.getact(), input.getactd()) {}
+InputLayer::InputLayer(const InputLayer &input)
+    : Layer(input.getpnnodes(), input.getw().n_cols, input.getlrate(),
+            input.getlambda(), input.getact(), input.getactd()) {}
 
 InputLayer::InputLayer(const int innodes) {
   lrate = 0;
@@ -182,6 +173,7 @@ InputLayer::InputLayer(const int innodes) {
   W = mat(innodes, innodes);
   grad = mat(innodes, innodes);
   // not using W and grad for input layer
+  // TODO implement rbf network
 }
 
 void InputLayer::operator= (const InputLayer &input) {
@@ -207,85 +199,61 @@ OutputLayer::OutputLayer() {}
 
 OutputLayer::OutputLayer(const OutputLayer &output) {
   lrate = output.getlrate();
-  act = output.getact();
-  actd = output.getactd();
+  lambda = output.getlambda();
+
+  // abandone previous node input pa which is not crucial
   z = output.getz();
   a = output.geta();
   W = output.getw();
   grad = output.getgrad();
   delta = output.getdelta();
+
+  act = output.getact();
+  actd = output.getactd();
+
   cost = output.getcost();
   costd = output.getcostd();
 }
 
 OutputLayer::OutputLayer(const int pnnodes, const int outputnodes,
                          const double lrate, const double lambda,
-                         double (*act)(double),
-                         double (*actd)(double),
-                         mat (*cost)(mat,mat),
-                         mat (*costd)(mat,mat,mat,mat)) {
-  this->lambda = lambda;
-  this->lrate = lrate;
-  this->act = act;
-  this->actd = actd;
+                         double (*act)(double), double (*actd)(double),
+                         matfunc cost, matfuncd costd)
+    : Layer(pnnodes, outputnodes, lrate, lambda, act, actd) {
   this->cost = cost;
   this->costd = costd;
-
-  W = mat(pnnodes+1, outputnodes);
-  grad = mat(pnnodes+1, outputnodes);
-
-#ifndef LIBMAT
-  W.randn();
-#else
-#endif
 }
 
 OutputLayer::OutputLayer(const int pnnodes, const int outputnodes,
                          const double lrate, const double lambda,
                          const ActFunc actfunc,
-                         mat (*cost)(mat,mat),
-                         mat (*costd)(mat,mat,mat,mat)) {
-  this->lambda = lambda;
-  this->lrate = lrate;
-  this->act = actfunc.act;
-  this->actd = actfunc.actd;
+                         matfunc cost, matfuncd costd)
+    : Layer(pnnodes, outputnodes, lrate, lambda, actfunc) {
   this->cost = cost;
   this->costd = costd;
-
-  W = mat(pnnodes+1, outputnodes);
-  grad = mat(pnnodes+1, outputnodes);
-
-#ifndef LIBMAT
-  const int scale = 10000;
-  const double eps = 6.0;
-  for (uint32_t i = 0 ; i < W.n_rows ; ++i) {
-    for (uint32_t j = 0 ; j < W.n_cols ; ++j) {
-      W(i, j) = static_cast<double>(rand() % scale) / static_cast<double>(scale);
-      W(i, j) = W(i, j) * 2 * eps;
-      W(i, j) = W(i, j) - eps;
-    }
-  }
-#else
-#endif
 }
 
 void OutputLayer::operator= (const OutputLayer &output) {
   lrate = output.getlrate();
   lambda = output.getlambda();
-  act = output.getact();
-  actd = output.getactd();
+
+  // abadone pa
   z = output.getz();
   a = output.geta();
   W = output.getw();
   grad = output.getgrad();
   delta = output.getdelta();
+
+  act = output.getact();
+  actd = output.getactd();
+
   cost = output.getcost();
   costd = output.getcostd();
 }
 
 mat OutputLayer::backprop(const mat label) {
   y = label;
-  delta = costd(y, a, z, pa);
+  delta = costd(y, a, z);
   grad = pa.t() * delta;
   // regularization
   grad = grad + lambda * W;
@@ -322,12 +290,55 @@ double OutputLayer::getcostval() const {
   return val;
 }
 
-mfunc OutputLayer::getcost() const {
+matfunc OutputLayer::getcost() const {
   return cost;
 }
 
-mfuncd OutputLayer::getcostd() const {
+matfuncd OutputLayer::getcostd() const {
   return costd;
 }
+
+/*** Softmax Regression ***/
+SoftmaxOutput::SoftmaxOutput() {}
+
+SoftmaxOutput::SoftmaxOutput(const SoftmaxOutput &output) {
+  lrate = output.getlrate();
+  lambda = output.getlambda();
+
+  z = output.getz();
+  a = output.geta();
+  W = output.getw();
+  grad = output.getgrad();
+  delta = output.getdelta();
+
+  act = output.getact();
+  actd = output.getactd();
+
+  cost = output.getcost();
+  costd = output.getcostd();
+}
+
+SoftmaxOutput::SoftmaxOutput(const int pnnodes, const int outputnodes,
+                             const double lrate, const double lambda)
+    : OutputLayer(pnnodes, outputnodes, lrate, lambda,
+                  identity.act, identity.actd,
+                  SoftmaxOutput::costfunc, SoftmaxOutput::costfuncdelta) {}
+
+mat SoftmaxOutput::costfunc(mat y, mat h) {
+  const mat expo = arma::exp(h);
+  const mat sumexpo = arma::repmat(arma::sum(expo, 1), 1, y.n_cols);
+  const mat P = expo % (1.0 / sumexpo);
+  const mat J = - (y % arma::log(P));
+  return J;
+}
+
+mat SoftmaxOutput::costfuncdelta(mat y, mat a, mat) {
+  const mat expo = arma::exp(a);
+  const mat sumexpo = arma::repmat(arma::sum(expo, 1), 1, y.n_cols);
+  const mat P = expo % (1.0 / sumexpo);
+  const mat delta = y - P;
+  return delta;
+}
+
 
 }
