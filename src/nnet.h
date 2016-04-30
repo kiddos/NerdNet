@@ -30,8 +30,8 @@ class NeuralNet {
   const double eps;
   mat x, y;
   mat result;
-  mat (*cost)(mat,mat);
-  mat (*costd)(mat,mat,mat,mat);
+  matfunc cost;
+  matfuncd costd;
   InputLayer input;
   std::vector<Layer> hidden;
   OutputLayer output;
