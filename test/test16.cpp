@@ -66,7 +66,7 @@ mat cost(mat y, mat h) {
   return J;
 }
 
-mat costd(mat y, mat a, mat,mat) {
+mat costd(mat y, mat a, mat) {
   //const mat diff = a - y;
   //const mat squared = (diff % diff) / tou;
   //const mat J = tou * nn::funcop(squared, exp);

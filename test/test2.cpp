@@ -47,7 +47,7 @@ mat cost(mat y, mat h) {
   return J;
 }
 
-mat costd(mat y, mat a, mat , mat) {
+mat costd(mat y, mat a, mat) {
   mat grad = (a - y);
   //mat grad = -(y % nn::funcop(z, sigmoidgrad));
   return grad;

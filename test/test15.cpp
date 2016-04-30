@@ -81,7 +81,7 @@ mat cost(mat y, mat h) {
   return J;
 }
 
-mat costd(mat y, mat a, mat,mat) {
+mat costd(mat y, mat a, mat) {
   //const mat exponential = nn::funcop(a, exp);
   //const mat sum = colsum(exponential);
   //const mat p = exponential % (1.0 / sum);
