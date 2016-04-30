@@ -102,21 +102,16 @@ bool NeuralNet::gradcheck() {
     }
   }
 
+  if (success) {
 #ifdef DEBUG
-  cout << " passed." << endl;
+    cout << " passed." << endl;
 #endif
+  }
 
   return success;
 }
 
 double NeuralNet::computecost() {
-  // forward propagation
-  //mat current = input.forwardprop(x);
-  //for (uint32_t i = 0 ; i < hidden.size() ; ++i) {
-    //mat n = hidden[i].forwardprop(current);
-    //current = n;
-  //}
-  //mat out = output.forwardprop(current);
   mat J = cost(y, result);
   double val = 0;
   for (uint32_t i = 0 ; i < J.n_rows ; ++i) {
@@ -154,11 +149,11 @@ void NeuralNet::setlrate(const double lrate) {
 }
 
 bool NeuralNet::issame(const mat m1, const mat m2) {
-  const double scale = 1 / eps;
+  const double scale = 1.0 / eps;
   for (uint32_t i = 0 ; i < m1.n_rows ; ++i) {
     for (uint32_t j = 0 ; j < m1.n_cols ; ++j) {
-      const double val1 = m1(i, j) * scale;
-      const double val2 = m2(i, j) * scale;
+      const double val1 = m1(i, j) * scale / log(m1(i, j));
+      const double val2 = m2(i, j) * scale / log(m1(i, j));
       if (fabs(val1 - val2) > 1.0) {
         return false;
       }
@@ -204,10 +199,8 @@ double NeuralNet::computecost(const mat perturb, const uint32_t idx) {
   }
 
   // regularization
-  // hidden layer
-  mat tempw;
   for (uint32_t i = 0 ; i < hidden.size() ; ++i) {
-    tempw = hidden[i].getw();
+    mat tempw = hidden[i].getw();
     if (i == idx) {
       tempw = tempw + perturb;
     }
@@ -220,8 +213,7 @@ double NeuralNet::computecost(const mat perturb, const uint32_t idx) {
     }
   }
 
-  // output layer
-  tempw = output.getw();
+  mat tempw = output.getw();
   if (idx == hidden.size()) {
     tempw = tempw + perturb;
   }
