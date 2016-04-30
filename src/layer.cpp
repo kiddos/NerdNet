@@ -58,7 +58,15 @@ Layer::Layer(const int pnnodes, const int nnodes, const double lrate,
   grad = mat(pnnodes+1, nnodes);
 
 #ifndef LIBMAT
-  W.imbue([] () {return rand() % 10000 / 10000.0;});
+  const int scale = 10000;
+  const double eps = 6.0;
+  for (uint32_t i = 0 ; i < W.n_rows ; ++i) {
+    for (uint32_t j = 0 ; j < W.n_cols ; ++j) {
+      W(i, j) = static_cast<double>(rand() % scale) / static_cast<double>(scale);
+      W(i, j) = W(i, j) * 2 * eps;
+      W(i, j) = W(i, j) - eps;
+    }
+  }
 #else
 #endif
 }
@@ -248,7 +256,15 @@ OutputLayer::OutputLayer(const int pnnodes, const int outputnodes,
   grad = mat(pnnodes+1, outputnodes);
 
 #ifndef LIBMAT
-  W.randn();
+  const int scale = 10000;
+  const double eps = 6.0;
+  for (uint32_t i = 0 ; i < W.n_rows ; ++i) {
+    for (uint32_t j = 0 ; j < W.n_cols ; ++j) {
+      W(i, j) = static_cast<double>(rand() % scale) / static_cast<double>(scale);
+      W(i, j) = W(i, j) * 2 * eps;
+      W(i, j) = W(i, j) - eps;
+    }
+  }
 #else
 #endif
 }
