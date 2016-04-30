@@ -176,16 +176,20 @@ InputLayer::InputLayer(const int innodes) {
   // TODO implement rbf network
 }
 
-void InputLayer::operator= (const InputLayer &input) {
+InputLayer& InputLayer::operator= (const InputLayer &input) {
   lrate = input.getlrate();
   lambda = input.getlambda();
-  act = input.getact();
-  actd = input.getactd();
+
   z = input.getz();
   a = input.geta();
   W = input.getw();
   grad = input.getgrad();
   delta = input.getdelta();
+
+  act = input.getact();
+  actd = input.getactd();
+
+  return *this;
 }
 
 mat InputLayer::forwardprop(const mat input) {
@@ -233,7 +237,7 @@ OutputLayer::OutputLayer(const int pnnodes, const int outputnodes,
   this->costd = costd;
 }
 
-void OutputLayer::operator= (const OutputLayer &output) {
+OutputLayer& OutputLayer::operator= (const OutputLayer &output) {
   lrate = output.getlrate();
   lambda = output.getlambda();
 
@@ -249,6 +253,8 @@ void OutputLayer::operator= (const OutputLayer &output) {
 
   cost = output.getcost();
   costd = output.getcostd();
+
+  return *this;
 }
 
 mat OutputLayer::backprop(const mat label) {
@@ -301,28 +307,14 @@ matfuncd OutputLayer::getcostd() const {
 /*** Softmax Regression ***/
 SoftmaxOutput::SoftmaxOutput() {}
 
-SoftmaxOutput::SoftmaxOutput(const SoftmaxOutput &output) {
-  lrate = output.getlrate();
-  lambda = output.getlambda();
-
-  z = output.getz();
-  a = output.geta();
-  W = output.getw();
-  grad = output.getgrad();
-  delta = output.getdelta();
-
-  act = output.getact();
-  actd = output.getactd();
-
-  cost = output.getcost();
-  costd = output.getcostd();
-}
+SoftmaxOutput::SoftmaxOutput(const SoftmaxOutput &output)
+    : OutputLayer(output) {}
 
 SoftmaxOutput::SoftmaxOutput(const int pnnodes, const int outputnodes,
                              const double lrate, const double lambda)
-    : OutputLayer(pnnodes, outputnodes, lrate, lambda,
-                  identity.act, identity.actd,
-                  SoftmaxOutput::costfunc, SoftmaxOutput::costfuncdelta) {}
+    : OutputLayer(pnnodes, outputnodes, lrate, lambda, identity,
+                  SoftmaxOutput::costfunc,
+                  SoftmaxOutput::costfuncdelta) {}
 
 mat SoftmaxOutput::costfunc(mat y, mat h) {
   const mat expo = arma::exp(h);
@@ -341,4 +333,69 @@ mat SoftmaxOutput::costfuncdelta(mat y, mat a, mat) {
 }
 
 
+/*** Quadratic Output (Mean Square Error) ***/
+QuadraticOutput::QuadraticOutput() {}
+
+QuadraticOutput::QuadraticOutput(const QuadraticOutput &output)
+    : OutputLayer(output) {}
+
+QuadraticOutput::QuadraticOutput(const int pnnodes, const int outputnodes,
+                                 const double lrate, const double lambda)
+    : OutputLayer(pnnodes, outputnodes, lrate, lambda, identity,
+                  QuadraticOutput::costfunc,
+                  QuadraticOutput::costfuncdelta) {}
+
+mat QuadraticOutput::costfunc(mat y, mat h) {
+  const mat diff = y - h;
+  const mat J = (diff % diff) / 2.0;
+  return J;
 }
+
+mat QuadraticOutput::costfuncdelta(mat y, mat a, mat) {
+  return a - y;
+}
+
+/*** Cross Entropy output ***/
+CrossEntropyOutput::CrossEntropyOutput() {}
+
+CrossEntropyOutput::CrossEntropyOutput(const CrossEntropyOutput &output)
+    : OutputLayer(output) {}
+
+CrossEntropyOutput::CrossEntropyOutput(const int pnnodes, const int outputnodes,
+                                       const double lrate, const double lambda)
+    : OutputLayer(pnnodes, outputnodes, lrate, lambda, sigmoid,
+                  CrossEntropyOutput::costfunc,
+                  CrossEntropyOutput::costfuncdelta) {}
+
+mat CrossEntropyOutput::costfunc(mat y, mat h) {
+  const mat J = -(y % arma::log(h) + (1-y) % arma::log(1-h));
+  return J;
+}
+
+mat CrossEntropyOutput::costfuncdelta(mat y, mat a, mat) {
+  return a - y;
+}
+
+/*** Kullback-Leibler output ***/
+KullbackLeiblerOutput::KullbackLeiblerOutput() {}
+
+KullbackLeiblerOutput::KullbackLeiblerOutput(const KullbackLeiblerOutput &output)
+    : OutputLayer(output) {}
+
+KullbackLeiblerOutput::KullbackLeiblerOutput(const int pnnodes, const int outputnodes,
+                                             const double lrate, const double lambda)
+    : OutputLayer(pnnodes, outputnodes, lrate, lambda, identity,
+                  CrossEntropyOutput::costfunc,
+                  CrossEntropyOutput::costfuncdelta) {}
+
+mat KullbackLeiblerOutput::costfunc(mat y, mat h) {
+  const mat J = y % arma::log(y / h);
+  return J;
+}
+
+mat KullbackLeiblerOutput::costfuncdelta(mat y, mat a, mat) {
+  return y / a;
+}
+
+}
+
