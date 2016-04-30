@@ -14,7 +14,6 @@ class NeuralNet {
             std::vector<Layer> layers);
   void feeddata(const mat x, const mat y, const bool check);
   mat predict(const mat sample);
-  void gradcheck();
   double computecost();
   mat getresult() const;
   InputLayer getinput() const;
@@ -23,6 +22,8 @@ class NeuralNet {
   void setlrate(const double lrate);
 
  private:
+  bool issame(const mat m1, const mat m2);
+  bool gradcheck();
   double computecost(const mat perturb, const uint32_t idx);
   mat computengrad(const int nrows, const int ncols, const int idx);
 
