@@ -204,8 +204,10 @@ double NeuralNet::computecost(const mat perturb, const uint32_t idx) {
   }
 
   // regularization
+  // hidden layer
+  mat tempw;
   for (uint32_t i = 0 ; i < hidden.size() ; ++i) {
-    mat tempw = hidden[i].getw();
+    tempw = hidden[i].getw();
     if (i == idx) {
       tempw = tempw + perturb;
     }
@@ -215,6 +217,18 @@ double NeuralNet::computecost(const mat perturb, const uint32_t idx) {
       for (uint32_t k = 0 ; k < regterm.n_cols ; ++k) {
         val += regterm(j, k);
       }
+    }
+  }
+
+  // output layer
+  tempw = output.getw();
+  if (idx == hidden.size()) {
+    tempw = tempw + perturb;
+  }
+  const mat regterm = (output.getlambda() / 2.0) * (tempw % tempw);
+  for (uint32_t j = 0 ; j < regterm.n_rows ; ++j) {
+    for (uint32_t k = 0 ; k < regterm.n_cols ; ++k) {
+      val += regterm(j, k);
     }
   }
   return val;
