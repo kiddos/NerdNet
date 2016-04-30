@@ -13,7 +13,7 @@ namespace nn {
 
 NeuralNet::NeuralNet(const InputLayer input, const OutputLayer output,
                      vector<Layer> hidden) :
-                     eps(1e-5), cost(output.getcost()), costd(output.getcostd()),
+                     eps(1e-6), cost(output.getcost()), costd(output.getcostd()),
                      input(input), hidden(hidden), output(output) {}
 
 void NeuralNet::feeddata(const mat x, const mat y, const bool check) {
@@ -154,7 +154,7 @@ void NeuralNet::setlrate(const double lrate) {
 }
 
 bool NeuralNet::issame(const mat m1, const mat m2) {
-  const double scale = 1e6;
+  const double scale = 1 / eps;
   for (uint32_t i = 0 ; i < m1.n_rows ; ++i) {
     for (uint32_t j = 0 ; j < m1.n_cols ; ++j) {
       const double val1 = m1(i, j) * scale;
