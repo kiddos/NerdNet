@@ -20,7 +20,7 @@ using nn::OutputLayer;
 using nn::NeuralNet;
 using nn::mat;
 
-const int K = 2;
+const int K = 6;
 const int datasize = 188;
 const double scale = 5000;
 //const double tou = 1000;
@@ -136,16 +136,16 @@ int sample(mglGraph* graph) {
 }
 
 int main() {
-  double lrate = 1e-5;
-  const double lambda = 1e-7;
+  double lrate = 1e-3;
+  const double lambda = 0;
 
   srand(time(NULL));
 
   InputLayer input(K);
   vector<Layer> hidden = {
-    Layer(K, 100, lrate, lambda, atan, [](double x) {return 1.0 / (1.0+x*x);}),
+    Layer(K, 1024, lrate, lambda, sigmoid, sigmoidgrad),
   };
-  OutputLayer output(100, 1, lrate, lambda, identity, identitygrad, cost, costd);
+  OutputLayer output(1024, 1, lrate, lambda, identity, identitygrad, cost, costd);
   NeuralNet nnet(input, output, hidden);
 
   mat x, y;
@@ -153,13 +153,13 @@ int main() {
   //cout << x << endl;
   //cout << y << endl;
 
-  const int batchsize = x.n_rows / 3;
+  //const int batchsize = x.n_rows / 3;
   //nnet.feeddata(x, y, true);
   for (uint32_t i = 0 ; i < x.n_rows * 2000 ; ++i) {
-    const int start = i % (x.n_rows-batchsize);
-    const int end = start + batchsize;
-    nnet.feeddata(x.rows(start, end), y.rows(start, end), false);
-    //nnet.feeddata(x.row(i % x.n_rows), y.row(i % x.n_rows), false);
+    //const int start = i % (x.n_rows-batchsize);
+    //const int end = start + batchsize;
+    //nnet.feeddata(x.rows(start, end), y.rows(start, end), false);
+    nnet.feeddata(x.row(i % x.n_rows), y.row(i % x.n_rows), false);
 
     const double newcost = nnet.computecost();
     cout << "\riteration: " << i+1 << " cost: " << newcost;
