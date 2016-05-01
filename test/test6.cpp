@@ -122,7 +122,7 @@ int sample(mglGraph* graph) {
 }
 
 int main() {
-  const double lrate = 1e-3;
+  const double lrate = 1e-4;
   const double lambda = 0;
 
   srand(time(NULL));
