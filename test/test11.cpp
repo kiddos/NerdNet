@@ -139,9 +139,9 @@ double accuracy(mat answer, mat prediction) {
 }
 
 int main() {
-  double lrate = 1e-3;
+  double lrate = 2e-3;
   const double lratedecay = 0.96;
-  const double lambda = 1e-3;
+  const double lambda = 1e-6;
   //const int batchsize = 1;
 
   srand(time(NULL));
