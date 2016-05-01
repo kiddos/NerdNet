@@ -84,9 +84,7 @@ int main() {
 
   InputLayer input(4);
   vector<Layer> hidden = {
-    Layer(4, 3, lrate, lambda, atan, [](double x) {return 1.0/(1.0+x*x);}),
-    Layer(3, 3, lrate, lambda, rectifier, rectifiergrad),
-    Layer(3, 6, lrate, lambda, sigmoid, sigmoidgrad),
+    Layer(4, 6, lrate, lambda, atan, [](double x) {return 1.0/(1.0+x*x);}),
   };
   OutputLayer output(6, 3, lrate, lambda, sigmoid, sigmoidgrad, cost, costd);
   NeuralNet nnet(input, output, hidden);
@@ -95,7 +93,7 @@ int main() {
   load(x, y);
 
   nnet.feeddata(x, y, true);
-  for (int i = 0 ; i < 90000 ; ++i) {
+  for (int i = 0 ; i < 210000 ; ++i) {
     nnet.feeddata(x, y, false);
     cout << "\riteration: " << i+1 << " cost: " << nnet.computecost();
   }
