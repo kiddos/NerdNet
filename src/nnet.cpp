@@ -13,7 +13,7 @@ namespace nn {
 
 NeuralNet::NeuralNet(const InputLayer input, const OutputLayer output,
                      vector<Layer> hidden) :
-                     eps(1e-6), cost(output.getcost()), costd(output.getcostd()),
+                     eps(1e-4), cost(output.getcost()), costd(output.getcostd()),
                      input(input), hidden(hidden), output(output) {}
 
 void NeuralNet::feeddata(const mat x, const mat y, const bool check) {
@@ -58,14 +58,14 @@ mat NeuralNet::predict(const mat sample) {
 
 bool NeuralNet::gradcheck() {
   // back prop result from output to input
+#ifdef DEBUG
+  cout << "gradient checking ......";
+#endif
+
   bool success = true;
   mat w = output.getw();
   mat ngrad = computengrad(w.n_rows, w.n_cols, hidden.size());
   mat grad = output.getgrad();
-
-#ifdef DEBUG
-  cout << "gradient checking ......";
-#endif
 
   if (!issame(grad, ngrad)) {
     if (success) {
@@ -76,6 +76,7 @@ bool NeuralNet::gradcheck() {
       success = false;
     }
 #ifdef DEBUG
+    cout << "output layer: " << endl;
     cout << "backprop grad:" << endl << grad << endl;
     cout << "numeric grad:" << endl << ngrad << endl;
 #endif
@@ -95,6 +96,7 @@ bool NeuralNet::gradcheck() {
         success = false;
       }
 #ifdef DEBUG
+      cout << "hidden " << i <<  ":\n" << hidden[i].getw() << endl;
       cout << "backprop grad:" << endl << grad << endl;
       cout << "numeric grad:" << endl << ngrad << endl;
 #endif
@@ -152,9 +154,9 @@ bool NeuralNet::issame(const mat m1, const mat m2) {
   const double scale = 1.0 / eps;
   for (uint32_t i = 0 ; i < m1.n_rows ; ++i) {
     for (uint32_t j = 0 ; j < m1.n_cols ; ++j) {
-      const double val1 = m1(i, j) * scale / log(m1(i, j));
-      const double val2 = m2(i, j) * scale / log(m1(i, j));
-      if (fabs(val1 - val2) > 1.0) {
+      const double val1 = m1(i, j) * scale;
+      const double val2 = m2(i, j) * scale;
+      if (fabs(val1 - val2) > 100.0) {
         return false;
       }
     }
