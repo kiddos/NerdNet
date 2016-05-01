@@ -71,7 +71,7 @@ void load(mat &x, mat &y) {
 }
 
 int main() {
-  const double lrate = 7e-1;
+  const double lrate = 1e-1;
   const double lambda = 1e-5;
 
   srand(time(NULL));
