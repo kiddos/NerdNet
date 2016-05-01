@@ -6,10 +6,6 @@
 #include <time.h>
 #include <string>
 
-#include <opencv2/core.hpp>
-#include <opencv2/highgui.hpp>
-#include <opencv2/shape.hpp>
-
 #include "../src/nnet.h"
 
 using std::vector;
@@ -104,19 +100,17 @@ double accuracy(mat answer, mat prediction) {
 }
 
 int main() {
-  double lrate = 1e-3;
-  const double lratedecay = 0.90;
-  const double lambda = 1e-8;
+  double lrate = 3e-4;
+  //const double lratedecay = 0.90;
+  const double lambda = 1e-6;
 
   srand(time(NULL));
 
   InputLayer input(4);
   vector<Layer> hidden = {
-    Layer(4, 3, lrate, lambda, sigmoid, sigmoidgrad),
-    Layer(3, 3, lrate, lambda, sigmoid, sigmoidgrad),
-    Layer(3, 6, lrate, lambda, sigmoid, sigmoidgrad),
+    Layer(4, 4, lrate, lambda, sigmoid, sigmoidgrad),
   };
-  OutputLayer output(6, 3, lrate, 0, sigmoid, sigmoidgrad, cost, costd);
+  OutputLayer output(4, 3, lrate, 0, sigmoid, sigmoidgrad, cost, costd);
   NeuralNet nnet(input, output, hidden);
 
   mat x, y;
@@ -135,14 +129,14 @@ int main() {
       cout << endl << "iteration: " << i+1 << " cost: " << newcost;
     }
 
-    if (newcost < 150 && i % (x.n_rows * 10) == 0) {
-      if (newcost < 50) {
-        lrate *= 0.96;
-      } else {
-        lrate *= lratedecay;
-      }
-      nnet.setlrate(lrate);
-    }
+    //if (newcost < 150 && i % (x.n_rows * 10) == 0) {
+      //if (newcost < 50) {
+        //lrate *= 0.96;
+      //} else {
+        //lrate *= lratedecay;
+      //}
+      //nnet.setlrate(lrate);
+    //}
   }
   cout << endl;
   mat result = nnet.predict(x);
