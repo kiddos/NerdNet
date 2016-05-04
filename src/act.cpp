@@ -28,7 +28,8 @@ static inline double _tanh(double z) {
   return tanh(z);
 }
 static inline double _tanhgrad(double z) {
-  return 1.0 / (1.0 - z*z);
+  const double tanhyper = tanh(z);
+  return 1.0 - tanhyper * tanhyper;
 }
 
 static inline double _bipolarsigmoid(double z) {
