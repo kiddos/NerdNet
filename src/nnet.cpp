@@ -96,7 +96,7 @@ bool NeuralNet::gradcheck() {
         success = false;
       }
 #ifdef DEBUG
-      cout << "hidden " << i <<  ":\n" << hidden[i].getw() << endl;
+      cout << "hidden " << i << ":" << endl;
       cout << "backprop grad:" << endl << grad << endl;
       cout << "numeric grad:" << endl << ngrad << endl;
 #endif
@@ -156,7 +156,12 @@ bool NeuralNet::issame(const mat m1, const mat m2) {
     for (uint32_t j = 0 ; j < m1.n_cols ; ++j) {
       const double val1 = m1(i, j) * scale;
       const double val2 = m2(i, j) * scale;
-      if (fabs(val1 - val2) > 100.0) {
+      if (fabs(val1 - val2) > 10.0) {
+#ifdef DEBUG
+        cout << " diff at index(" << i << "," << j << "): diff: " <<
+            fabs(val1-val2) <<
+            "val1: " << val1 << ", val2:" << val2 << endl;
+#endif
         return false;
       }
     }
