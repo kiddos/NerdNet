@@ -18,6 +18,7 @@ using nn::NeuralNet;
 using nn::mat;
 
 const int datasize = 5404;
+//const int datasize = 300;
 const int n = 5;
 
 double rectifier(double z) {
@@ -68,7 +69,7 @@ mat cost(mat y, mat h) {
   //const mat sum = colsum(exponential);
   //const mat p = exponential % (1 / sum);
   //const mat J = - (y % nn::funcop(p, log));
-  mat J = -(y % nn::funcop(h, log) + (1-y) % nn::funcop(1-h, log));
+  mat J = -(y % nn::funcop(h, log) + (1-y) % nn::funcop(1-h, log)) / y.n_rows;
   //mat J = -(y % h.transform(log) + (1-y) % nn::funcop(1-h, log)) / y.n_rows;
   //mat J = -(y % h);
   return J;
@@ -79,7 +80,7 @@ mat costd(mat y, mat a, mat) {
   //const mat sum = colsum(exponential);
   //const mat p = exponential % (1.0 / sum);
   //const mat delta = p - y;
-  mat delta = (a - y);
+  mat delta = (a - y) / y.n_rows;
   //mat grad = (a - y) / y.n_rows;
   //mat grad = -(y % nn::funcop(z, sigmoidgrad));
   return delta;
@@ -112,7 +113,7 @@ void load(mat &x, mat &y) {
         input >> c;
       }
 
-      double val = 0;
+      int val = 0;
       input >> val;
       y(i, val) = 1;
     }
@@ -150,30 +151,29 @@ double accuracy(mat answer, mat prediction) {
 }
 
 int main() {
-  double lrate = 3e-1;
-  //const double lratedecay = 0.66;
-  const double lambda = 1e-9;
+  const double lrate0 = 1e-2;
+  const double lambda = 0;
+  const double decayfactor = datasize;
+  double lrate = lrate0;
 
   srand(time(NULL));
 
   InputLayer input(5);
   vector<Layer> hidden = {
-    //Layer(5, 9, lrate, lambda, atan, [](double x) {return 1.0 / (1.0+x*x);}),
-    Layer(5, 32, lrate, lambda, sigmoid, sigmoidgrad),
-    Layer(32, 8, lrate, lambda, sigmoid, sigmoidgrad),
+    Layer(5, 4096, lrate, lambda, nn::arctan),
   };
-  OutputLayer output(8, 2, lrate, 0, sigmoid, sigmoid, cost, costd);
+  nn::CrossEntropyOutput output(4096, 2, lrate, lambda);
   NeuralNet nnet(input, output, hidden);
 
   mat x, y;
   load(x, y);
-  cout << x.n_rows << endl;
-  cout << y.n_rows << endl;
+  //cout << x.n_rows << endl;
+  //cout << y.n_rows << endl;
 
-  //const int batchsize = x.n_rows / 50;
-  //const int batchsize = 10;
+  //const int batchsize = x.n_rows / 20;
+  //const int batchsize = 300;
   //nnet.feeddata(x.row(0), y.row(0), true);
-  for (uint32_t i = 0 ; i < x.n_rows * 100 ; ++i) {
+  for (uint32_t i = 0 ; i < x.n_rows * 20 ; ++i) {
     //const int start = i % (x.n_rows-batchsize);
     //const int end = start + batchsize;
     //nnet.feeddata(x.rows(start, end), y.rows(start, end), false);
@@ -181,17 +181,18 @@ int main() {
     nnet.feeddata(x.row(i % x.n_rows), y.row(i % x.n_rows), false);
     cout << "\riteration: " << i+1 << " cost: " << nnet.computecost()
           << "          ";
-    if (i % (x.n_rows * 10) == 0) {
+    if (i % (x.n_rows * 1) == 0) {
       cout << endl << "iteration: " << i+1 << " cost: " << nnet.computecost()
           << "          ";
     }
-    //if (i % 5000 == 0) {
-      //lrate *= lratedecay;
-      //nnet.setlrate(lrate);
-    //}
+    if (i % (x.n_rows) == 0) {
+      lrate = lrate0 * exp(-1.0 * i / decayfactor);
+      nnet.setlrate(lrate);
+    }
   }
   cout << endl;
   mat result = nnet.predict(x);
+  cout << nnet.getresult() << endl;
   cout << "accuracy: " << accuracy(y, result) * 100 << endl;
 
   return 0;
