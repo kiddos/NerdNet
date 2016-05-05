@@ -155,14 +155,15 @@ int main() {
   const double lambda = 0;
   const double decayfactor = datasize;
   double lrate = lrate0;
+  const int hiddennodes = 4;
 
   srand(time(NULL));
 
   InputLayer input(5);
   vector<Layer> hidden = {
-    Layer(5, 4096, lrate, lambda, nn::arctan),
+    Layer(5, hiddennodes, lrate, lambda, nn::arctan),
   };
-  nn::CrossEntropyOutput output(4096, 2, lrate, lambda);
+  nn::CrossEntropyOutput output(hiddennodes, 2, lrate, lambda);
   NeuralNet nnet(input, output, hidden);
 
   mat x, y;
