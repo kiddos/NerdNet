@@ -100,17 +100,23 @@ double accuracy(mat answer, mat prediction) {
 }
 
 int main() {
-  double lrate = 3e-4;
+  double lrate = 6e-4;
   //const double lratedecay = 0.90;
-  const double lambda = 1e-6;
+  const double lambda = 1e-8;
 
   srand(time(NULL));
 
   InputLayer input(4);
   vector<Layer> hidden = {
-    Layer(4, 4, lrate, lambda, sigmoid, sigmoidgrad),
+    Layer(4, 6, lrate, lambda, sigmoid, sigmoidgrad),
+    Layer(6, 6, lrate, lambda, sigmoid, sigmoidgrad),
+    Layer(6, 6, lrate, lambda, sigmoid, sigmoidgrad),
   };
-  OutputLayer output(4, 3, lrate, 0, sigmoid, sigmoidgrad, cost, costd);
+  //OutputLayer output(4, 3, lrate, 0, sigmoid, sigmoidgrad, cost, costd);
+  //nn::CrossEntropyOutput output(6, 3, lrate, lambda);
+  nn::SoftmaxOutput output(6, 3, lrate, lambda);
+  //nn::QuadraticOutput output(6, 3, lrate, lambda);
+  //nn::KullbackLeiblerOutput output(6, 3, lrate, lambda);
   NeuralNet nnet(input, output, hidden);
 
   mat x, y;
@@ -119,7 +125,7 @@ int main() {
   //cout << y << endl;
 
   nnet.feeddata(x, y, true);
-  for (uint32_t i = 0 ; i < x.n_rows * 2000 ; ++i) {
+  for (uint32_t i = 0 ; i < x.n_rows * 1000 ; ++i) {
     nnet.feeddata(x, y, false);
     //nnet.feeddata(x.row(i%x.n_rows), y.row(i%x.n_rows), false);
     const double newcost = nnet.computecost();
