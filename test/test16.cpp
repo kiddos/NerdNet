@@ -20,7 +20,7 @@ using nn::OutputLayer;
 using nn::NeuralNet;
 using nn::mat;
 
-const int K = 3;
+const int K = 6;
 const int datasize = 304;
 const int n = K;
 const int o = 1;
@@ -166,21 +166,8 @@ int main() {
   InputLayer input(n);
   vector<Layer> hidden = {
     Layer(n, 256, lrate, lambda, sigmoid, sigmoidgrad),
-    Layer(256, 16, lrate, lambda, sigmoid, sigmoidgrad),
-    Layer(16, 16, lrate, lambda, sigmoid, sigmoidgrad),
-    Layer(16, 16, lrate, lambda, sigmoid, sigmoidgrad),
-    Layer(16, 16, lrate, lambda, sigmoid, sigmoidgrad),
-    Layer(16, 16, lrate, lambda, sigmoid, sigmoidgrad),
-    Layer(16, 16, lrate, lambda, sigmoid, sigmoidgrad),
-    Layer(16, 16, lrate, lambda, sigmoid, sigmoidgrad),
-    Layer(16, 16, lrate, lambda, sigmoid, sigmoidgrad),
-    Layer(16, 16, lrate, lambda, sigmoid, sigmoidgrad),
-    Layer(16, 16, lrate, lambda, sigmoid, sigmoidgrad),
-    Layer(16, 16, lrate, lambda, sigmoid, sigmoidgrad),
-    Layer(16, 16, lrate, lambda, sigmoid, sigmoidgrad),
-    Layer(16, 16, lrate, lambda, sigmoid, sigmoidgrad),
   };
-  OutputLayer output(16, o, lrate, lambda, identity, identitygrad, cost, costd);
+  OutputLayer output(256, o, lrate, lambda, identity, identitygrad, cost, costd);
   NeuralNet nnet(input, output, hidden);
 
   mat x, y;
@@ -201,7 +188,7 @@ int main() {
           << "       ";
     if (i % (x.n_rows*10) == 0) {
       double costtemp = nnet.computecost();
-      if (costtemp > cost || costtemp < 1e-7) break;
+      //if (costtemp > cost || costtemp < 1e-7) break;
 
       cost = costtemp;
       cout << endl << "iteration: " << i+1 << " cost: " << cost
