@@ -18,81 +18,37 @@ using nn::NeuralNet;
 using nn::mat;
 
 const int datasize = 5404;
+const double trainpercent = 0.8;
 //const int datasize = 300;
 const int n = 5;
 
-double rectifier(double z) {
-  return z >= 0 ? z : 0;
-}
-
-double rectifiergrad(double z) {
-  return z >= 0 ? 1 : 0;
-}
-
-double sigmoid(double z) {
-  return 1.0 / (1.0 + exp(-z));
-}
-
-double sigmoidgrad(double z) {
-  const double e = exp(-z);
-  const double b = 1 + e;
-  return e / (b * b);
-}
-
-double identity(double z) {
-  return z;
-}
-
-double identitygrad(double) {
-  return 1;
-}
-
-
-mat colsum(const mat m) {
-  mat result(m.n_rows, m.n_cols);
-  result.zeros();
-
-  for (uint32_t i = 0 ; i < m.n_rows ; ++i) {
-    double sum = 0;
-    for (uint32_t j = 0 ; j < m.n_cols ; ++j) {
-      sum += m(i, j);
+void shuffledata(mat &x, mat &y) {
+  for (uint32_t i = 0 ; i < x.n_rows ; ++i) {
+    int index1 = rand() % x.n_rows;
+    int index2 = rand() % x.n_rows;
+    mat xrow1 = x.row(index1);
+    mat xrow2 = x.row(index2);
+    mat yrow1 = y.row(index1);
+    mat yrow2 = y.row(index2);
+    for (uint32_t j = 0 ; j < x.n_cols ; ++j) {
+      x(index1, j) = xrow2(0, j);
+      x(index2, j) = xrow1(0, j);
     }
-    for (uint32_t j = 0 ; j < m.n_cols ; ++j) {
-      result(i, j) = sum;
+
+    for (uint32_t j = 0 ; j < y.n_cols ; ++j) {
+      y(index1, j) = yrow2(0, j);
+      y(index2, j) = yrow1(0, j);
     }
   }
-  return result;
 }
 
-mat cost(mat y, mat h) {
-  //const mat exponential = nn::funcop(h, exp);
-  //const mat sum = colsum(exponential);
-  //const mat p = exponential % (1 / sum);
-  //const mat J = - (y % nn::funcop(p, log));
-  mat J = -(y % nn::funcop(h, log) + (1-y) % nn::funcop(1-h, log)) / y.n_rows;
-  //mat J = -(y % h.transform(log) + (1-y) % nn::funcop(1-h, log)) / y.n_rows;
-  //mat J = -(y % h);
-  return J;
-}
-
-mat costd(mat y, mat a, mat) {
-  //const mat exponential = nn::funcop(a, exp);
-  //const mat sum = colsum(exponential);
-  //const mat p = exponential % (1.0 / sum);
-  //const mat delta = p - y;
-  mat delta = (a - y) / y.n_rows;
-  //mat grad = (a - y) / y.n_rows;
-  //mat grad = -(y % nn::funcop(z, sigmoidgrad));
-  return delta;
-}
-
-void load(mat &x, mat &y) {
+void load(mat &trainx, mat &trainy, mat &testx, mat &testy) {
   std::ifstream input("/home/joseph/C/data/phoneme.dat", std::ios::in);
   std::string line;
 
   if (input.is_open()) {
-    x = mat(datasize, n);
-    y = mat(datasize, 2);
+    mat x = mat(datasize, n);
+    mat y = mat(datasize, 2);
     y.zeros();
 
     for (; std::getline(input, line) ;) {
@@ -118,22 +74,30 @@ void load(mat &x, mat &y) {
       y(i, val) = 1;
     }
 
-    cout << "shuffle data..." << endl;
-    for (uint32_t i = 0 ; i < x.n_rows ; ++i) {
-      int index1 = rand() % x.n_rows;
-      int index2 = rand() % x.n_rows;
-      mat xrow1 = x.row(index1);
-      mat xrow2 = x.row(index2);
-      mat yrow1 = y.row(index1);
-      mat yrow2 = y.row(index2);
-      for (uint32_t j = 0 ; j < x.n_cols ; ++j) {
-        x(index1, j) = xrow2(0, j);
-        x(index2, j) = xrow1(0, j);
-      }
+    const int trainsize = static_cast<int>(datasize * trainpercent);
+    const int testsize = datasize - trainsize;
 
-      for (uint32_t j = 0 ; j < y.n_cols ; ++j) {
-        y(index1, j) = yrow2(0, j);
-        y(index2, j) = yrow1(0, j);
+    trainx = mat(trainsize, x.n_cols);
+    trainy = mat(trainsize, y.n_cols);
+    testx = mat(testsize, x.n_cols);
+    testy = mat(testsize, y.n_cols);
+
+    shuffledata(x, y);
+    for (int i = 0 ; i < trainsize ; ++i) {
+      for (uint32_t j = 0 ; j < trainx.n_cols ; ++j) {
+        trainx(i, j) = x(i, j);
+      }
+      for (uint32_t j = 0 ; j < trainy.n_cols ; ++j) {
+        trainy(i, j) = y(i, j);
+      }
+    }
+
+    for (int i = 0 ; i < testsize ; ++i) {
+      for (uint32_t j = 0 ; j < trainx.n_cols ; ++j) {
+        testx(i, j) = x(i+trainsize, j);
+      }
+      for (uint32_t j = 0 ; j < trainy.n_cols ; ++j) {
+        testy(i, j) = y(i+trainsize, j);
       }
     }
   }
@@ -155,7 +119,7 @@ int main() {
   const double lambda = 0;
   const double decayfactor = datasize;
   double lrate = lrate0;
-  const int hiddennodes = 4;
+  const int hiddennodes = 4096;
 
   srand(time(NULL));
 
@@ -166,35 +130,37 @@ int main() {
   nn::CrossEntropyOutput output(hiddennodes, 2, lrate, lambda);
   NeuralNet nnet(input, output, hidden);
 
-  mat x, y;
-  load(x, y);
+  mat trainx, trainy, testx, testy;
+  load(trainx, trainy, testx, testy);
   //cout << x.n_rows << endl;
   //cout << y.n_rows << endl;
 
   //const int batchsize = x.n_rows / 20;
   //const int batchsize = 300;
   //nnet.feeddata(x.row(0), y.row(0), true);
-  for (uint32_t i = 0 ; i < x.n_rows * 20 ; ++i) {
+  for (uint32_t i = 0 ; i < trainx.n_rows * 25 ; ++i) {
     //const int start = i % (x.n_rows-batchsize);
     //const int end = start + batchsize;
     //nnet.feeddata(x.rows(start, end), y.rows(start, end), false);
     //nnet.feeddata(x, y, false);
-    nnet.feeddata(x.row(i % x.n_rows), y.row(i % x.n_rows), false);
+    nnet.feeddata(trainx.row(i % trainx.n_rows), trainy.row(i % trainy.n_rows), false);
     cout << "\riteration: " << i+1 << " cost: " << nnet.computecost()
           << "          ";
-    if (i % (x.n_rows * 1) == 0) {
+    if (i % (trainx.n_rows * 1) == 0) {
       cout << endl << "iteration: " << i+1 << " cost: " << nnet.computecost()
           << "          ";
     }
-    if (i % (x.n_rows) == 0) {
+    if (i % (trainx.n_rows) == 0) {
       lrate = lrate0 * exp(-1.0 * i / decayfactor);
       nnet.setlrate(lrate);
     }
   }
   cout << endl;
-  mat result = nnet.predict(x);
-  cout << nnet.getresult() << endl;
-  cout << "accuracy: " << accuracy(y, result) * 100 << endl;
+  mat result = nnet.predict(trainx);
+  //cout << nnet.getresult() << endl;
+  cout << "train accuracy: " << accuracy(trainy, result) * 100 << endl;
+  result = nnet.predict(testx);
+  cout << "accuracy: " << accuracy(testy, result) * 100 << endl;
 
   return 0;
 }
