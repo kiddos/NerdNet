@@ -22,7 +22,7 @@ using nn::NeuralNet;
 using nn::mat;
 
 const int datasize = 12960;
-const double trainingpercent = 1;
+const double trainingpercent = 0.8;
 const int n = 8;
 const int o = 5;
 
@@ -162,10 +162,10 @@ int main() {
   }
 
   cout << endl;
-  //mat result = nnet.predict(testx);
-  //cout << "testing accuracy: " << accuracy(testy, result) * 100 << endl;
-  mat result = nnet.predict(trainx);
-  cout << nnet.getresult() << endl;
+  mat result = nnet.predict(testx);
+  cout << "testing accuracy: " << accuracy(testy, result) * 100 << endl;
+  result = nnet.predict(trainx);
+  //cout << nnet.getresult() << endl;
   cout << "training accuracy: " << accuracy(trainy, result) * 100 << endl;
 
   return 0;
