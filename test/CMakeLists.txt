@@ -23,6 +23,7 @@ add_executable(crossentropytest test18.cpp)
 add_executable(softmaxtest2 test19.cpp)
 add_executable(quadratictest test20.cpp)
 add_executable(kullbackleiblertest test21.cpp)
+add_executable(gametest test22.cpp)
 
 set(LIBS nnet armadillo opencv_core opencv_highgui opencv_imgproc mgl mgl-qt)
 
@@ -47,6 +48,7 @@ target_link_libraries(crossentropytest ${LIBS})
 target_link_libraries(softmaxtest2 ${LIBS})
 target_link_libraries(quadratictest ${LIBS})
 target_link_libraries(kullbackleiblertest ${LIBS})
+target_link_libraries(gametest ${LIBS})
 
 add_test(XORProblem ./XORProblem)
 add_test(MNIST ./MNIST)
