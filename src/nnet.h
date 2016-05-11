@@ -5,20 +5,27 @@
 #include <vector>
 #include "type.h"
 #include "layer.h"
+#include "debug.h"
 
 namespace nn {
 
 class NeuralNet {
  public:
+  NeuralNet();
+  NeuralNet(const NeuralNet& nnet);
   NeuralNet(const InputLayer input, const OutputLayer output,
             std::vector<Layer> layers);
+  NeuralNet& operator= (const NeuralNet& nnet);
   void feeddata(const mat x, const mat y, const bool check);
   mat predict(const mat sample);
   double computecost();
+
   mat getresult() const;
+  uint32_t getnumhidden() const;
   InputLayer getinput() const;
   Layer gethidden(const uint32_t index) const;
   OutputLayer getoutput() const;
+
   void setlrate(const double lrate);
 
  private:
