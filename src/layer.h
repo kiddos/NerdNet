@@ -22,6 +22,8 @@ class Layer {
   virtual mat forwardprop(const mat pa);
   virtual mat backprop(const mat delta);
   virtual void update();
+  void randominit(const double eps);
+
   int getpnnodes() const;
   int getnnodes() const;
   double getlrate() const;
@@ -38,7 +40,6 @@ class Layer {
   void setlambda(const double lambda);
 
  protected:
-  void randominit(const double eps);
   double lrate;
   double lambda;
   double (*act)(double);
