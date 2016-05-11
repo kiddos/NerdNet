@@ -1,20 +1,32 @@
 #include "nnet.h"
 
-#ifdef DEBUG
-#include <iostream>
-
-using std::cout;
-using std::endl;
-#endif
-
 using std::vector;
 
 namespace nn {
 
+NeuralNet::NeuralNet() : eps(1e-4) {}
+
+NeuralNet::NeuralNet(const NeuralNet& nnet)
+    : eps(nnet.eps), x(nnet.x), y(nnet.y), result(nnet.result),
+      cost(nnet.cost), costd(nnet.costd),
+      input(nnet.input), hidden(nnet.hidden), output(nnet.output) {}
+
 NeuralNet::NeuralNet(const InputLayer input, const OutputLayer output,
-                     vector<Layer> hidden) :
-                     eps(1e-4), cost(output.getcost()), costd(output.getcostd()),
-                     input(input), hidden(hidden), output(output) {}
+                     vector<Layer> hidden)
+    : eps(1e-4), cost(output.getcost()), costd(output.getcostd()),
+      input(input), hidden(hidden), output(output) {}
+
+NeuralNet& NeuralNet::operator= (const NeuralNet& nnet) {
+  x = nnet.x;
+  y = nnet.y;
+  result = nnet.result;
+  cost = nnet.cost;
+  costd = nnet.costd;
+  input = nnet.input;
+  hidden = nnet.hidden;
+  output = nnet.output;
+  return *this;
+}
 
 void NeuralNet::feeddata(const mat x, const mat y, const bool check) {
   this->x = x;
@@ -126,6 +138,10 @@ double NeuralNet::computecost() {
 
 mat NeuralNet::getresult() const {
   return result;
+}
+
+uint32_t NeuralNet::getnumhidden() const {
+  return hidden.size();
 }
 
 InputLayer NeuralNet::getinput() const {
