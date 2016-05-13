@@ -8,7 +8,7 @@ namespace nn {
 class OutputLayer : public Layer {
  public:
   OutputLayer();
-  OutputLayer(const OutputLayer &output);
+  OutputLayer(const OutputLayer& output);
   OutputLayer(const int pnnodes, const int outputnodes,
               const double lrate, const double lambda,
               func act, func actd,
@@ -18,7 +18,7 @@ class OutputLayer : public Layer {
               const double lambda,
               const ActFunc actfunc,
               matfunc cost, matfuncd costd);
-  virtual OutputLayer& operator= (const OutputLayer &output);
+  virtual OutputLayer& operator= (const OutputLayer& output);
   virtual mat backprop(const mat label);
   mat argmax() const;
   double getcostval() const;
@@ -35,7 +35,7 @@ class OutputLayer : public Layer {
 class SoftmaxOutput : public OutputLayer {
  public:
   SoftmaxOutput();
-  SoftmaxOutput(const SoftmaxOutput &output);
+  SoftmaxOutput(const SoftmaxOutput& output);
   SoftmaxOutput(const int pnnodes, const int outputnodes,
                 const double lrate, const double lambda);
 
@@ -46,7 +46,7 @@ class SoftmaxOutput : public OutputLayer {
 class QuadraticOutput : public OutputLayer {
  public:
   QuadraticOutput();
-  QuadraticOutput(const QuadraticOutput &output);
+  QuadraticOutput(const QuadraticOutput& output);
   QuadraticOutput(const int pnnodes, const int outputnodes,
                   const double lrate, const double lambda);
 
@@ -57,7 +57,7 @@ class QuadraticOutput : public OutputLayer {
 class CrossEntropyOutput : public OutputLayer {
  public:
   CrossEntropyOutput();
-  CrossEntropyOutput(const CrossEntropyOutput &output);
+  CrossEntropyOutput(const CrossEntropyOutput& output);
   CrossEntropyOutput(const int pnnodes, const int outputnodes,
                      const double lrate, const double lambda);
 
@@ -68,7 +68,7 @@ class CrossEntropyOutput : public OutputLayer {
 class KullbackLeiblerOutput : public OutputLayer {
  public:
   KullbackLeiblerOutput();
-  KullbackLeiblerOutput(const KullbackLeiblerOutput &output);
+  KullbackLeiblerOutput(const KullbackLeiblerOutput& output);
   KullbackLeiblerOutput(const int pnnodes, const int outputnodes,
                         const double lrate, const double lambda);
 
