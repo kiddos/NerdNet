@@ -4,27 +4,15 @@ namespace nn {
 
 OutputLayer::OutputLayer() {}
 
-OutputLayer::OutputLayer(const OutputLayer &output) {
-  lrate = output.getlrate();
-  lambda = output.getlambda();
-
-  // abandone previous node input pa which is not crucial
-  z = output.getz();
-  a = output.geta();
-  W = output.getw();
-  grad = output.getgrad();
-  delta = output.getdelta();
-
-  act = output.getact();
-  actd = output.getactd();
-
+OutputLayer::OutputLayer(const OutputLayer& output)
+    : Layer(output) {
   cost = output.getcost();
   costd = output.getcostd();
 }
 
 OutputLayer::OutputLayer(const int pnnodes, const int outputnodes,
                          const double lrate, const double lambda,
-                         double (*act)(double), double (*actd)(double),
+                         func act, func actd,
                          matfunc cost, matfuncd costd)
     : Layer(pnnodes, outputnodes, lrate, lambda, act, actd) {
   this->cost = cost;
@@ -40,7 +28,7 @@ OutputLayer::OutputLayer(const int pnnodes, const int outputnodes,
   this->costd = costd;
 }
 
-OutputLayer& OutputLayer::operator= (const OutputLayer &output) {
+OutputLayer& OutputLayer::operator= (const OutputLayer& output) {
   lrate = output.getlrate();
   lambda = output.getlambda();
 
@@ -110,7 +98,7 @@ matfuncd OutputLayer::getcostd() const {
 /*** Softmax Output ***/
 SoftmaxOutput::SoftmaxOutput() {}
 
-SoftmaxOutput::SoftmaxOutput(const SoftmaxOutput &output)
+SoftmaxOutput::SoftmaxOutput(const SoftmaxOutput& output)
     : OutputLayer(output) {}
 
 SoftmaxOutput::SoftmaxOutput(const int pnnodes, const int outputnodes,
@@ -139,7 +127,7 @@ mat SoftmaxOutput::costfuncdelta(mat y, mat a, mat) {
 /*** Quadratic Output (Mean Square Error) ***/
 QuadraticOutput::QuadraticOutput() {}
 
-QuadraticOutput::QuadraticOutput(const QuadraticOutput &output)
+QuadraticOutput::QuadraticOutput(const QuadraticOutput& output)
     : OutputLayer(output) {}
 
 QuadraticOutput::QuadraticOutput(const int pnnodes, const int outputnodes,
@@ -161,7 +149,7 @@ mat QuadraticOutput::costfuncdelta(mat y, mat a, mat) {
 /*** Cross Entropy output ***/
 CrossEntropyOutput::CrossEntropyOutput() {}
 
-CrossEntropyOutput::CrossEntropyOutput(const CrossEntropyOutput &output)
+CrossEntropyOutput::CrossEntropyOutput(const CrossEntropyOutput& output)
     : OutputLayer(output) {}
 
 CrossEntropyOutput::CrossEntropyOutput(const int pnnodes, const int outputnodes,
@@ -182,7 +170,7 @@ mat CrossEntropyOutput::costfuncdelta(mat y, mat a, mat) {
 /*** Kullback-Leibler output ***/
 KullbackLeiblerOutput::KullbackLeiblerOutput() {}
 
-KullbackLeiblerOutput::KullbackLeiblerOutput(const KullbackLeiblerOutput &output)
+KullbackLeiblerOutput::KullbackLeiblerOutput(const KullbackLeiblerOutput& output)
     : OutputLayer(output) {}
 
 KullbackLeiblerOutput::KullbackLeiblerOutput(const int pnnodes, const int outputnodes,

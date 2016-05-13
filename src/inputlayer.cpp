@@ -4,7 +4,7 @@ namespace nn {
 
 InputLayer::InputLayer() {}
 
-InputLayer::InputLayer(const InputLayer &input)
+InputLayer::InputLayer(const InputLayer& input)
     : Layer(input.getpnnodes(), input.getw().n_cols, input.getlrate(),
             input.getlambda(), input.getact(), input.getactd()) {}
 
@@ -17,7 +17,7 @@ InputLayer::InputLayer(const int innodes) {
   grad = mat(innodes, innodes);
 }
 
-InputLayer& InputLayer::operator= (const InputLayer &input) {
+InputLayer& InputLayer::operator= (const InputLayer& input) {
   lrate = input.getlrate();
   lambda = input.getlambda();
 
