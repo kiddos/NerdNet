@@ -127,13 +127,7 @@ bool NeuralNet::gradcheck() {
 
 double NeuralNet::computecost() {
   mat J = cost(y, result);
-  double val = 0;
-  for (uint32_t i = 0 ; i < J.n_rows ; ++i) {
-    for (uint32_t j = 0 ; j < J.n_cols ; ++j) {
-      val += J(i, j);
-    }
-  }
-  return val;
+  return sumall(J);
 }
 
 mat NeuralNet::getresult() const {
