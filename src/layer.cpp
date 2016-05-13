@@ -28,13 +28,13 @@ Layer::Layer() : lrate(0), lambda(0), iters(0), usemomentum(false) {
   actd = [] (double x) {return (x=1);};
 }
 
-Layer::Layer(const Layer& l)
-    : lrate(l.lrate), lambda(l.lambda),
-      iters(l.iters), usemomentum(l.usemomentum),
-      pa(l.pa), z(l.z), a(l.a), delta(l.delta),
-      W(l.W), grad(l.grad), momentum(l.momentum) {
-  act = l.getact();
-  actd = l.getactd();
+Layer::Layer(const Layer& layer)
+    : lrate(layer.lrate), lambda(layer.lambda),
+      iters(layer.iters), usemomentum(layer.usemomentum),
+      pa(layer.pa), z(layer.z), a(layer.a), delta(layer.delta),
+      W(layer.W), grad(layer.grad), momentum(layer.momentum) {
+  act = layer.act;
+  actd = layer.actd;
 }
 
 Layer::Layer(const int pnnodes, const int nnodes,
@@ -60,16 +60,23 @@ Layer::Layer(const int pnnodes, const int nnodes, const double lrate,
   momentum.zeros();
 }
 
-Layer& Layer::operator= (const Layer& l) {
-  lrate = l.getlrate();
-  lambda = l.getlambda();
-  act = l.getact();
-  actd = l.getactd();
-  z = l.getz();
-  a = l.geta();
-  W = l.getw();
-  grad = l.getgrad();
-  delta = l.getdelta();
+Layer& Layer::operator= (const Layer& layer) {
+  lrate = layer.lrate;
+  lambda = layer.lambda;
+  iters = layer.iters;
+  usemomentum = layer.usemomentum;
+
+  act = layer.act;
+  actd = layer.actd;
+
+  pa = layer.pa;
+  z = layer.z;
+  a = layer.a;
+  delta = layer.delta;
+
+  W = layer.W;
+  grad = layer.grad;
+  momentum = layer.momentum;
   return *this;
 }
 

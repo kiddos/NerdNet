@@ -13,14 +13,14 @@ mat addcol(const mat m, const double val);
 class Layer {
  public:
   Layer();
-  Layer(const Layer& l);
+  Layer(const Layer& layer);
   Layer(const int pnnodes, const int nnodes,
         const double lrate, const double lambda,
         func act, func actd, bool usemomentum=false);
   Layer(const int pnnodes, const int nnodes,
         const double lrate, const double lambda,
         ActFunc actfunc, bool usemomentum=false);
-  virtual Layer& operator= (const Layer& l);
+  virtual Layer& operator= (const Layer& layer);
   virtual mat forwardprop(const mat pa);
   virtual mat backprop(const mat delta);
   virtual void update();
