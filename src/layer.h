@@ -7,18 +7,20 @@
 
 namespace nn {
 
-mat funcop(const mat m, double (*f)(double));
+mat funcop(const mat m, func f);
 mat addcol(const mat m, const double val);
 
 class Layer {
  public:
   Layer();
-  Layer(const Layer &l);
-  Layer(const int pnnodes, const int nnodes, const double lrate,
-        const double lambda, func act, func actd);
-  Layer(const int pnnodes, const int nnodes, const double lrate,
-        const double lambda, ActFunc actfunc);
-  virtual Layer& operator= (const Layer &l);
+  Layer(const Layer& l);
+  Layer(const int pnnodes, const int nnodes,
+        const double lrate, const double lambda,
+        func act, func actd, bool usemomentum=false);
+  Layer(const int pnnodes, const int nnodes,
+        const double lrate, const double lambda,
+        ActFunc actfunc, bool usemomentum=false);
+  virtual Layer& operator= (const Layer& l);
   virtual mat forwardprop(const mat pa);
   virtual mat backprop(const mat delta);
   virtual void update();
@@ -42,10 +44,11 @@ class Layer {
  protected:
   double lrate;
   double lambda;
-  unsigned long long int iters;
+  double iters;
+  bool usemomentum;
   func act, actd;
-  mat pa, z, a;
-  mat W, grad, delta, momentum;
+  mat pa, z, a, delta;
+  mat W, grad, momentum;
 };
 
 }
