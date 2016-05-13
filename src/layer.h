@@ -2,13 +2,11 @@
 #define LAYER_H
 
 #include <stdint.h>
+#include "matop.h"
 #include "type.h"
 #include "act.h"
 
 namespace nn {
-
-mat funcop(const mat m, func f);
-mat addcol(const mat m, const double val);
 
 class Layer {
  public:

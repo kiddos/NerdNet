@@ -2,27 +2,6 @@
 
 namespace nn {
 
-mat funcop(const mat m, func f) {
-  mat newmat(m.n_rows, m.n_cols);
-  for (uint32_t i = 0 ; i < m.n_rows ; ++i) {
-    for (uint32_t j = 0 ; j < m.n_cols ; ++j) {
-      newmat(i, j) = f(m(i, j));
-    }
-  }
-  return newmat;
-}
-
-mat addcol(const mat m, const double val) {
-  mat newmat(m.n_rows, m.n_cols+1);
-  for (uint32_t i = 0 ; i < m.n_rows ; ++i) {
-    newmat(i, 0) = val;
-    for (uint32_t j = 0 ; j < m.n_cols ; ++j) {
-      newmat(i, j+1) = m(i, j);
-    }
-  }
-  return newmat;
-}
-
 Layer::Layer() : lrate(0), lambda(0), iters(0), usemomentum(false) {
   act = [] (double x) {return x;};
   actd = [] (double x) {return (x=1);};
@@ -92,7 +71,7 @@ void Layer::randominit(const double eps) {
 }
 
 mat Layer::forwardprop(const mat pa) {
-  this->pa = addcol(pa, 1);
+  this->pa = addcol(pa);
   z = this->pa * W;
   a = funcop(z, act);
 
@@ -103,7 +82,7 @@ mat Layer::backprop(const mat d) {
   // compute this delta and grad
   mat actdz = funcop(z, actd);
   mat delta = d;
-  delta = delta % addcol(actdz, 1);
+  delta = delta % addcol(actdz);
 
   delta.shed_col(0);
   grad = pa.t() * delta;
