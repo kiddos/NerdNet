@@ -18,18 +18,7 @@ InputLayer::InputLayer(const int innodes) {
 }
 
 InputLayer& InputLayer::operator= (const InputLayer& input) {
-  lrate = input.getlrate();
-  lambda = input.getlambda();
-
-  z = input.getz();
-  a = input.geta();
-  W = input.getw();
-  grad = input.getgrad();
-  delta = input.getdelta();
-
-  act = input.getact();
-  actd = input.getactd();
-
+  Layer::operator= (input);
   return *this;
 }
 

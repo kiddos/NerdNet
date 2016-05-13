@@ -29,22 +29,10 @@ OutputLayer::OutputLayer(const int pnnodes, const int outputnodes,
 }
 
 OutputLayer& OutputLayer::operator= (const OutputLayer& output) {
-  lrate = output.getlrate();
-  lambda = output.getlambda();
-
-  // abadone pa
-  z = output.getz();
-  a = output.geta();
-  W = output.getw();
-  grad = output.getgrad();
-  delta = output.getdelta();
-
-  act = output.getact();
-  actd = output.getactd();
+  Layer::operator= (output);
 
   cost = output.getcost();
   costd = output.getcostd();
-
   return *this;
 }
 
