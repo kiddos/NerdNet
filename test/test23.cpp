@@ -60,7 +60,7 @@ void draw(cv::Mat& image, NeuralNet& nnet) {
 }
 
 int main() {
-  const double lrate = 1e-5;
+  const double lrate = 1e-6;
   const double lambda = 0;
   const int batchsize = 0;
   const int n = 2;
@@ -70,10 +70,9 @@ int main() {
 
   InputLayer input(n);
   vector<Layer> hidden = {
-    Layer(n, 100, lrate, lambda, nn::relu),
-    //Layer(20, 20, lrate, lambda, nn::relu),
+    Layer(n, 600, lrate, lambda, nn::relu),
   };
-  QuadraticOutput output(100, o, lrate, lambda);
+  QuadraticOutput output(600, o, lrate, lambda);
   NeuralNet nnet(input, output, hidden);
 
   mat x, y;
@@ -87,7 +86,7 @@ int main() {
   cv::resize(realimage, realimage, cv::Size(IMAGE_WIDTH, IMAGE_HEIGHT));
   cv::Mat nnetimage = cv::Mat::zeros(realimage.rows, realimage.cols, CV_8UC3);
   cv::imshow("Real Image", realimage);
-  nnet.feeddata(x.row(0), y.row(0), true);
+  //nnet.feeddata(x.row(0), y.row(0), true);
   cout << "training start..." << endl;
   for (uint32_t i = 0 ; i < x.n_rows * 100 ; ++i) {
     const int start = i % (x.n_rows-batchsize);
