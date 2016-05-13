@@ -10,7 +10,7 @@ class ConvLayer : public Layer {
   ConvLayer();
   ConvLayer(const int nfilter, const int spatial,
             const int stride, const int padding,
-            const double lrate, double (*act)(double), double (*actd)(double));
+            const double lrate, func act, func actd);
   ConvLayer(const int nfilter, const int spatial,
             const int stride, const int padding,
             const double lrate, ActFunc actfunc);

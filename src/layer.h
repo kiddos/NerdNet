@@ -15,7 +15,7 @@ class Layer {
   Layer();
   Layer(const Layer &l);
   Layer(const int pnnodes, const int nnodes, const double lrate,
-        const double lambda, double (*act)(double), double (*actd)(double));
+        const double lambda, func act, func actd);
   Layer(const int pnnodes, const int nnodes, const double lrate,
         const double lambda, ActFunc actfunc);
   virtual Layer& operator= (const Layer &l);
