@@ -3,7 +3,6 @@ check_include_files(armadillo HAVE_ARMADILLO)
 check_include_files(mat.h HAVE_MAT)
 
 set(LAYER_SOURCE layer.cpp inputlayer.cpp outputlayer.cpp)
-set(LAYER_SOURCE ${LAYER_SOURCE} convlayer.cpp)
 set(BASE_SOURCE act.cpp matop.cpp)
 set(SOURCE ${LAYER_SOURCE} ${BASE_SOURCE} neuralnet.cpp)
 
