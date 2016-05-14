@@ -9,9 +9,8 @@ mat funcop(const mat m, func f) {
 }
 
 mat addcol(const mat m) {
-  mat newmat = m;
-  mat values(m.n_rows, 1, arma::fill::ones);
-  newmat.insert_cols(0, values);
+  mat newmat(m.n_rows, m.n_cols+1, arma::fill::ones);
+  newmat.submat(0, 1, newmat.n_rows-1, newmat.n_cols-1) = m;
   return newmat;
 }
 
