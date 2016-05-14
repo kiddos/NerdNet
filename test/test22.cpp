@@ -15,11 +15,13 @@
 using std::vector;
 using std::cout;
 using std::endl;
+using nn::mat;
 using nn::Layer;
 using nn::InputLayer;
 using nn::OutputLayer;
 using nn::NeuralNet;
-using nn::mat;
+using nn::Trainer;
+using nn::BatchTrainer;
 
 const int datasize = 660;
 const double trainingpercent = 0.66;
@@ -106,60 +108,41 @@ double accuracy(mat answer, mat prediction) {
 
 int main() {
   //const double lrate0 = 5e-2;
-  const double lrate0 = 1e-2;
-  const double lratedecayfactor = 50000;
-  const double lambda = 1e-1;
-  double lrate = lrate0;
+  const double lrate0 = 1e-3;
+  const double lambda = 1e-6;
+  const int batchsize = 60;
 
   srand(time(NULL));
 
 
   InputLayer input(n);
   vector<Layer> hidden = {
-    Layer(n, 100, lrate, lambda, nn::sigmoid),
-    Layer(100, 50, lrate, lambda, nn::sigmoid),
-    Layer(50, 25, lrate, lambda, nn::sigmoid),
+    Layer(n, 100, lrate0, lambda, nn::sigmoid),
+    Layer(100, 50, lrate0, lambda, nn::sigmoid),
+    Layer(50, 25, lrate0, lambda, nn::sigmoid),
     //Layer(n, n, lrate, lambda, nn::sigmoid),
     //Layer(n, n, lrate, lambda, nn::sigmoid),
     //Layer(n, n, lrate, lambda, nn::sigmoid),
     //Layer(n, n, lrate, lambda, nn::sigmoid),
   };
-  nn::SoftmaxOutput output(25, o, lrate, lambda);
+  nn::SoftmaxOutput output(25, o, lrate0, lambda);
   NeuralNet nnet(input, output, hidden);
+  BatchTrainer trainer(nnet, batchsize, lrate0, 1e-5, batchsize*10);
 
   mat trainx, trainy, testx, testy;
   load(trainx, trainy, testx, testy);
   cout << trainx.n_rows << endl;
   cout << trainy.n_rows << endl;
-  //cout << testx.n_rows << endl;
-  //cout << testy.n_rows << endl;
-  //cout << testx << endl;
-  //cout << trainx << endl;
 
-  const int batchsize = 60;
-  //nnet.feeddata(trainx.row(1), trainy.row(1), true);
+  trainer.gradcheck(trainx.row(1), trainy.row(1));
   for (int i = 0 ; i < datasize * 30 ; ++i) {
-    const int start = i % (trainx.n_rows-batchsize);
-    const int end = start + batchsize;
-    nnet.feeddata(trainx.rows(start, end), trainy.rows(start, end), false);
-    //nnet.feeddata(trainx.row(i%trainx.n_rows), trainy.row(i%trainy.n_rows), false);
-    //nnet.feeddata(trainx, trainy, false);
-    const double newcost = nnet.computecost();
+    trainer.feeddata(trainx, trainy);
+    const double newcost = trainer.evalcost();
     cout << "\riteration: " << i+1 << " cost: " << newcost;
-    if (i % datasize == 0) {
+
+    if (i % 10 == 0) {
       mat result = nnet.predict(trainx);
       cout << endl << "accuracy: " << accuracy(trainy, result) * 100 << endl;
-      //cout << endl << "iteration: " << i+1 << " cost: " << nnet.computecost();
-      //cout << nnet.gethidden(0).getgrad() << endl;
-      //cout << nnet.gethidden(1).getgrad() << endl;
-      //cout << nnet.gethidden(2).getgrad() << endl;
-      //cout << nnet.getoutput().getgrad() << endl;
-      //cout << endl << nnet.getresult() << endl;
-      //cout << y.row(i% datasize) << endl;
-    }
-    if (i % (datasize * 1) == 0) {
-      lrate = lrate0 * exp(-i / lratedecayfactor);
-      nnet.setlrate(lrate);
     }
   }
 

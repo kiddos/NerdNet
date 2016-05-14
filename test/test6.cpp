@@ -14,11 +14,12 @@
 using std::vector;
 using std::cout;
 using std::endl;
+using nn::mat;
 using nn::Layer;
 using nn::InputLayer;
 using nn::OutputLayer;
 using nn::NeuralNet;
-using nn::mat;
+using nn::Trainer;
 
 double rectifier(double z) {
   return z >= 0 ? z : 0;
@@ -133,15 +134,16 @@ int main() {
   };
   OutputLayer output(100, 1, lrate, lambda, identity, identitygrad, cost, costd);
   NeuralNet nnet(input, output, hidden);
+  Trainer trainer(nnet);
 
   mat x, y;
   load(x, y);
   //cout << x << endl;
   //cout << y << endl;
 
-  //nnet.feeddata(x, y, true);
+  trainer.feeddata(x, y);
   for (int i = 0 ; i < 66000 ; ++i) {
-    nnet.feeddata(x, y, false);
+    trainer.feeddata(x, y);
     cout << "\riteration: " << i+1 << " cost: " << nnet.computecost();
   }
   cout << endl;

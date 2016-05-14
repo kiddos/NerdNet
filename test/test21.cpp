@@ -14,11 +14,12 @@
 using std::vector;
 using std::cout;
 using std::endl;
+using nn::mat;
 using nn::Layer;
 using nn::InputLayer;
 using nn::KullbackLeiblerOutput;
 using nn::NeuralNet;
-using nn::mat;
+using nn::Trainer;
 
 const int K = 3;
 const int datasize = 304;
@@ -118,6 +119,7 @@ int main() {
   };
   KullbackLeiblerOutput output(16, o, lrate, lambda);
   NeuralNet nnet(input, output, hidden);
+  Trainer trainer(nnet);
 
   mat x, y;
   load(x, y, K);
@@ -131,7 +133,7 @@ int main() {
     //const int start = i % (x.n_rows-batchsize);
     //const int end = start + batchsize;
     //nnet.feeddata(x.rows(start, end), y.rows(start, end), false);
-    nnet.feeddata(x.row(i%x.n_rows), y.row(i%x.n_rows), false);
+    trainer.feeddata(x.row(i%x.n_rows), y.row(i%x.n_rows));
     //nnet.feeddata(x, y, false);
     cout << "\riteration: " << i+1 << " cost: " << nnet.computecost()
           << "       ";

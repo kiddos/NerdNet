@@ -14,11 +14,12 @@
 using std::vector;
 using std::cout;
 using std::endl;
+using nn::mat;
 using nn::Layer;
 using nn::InputLayer;
 using nn::OutputLayer;
 using nn::NeuralNet;
-using nn::mat;
+using nn::Trainer;
 
 const int datasize = 11;
 
@@ -88,13 +89,14 @@ int main() {
   };
   OutputLayer output(6, 3, lrate, lambda, sigmoid, sigmoidgrad, cost, costd);
   NeuralNet nnet(input, output, hidden);
+  Trainer trainer(nnet);
 
   mat x, y;
   load(x, y);
 
-  nnet.feeddata(x, y, true);
+  trainer.gradcheck(x.row(0), y.row(0));
   for (int i = 0 ; i < 210000 ; ++i) {
-    nnet.feeddata(x, y, false);
+    trainer.feeddata(x, y);
     cout << "\riteration: " << i+1 << " cost: " << nnet.computecost();
   }
   cout << endl;

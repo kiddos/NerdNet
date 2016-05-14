@@ -11,12 +11,12 @@
 using std::vector;
 using std::cout;
 using std::endl;
+using nn::mat;
 using nn::Layer;
 using nn::InputLayer;
 using nn::OutputLayer;
 using nn::NeuralNet;
-using nn::mat;
-
+using nn::Trainer;
 
 void shuffledata(mat &x, mat &y) {
   for (uint32_t i = 0 ; i < x.n_rows ; ++i) {
@@ -136,15 +136,16 @@ int main() {
   //nn::QuadraticOutput output(6, 3, lrate, lambda);
   nn::KullbackLeiblerOutput output(6, 3, lrate, lambda);
   NeuralNet nnet(input, output, hidden);
+  Trainer trainer(nnet);
 
   mat trainx, trainy, testx, testy;
   load(trainx, trainy, testx, testy);
   cout << trainx << endl;
   cout << trainy << endl;
 
-  //nnet.feeddata(x, y, true);
+  trainer.gradcheck(trainx, trainy);
   for (uint32_t i = 0 ; i < trainx.n_rows * 1000 ; ++i) {
-    nnet.feeddata(trainx, trainy, false);
+    trainer.feeddata(trainx, trainy);
     //nnet.feeddata(x.row(i%x.n_rows), y.row(i%x.n_rows), false);
     const double newcost = nnet.computecost();
     cout << "\riteration: " << i+1 << " cost: " << newcost;

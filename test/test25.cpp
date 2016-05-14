@@ -14,12 +14,14 @@
 using std::vector;
 using std::cout;
 using std::endl;
+using nn::mat;
 using nn::Layer;
 using nn::InputLayer;
 using nn::OutputLayer;
 using nn::NeuralNet;
-using nn::mat;
 using nn::SoftmaxOutput;
+using nn::Trainer;
+using nn::MomentumTrainer;
 
 void load(mat &x, mat &y) {
   std::ifstream xinput("./data/samplex.data", std::ios::in);
@@ -60,22 +62,23 @@ int main() {
 
   InputLayer input(2);
   vector<Layer> hidden = {
-    Layer(2, 6, lrate, lambda, nn::arctan, true),
-    Layer(6, 6, lrate, lambda, nn::relu, true),
-    Layer(6, 6, lrate, lambda, nn::sigmoid, true),
-    Layer(6, 6, lrate, lambda, nn::sigmoid, true),
-    Layer(6, 6, lrate, lambda, nn::sigmoid, true),
-    Layer(6, 6, lrate, lambda, nn::sigmoid, true),
+    Layer(2, 6, lrate, lambda, nn::arctan),
+    Layer(6, 6, lrate, lambda, nn::relu),
+    Layer(6, 6, lrate, lambda, nn::sigmoid),
+    Layer(6, 6, lrate, lambda, nn::sigmoid),
+    Layer(6, 6, lrate, lambda, nn::sigmoid),
+    Layer(6, 6, lrate, lambda, nn::sigmoid),
   };
   SoftmaxOutput output(6, 2, lrate, lambda);
   NeuralNet nnet(input, output, hidden);
+  MomentumTrainer trainer(nnet, 0.9);
 
   mat x, y, sample;
   load(x, y); loadsample(sample, w, h);
-  nnet.feeddata(x, y, true);
+  trainer.gradcheck(x, y);
   for (int i = 0 ; i < 210000 ; ++i) {
     //nnet.feeddata(x.row(i % x.n_rows), y.row(i % y.n_rows), false);
-    nnet.feeddata(x, y, false);
+    trainer.feeddata(x, y);
     cout << "\riteration: " << i << " | cost: " << nnet.computecost();
     //if (i % (x.n_rows * 50) == 0)
       //cout << endl << "iteration: " << i << " | cost: " << nnet.computecost();

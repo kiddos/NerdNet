@@ -13,11 +13,12 @@
 using std::vector;
 using std::cout;
 using std::endl;
+using nn::mat;
 using nn::Layer;
 using nn::InputLayer;
 using nn::OutputLayer;
 using nn::NeuralNet;
-using nn::mat;
+using nn::Trainer;
 using cv::Scalar;
 using cv::Vec3b;
 
@@ -94,15 +95,16 @@ int main() {
   };
   nn::SoftmaxOutput output(100, 3, lrate, lambda);
   NeuralNet nnet(input, output, hidden);
+  Trainer trainer(nnet);
 
   mat x, y, sample;
   load(x, y); loadsample(sample, w, h);
   //cout << y << endl;
   //cout << sample << endl;
   //cout << sample.row(0) << endl;
-  //nnet.feeddata(x, y, true);
+  trainer.gradcheck(x.row(0), y.row(0));
   for (int i = 0 ; i < 36000 ; ++i) {
-    nnet.feeddata(x, y, false);
+    trainer.feeddata(x, y);
     //nnet.feeddata(x, y, true);
     cout << "\riteration: " << i << " | cost: " << nnet.computecost();
   }

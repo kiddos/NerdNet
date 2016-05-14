@@ -14,11 +14,12 @@
 using std::vector;
 using std::cout;
 using std::endl;
+using nn::mat;
 using nn::Layer;
 using nn::InputLayer;
 using nn::OutputLayer;
 using nn::NeuralNet;
-using nn::mat;
+using nn::Trainer;
 
 const int datasize = 42000;
 const int n = 784;
@@ -106,6 +107,7 @@ int main() {
   };
   OutputLayer output(100, 10, lrate, lambda, sigmoid, sigmoidgrad, cost, costd);
   NeuralNet nnet(input, output, hidden);
+  Trainer trainer(nnet);
 
   mat x, y, sample;
   load(x, y);
@@ -116,7 +118,7 @@ int main() {
   for (int i = 0 ; i < datasize * 26; ++i) {
     const int start = i % (datasize-batchsize);
     const int end = start + batchsize;
-    nnet.feeddata(x.rows(start, end), y.rows(start, end), false);
+    trainer.feeddata(x.rows(start, end), y.rows(start, end));
 
     if (i % datasize == 0) {
       const double cost = nnet.computecost();

@@ -14,12 +14,13 @@
 using std::vector;
 using std::cout;
 using std::endl;
+using nn::mat;
 using nn::Layer;
 using nn::InputLayer;
 using nn::OutputLayer;
 using nn::NeuralNet;
-using nn::mat;
 using nn::SoftmaxOutput;
+using nn::Trainer;
 
 void load(mat &x, mat &y) {
   std::ifstream xinput("./data/samplex.data", std::ios::in);
@@ -69,13 +70,14 @@ int main() {
   };
   SoftmaxOutput output(6, 2, lrate, lambda);
   NeuralNet nnet(input, output, hidden);
+  Trainer trainer(nnet);
 
   mat x, y, sample;
   load(x, y); loadsample(sample, w, h);
-  nnet.feeddata(x, y, true);
+  trainer.feeddata(x, y);
   for (int i = 0 ; i < 210000 ; ++i) {
     //nnet.feeddata(x.row(i % x.n_rows), y.row(i % y.n_rows), false);
-    nnet.feeddata(x, y, false);
+    trainer.feeddata(x, y);
     cout << "\riteration: " << i << " | cost: " << nnet.computecost();
     //if (i % (x.n_rows * 50) == 0)
       //cout << endl << "iteration: " << i << " | cost: " << nnet.computecost();
