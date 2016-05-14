@@ -43,4 +43,8 @@ void Trainer::feeddata(const mat& x, const mat& y) {
   nnet->update();
 }
 
+double Trainer::evalcost() const {
+  return nnet->computecost();
+}
+
 }

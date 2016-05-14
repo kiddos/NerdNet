@@ -18,6 +18,7 @@ class Trainer {
 
   virtual bool gradcheck(const mat& x, const mat& y);
   virtual void feeddata(const mat& x, const mat& y);
+  virtual double evalcost() const;
 
  protected:
   NeuralNet* nnet;
