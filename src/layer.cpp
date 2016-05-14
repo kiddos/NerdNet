@@ -2,48 +2,37 @@
 
 namespace nn {
 
-Layer::Layer() : lrate(0), lambda(0), iters(0), usemomentum(false) {
+Layer::Layer() : lrate(0), lambda(0) {
   act = [] (double x) {return x;};
   actd = [] (double x) {return (x=1);};
 }
 
 Layer::Layer(const Layer& layer)
     : lrate(layer.lrate), lambda(layer.lambda),
-      iters(layer.iters), usemomentum(layer.usemomentum),
       pa(layer.pa), z(layer.z), a(layer.a), delta(layer.delta),
-      W(layer.W), grad(layer.grad), momentum(layer.momentum) {
+      W(layer.W), grad(layer.grad) {
   act = layer.act;
   actd = layer.actd;
 }
 
 Layer::Layer(const int pnnodes, const int nnodes,
              const double lrate, const double lambda,
-             double (*act)(double), double (*actd)(double),
-             bool usemomentum)
-    : lrate(lrate), lambda(lambda),
-      iters(0), usemomentum(usemomentum),
-      act(act), actd(actd),
-      W(pnnodes+1, nnodes), grad(pnnodes+1, nnodes), momentum(pnnodes+1, nnodes) {
+             func act, func actd)
+    : lrate(lrate), lambda(lambda), act(act), actd(actd),
+      W(pnnodes+1, nnodes), grad(pnnodes+1, nnodes) {
   randominit(6.0);
-  momentum.zeros();
 }
 
 Layer::Layer(const int pnnodes, const int nnodes, const double lrate,
-             const double lambda, ActFunc actfunc,
-             bool usemomentum)
-    : lrate(lrate), lambda(lambda),
-      iters(0), usemomentum(usemomentum),
-      act(actfunc.act), actd(actfunc.actd),
-      W(pnnodes+1, nnodes), grad(pnnodes+1, nnodes), momentum(pnnodes+1, nnodes) {
+             const double lambda, ActFunc actfunc)
+    : lrate(lrate), lambda(lambda), act(actfunc.act), actd(actfunc.actd),
+      W(pnnodes+1, nnodes), grad(pnnodes+1, nnodes) {
   randominit(6.0);
-  momentum.zeros();
 }
 
 Layer& Layer::operator= (const Layer& layer) {
   lrate = layer.lrate;
   lambda = layer.lambda;
-  iters = layer.iters;
-  usemomentum = layer.usemomentum;
 
   act = layer.act;
   actd = layer.actd;
@@ -55,7 +44,6 @@ Layer& Layer::operator= (const Layer& layer) {
 
   W = layer.W;
   grad = layer.grad;
-  momentum = layer.momentum;
   return *this;
 }
 
@@ -95,13 +83,11 @@ mat Layer::backprop(const mat d) {
 }
 
 void Layer::update() {
-  if (usemomentum) {
-    iters ++;
-    momentum = ((iters-1)/iters) * momentum + (1.0/iters) * grad;
-    W = W - lrate * momentum;
-  } else {
-    W = W - lrate * grad;
-  }
+  W = W - lrate * grad;
+}
+
+void Layer::update(const mat grad) {
+  W = W - lrate * grad;
 }
 
 int Layer::getpnnodes() const {
