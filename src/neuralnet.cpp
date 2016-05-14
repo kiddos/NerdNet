@@ -28,47 +28,53 @@ NeuralNet& NeuralNet::operator= (const NeuralNet& nnet) {
   return *this;
 }
 
-void NeuralNet::feeddata(const mat x, const mat y, const bool check) {
+mat NeuralNet::forwardprop(const mat& x) {
   this->x = x;
-  this->y = y;
 
-  // forward propagation
   mat current = input.forwardprop(x);
   for (uint32_t i = 0 ; i < hidden.size() ; ++i) {
-    mat n = hidden[i].forwardprop(current);
+    const mat n = hidden[i].forwardprop(current);
     current = n;
   }
   result = output.forwardprop(current);
+  return result;
+}
 
-  // backpropagation
+void NeuralNet::backprop(const mat& y) {
+  this->y = y;
+
   mat currentdelta = output.backprop(y);
   for (int i = hidden.size()-1 ; i >= 0 ; --i) {
     mat p = hidden[i].backprop(currentdelta);
     currentdelta = p;
   }
+}
 
-  if (check) gradcheck();
-
-  // update parameters
+void NeuralNet::update() {
   output.update();
   for (uint32_t i = 0 ; i < hidden.size() ; ++i) {
     hidden[i].update();
   }
 }
 
+void NeuralNet::update(const mat& ograd, const vector<mat>& hgrad) {
+  output.update(ograd);
+  for (uint32_t i = 0 ; i < hidden.size() ; ++i) {
+    hidden[i].update(hgrad[i]);
+  }
+}
+
 mat NeuralNet::predict(const mat sample) {
   // prediction is simply forwardprop
-  mat current = input.forwardprop(sample);
-  for (uint32_t i = 0 ; i < hidden.size() ; ++i) {
-    mat n = hidden[i].forwardprop(current);
-    current = n;
-  }
-  result = output.forwardprop(current);
+  result = forwardprop(sample);
   mat argmax = output.argmax();
   return argmax;
 }
 
-bool NeuralNet::gradcheck() {
+bool NeuralNet::gradcheck(const mat& x, const mat& y) {
+  forwardprop(x);
+  backprop(y);
+
   // back prop result from output to input
 #ifdef DEBUG
   cout << "gradient checking ......";
@@ -128,29 +134,6 @@ bool NeuralNet::gradcheck() {
 double NeuralNet::computecost() {
   mat J = cost(y, result);
   return sumall(J);
-}
-
-mat NeuralNet::getresult() const {
-  return result;
-}
-
-uint32_t NeuralNet::getnumhidden() const {
-  return hidden.size();
-}
-
-InputLayer NeuralNet::getinput() const {
-  return input;
-}
-
-Layer NeuralNet::gethidden(const uint32_t index) const {
-  if (index < hidden.size()) {
-    return hidden[index];
-  }
-  return Layer();
-}
-
-OutputLayer NeuralNet::getoutput() const {
-  return output;
 }
 
 void NeuralNet::setlrate(const double lrate) {
@@ -262,5 +245,29 @@ mat NeuralNet::computengrad(const int nrows, const int ncols, const int idx) {
 
   return wgrad;
 }
+
+mat NeuralNet::getresult() const {
+  return result;
+}
+
+uint32_t NeuralNet::getnumhidden() const {
+  return hidden.size();
+}
+
+InputLayer NeuralNet::getinput() const {
+  return input;
+}
+
+Layer NeuralNet::gethidden(const uint32_t index) const {
+  if (index < hidden.size()) {
+    return hidden[index];
+  }
+  return Layer();
+}
+
+OutputLayer NeuralNet::getoutput() const {
+  return output;
+}
+
 
 }

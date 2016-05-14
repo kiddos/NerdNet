@@ -19,8 +19,13 @@ class NeuralNet {
   NeuralNet(const InputLayer input, const OutputLayer output,
             std::vector<Layer> layers);
   NeuralNet& operator= (const NeuralNet& nnet);
-  void feeddata(const mat x, const mat y, const bool check);
+
   mat predict(const mat sample);
+  mat forwardprop(const mat& x);
+  void backprop(const mat& y);
+  void update();
+  void update(const mat& ograd, const std::vector<mat>& hgrad);
+  bool gradcheck(const mat& x, const mat& y);
   double computecost();
 
   mat getresult() const;
@@ -28,12 +33,10 @@ class NeuralNet {
   InputLayer getinput() const;
   Layer gethidden(const uint32_t index) const;
   OutputLayer getoutput() const;
-
   void setlrate(const double lrate);
 
  private:
   bool issame(const mat m1, const mat m2);
-  bool gradcheck();
   double computecost(const mat perturb, const uint32_t idx);
   mat computengrad(const int nrows, const int ncols, const int idx);
 
