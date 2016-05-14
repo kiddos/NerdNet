@@ -37,8 +37,8 @@ void BatchTrainer::feeddata(const mat& x, const mat& y) {
   for (uint32_t i = 0 ; i < x.n_rows ; ++i) {
     const int start = i;
     const int end = i + batchsize - 1;
-    nnet->forwardprop(x.rows(start, end));
-    nnet->backprop(y.rows(start, end));
+    nnet->forwardprop(trainx.rows(start, end));
+    nnet->backprop(trainy.rows(start, end));
     nnet->update();
 
     iters ++;
@@ -47,6 +47,12 @@ void BatchTrainer::feeddata(const mat& x, const mat& y) {
   if (usedecay && iters == step) {
     nnet->setlrate(r0 * exp(-k*iters));
   }
+}
+
+double BatchTrainer::evalcost() const {
+  nnet->forwardprop(x);
+  nnet->backprop(y);
+  return nnet->computecost();
 }
 
 }
