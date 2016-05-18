@@ -34,7 +34,7 @@ void BatchTrainer::feeddata(const mat& x, const mat& y) {
   trainx.insert_rows(trainx.n_rows, x.submat(0, 0, batchsize-2, x.n_cols-1));
   trainy.insert_rows(trainy.n_rows, y.submat(0, 0, batchsize-2, y.n_cols-1));
 
-  for (uint32_t i = 0 ; i < x.n_rows ; ++i) {
+  for (uint32_t i = 0 ; i < x.n_rows ; i += batchsize) {
     const int start = i;
     const int end = i + batchsize - 1;
     nnet->forwardprop(trainx.rows(start, end));
