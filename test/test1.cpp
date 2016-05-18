@@ -79,7 +79,7 @@ void loadsample(mat &sample, const int w, const int h) {
 
 int main() {
   const double lrate = 1e-3;
-  const double lambda = 1e-2;
+  const double lambda = 1e-6;
   const int w = 800;
   const int h = 600;
 
