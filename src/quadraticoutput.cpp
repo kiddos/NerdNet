@@ -15,12 +15,11 @@ QuadraticOutput::QuadraticOutput(const int pnnodes, const int outputnodes,
 
 mat QuadraticOutput::costfunc(mat y, mat h) {
   const mat diff = y - h;
-  const mat J = (diff % diff) / 2.0;
-  return J;
+  return (diff % diff) / 2.0 / y.n_rows;
 }
 
 mat QuadraticOutput::costfuncdelta(mat y, mat a, mat) {
-  return a - y;
+  return (a - y) / y.n_rows;
 }
 
 }

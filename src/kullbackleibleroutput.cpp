@@ -14,12 +14,12 @@ KullbackLeiblerOutput::KullbackLeiblerOutput(const int pnnodes, const int output
                   KullbackLeiblerOutput::costfuncdelta) {}
 
 mat KullbackLeiblerOutput::costfunc(mat y, mat h) {
-  const mat J = y % arma::log(y / h);
+  const mat J = y % arma::log(y / h) / y.n_rows;
   return J;
 }
 
 mat KullbackLeiblerOutput::costfuncdelta(mat y, mat a, mat) {
-  return y / a;
+  return (y / a) / y.n_rows;
 }
 
 }

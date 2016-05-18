@@ -14,12 +14,11 @@ CrossEntropyOutput::CrossEntropyOutput(const int pnnodes, const int outputnodes,
                   CrossEntropyOutput::costfuncdelta) {}
 
 mat CrossEntropyOutput::costfunc(mat y, mat h) {
-  const mat J = -(y % arma::log(h) + (1-y) % arma::log(1-h));
-  return J;
+  return -(y % arma::log(h) + (1-y) % arma::log(1-h)) / y.n_rows;
 }
 
 mat CrossEntropyOutput::costfuncdelta(mat y, mat a, mat) {
-  return a - y;
+  return (a - y) / y.n_rows;
 }
 
 }
