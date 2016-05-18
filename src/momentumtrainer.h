@@ -8,7 +8,9 @@ namespace nn {
 class MomentumTrainer : public Trainer {
  public:
   MomentumTrainer();
+  MomentumTrainer(NeuralNet& nnet);
   MomentumTrainer(NeuralNet& nnet, double momentum);
+  MomentumTrainer(NeuralNet& nnet, double r0, double k, unsigned long step);
   MomentumTrainer(NeuralNet& nnet, double momentum,
                   double r0, double k, unsigned long step);
   MomentumTrainer(const MomentumTrainer& trainer);

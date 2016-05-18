@@ -4,13 +4,24 @@ namespace nn {
 
 MomentumTrainer::MomentumTrainer() : momentum(0.6) {}
 
+MomentumTrainer::MomentumTrainer(NeuralNet& nnet)
+    : Trainer(nnet), momentum(0) {
+  initmomentum();
+}
+
 MomentumTrainer::MomentumTrainer(NeuralNet& nnet, double momentum)
     : Trainer(nnet), momentum(momentum) {
   initmomentum();
 }
 
+MomentumTrainer::MomentumTrainer(NeuralNet& nnet,
+                                 double r0, double k, unsigned long step)
+    : Trainer(nnet, r0, k, step), momentum(0) {
+  initmomentum();
+}
+
 MomentumTrainer::MomentumTrainer(NeuralNet& nnet, double momentum,
-                  double r0, double k, unsigned long step)
+                                 double r0, double k, unsigned long step)
     : Trainer(nnet, r0, k, step), momentum(momentum) {
   initmomentum();
 }
@@ -54,7 +65,13 @@ void MomentumTrainer::feeddata(const mat& x, const mat& y) {
   nnet->backprop(y);
   ograd = momentum * ograd + (1.0-momentum) * nnet->getoutput().getgrad();
   for (uint32_t i = 0 ; i < hgrads.size() ; ++i) {
-    hgrads[i] = momentum * hgrads[i] + (1.0-momentum) * nnet->gethidden(i).getgrad();
+    if (momentum != 0) {
+      hgrads[i] = momentum * hgrads[i] +
+          (1.0-momentum) * nnet->gethidden(i).getgrad();
+    } else {
+      hgrads[i] = (iters-1)/iters * hgrads[i] +
+          1.0/iters * nnet->gethidden(i).getgrad();
+    }
   }
 
   nnet->update(ograd, hgrads);
