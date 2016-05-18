@@ -25,20 +25,20 @@ class Layer {
   virtual void update(const mat grad);
   void randominit(const double eps);
 
-  int getpnnodes() const;
-  int getnnodes() const;
-  double getlrate() const;
-  double getlambda() const;
-  mat getz() const;
-  mat geta() const;
-  mat getw() const;
-  mat getgrad() const;
-  mat getdelta() const;
-  func getact() const;
-  func getactd() const;
-  void setw(mat w);
-  void setlrate(const double lrate);
-  void setlambda(const double lambda);
+  int getpnnodes() const { return W.n_rows; };
+  int getnnodes() const { return W.n_cols; };
+  double getlrate() const { return lrate; };
+  double getlambda() const { return lambda; };
+  mat getz() const { return z; };
+  mat geta() const { return a; };
+  mat getw() const { return W; };
+  mat getgrad() const { return grad; };
+  mat getdelta() const {return delta; };
+  func getact() const { return act; };
+  func getactd() const { return actd; };
+  void setw(mat w) { W = w; };
+  void setlrate(const double lrate) { this->lrate = lrate; };
+  void setlambda(const double lambda) { this->lambda = lambda; };
 
  protected:
   double lrate;
