@@ -3,6 +3,8 @@
 
 #include <float.h>
 #include <vector>
+#include <string>
+#include <fstream>
 
 #include "debug.h"
 #include "act.h"
@@ -27,13 +29,18 @@ class NeuralNet {
   void update(const mat& ograd, const std::vector<mat>& hgrad);
   bool gradcheck(const mat& x, const mat& y);
   double computecost();
+  void randomize(uint32_t index);
+  void save(const std::string path);
+  void load(const std::string path);
 
-  mat getresult() const;
-  uint32_t getnumhidden() const;
-  InputLayer getinput() const;
-  Layer gethidden(const uint32_t index) const;
-  OutputLayer getoutput() const;
+  mat getresult() const { return result; };
+  uint32_t getnumhidden() const { return hidden.size(); };
+  InputLayer getinput() const { return input; };
+  Layer gethidden(const uint32_t index) const { return hidden[index]; };
+  OutputLayer getoutput() const { return output; };
   void setlrate(const double lrate);
+  void sethiddenw(uint32_t index, const mat w) { hidden[index].setw(w); }
+  void setoutputw(const mat w) { output.setw(w); }
 
  private:
   bool issame(const mat m1, const mat m2);

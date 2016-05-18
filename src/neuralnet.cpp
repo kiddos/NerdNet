@@ -1,6 +1,9 @@
 #include "neuralnet.h"
 
 using std::vector;
+using std::string;
+using std::ifstream;
+using std::ofstream;
 
 namespace nn {
 
@@ -246,28 +249,71 @@ mat NeuralNet::computengrad(const int nrows, const int ncols, const int idx) {
   return wgrad;
 }
 
-mat NeuralNet::getresult() const {
-  return result;
-}
-
-uint32_t NeuralNet::getnumhidden() const {
-  return hidden.size();
-}
-
-InputLayer NeuralNet::getinput() const {
-  return input;
-}
-
-Layer NeuralNet::gethidden(const uint32_t index) const {
+void NeuralNet::randomize(uint32_t index) {
   if (index < hidden.size()) {
-    return hidden[index];
+    const mat w = hidden[index].getw();
+    const double avg = sumall(w) / (w.n_rows * w.n_cols);
+    hidden[index].randominit(avg);
+  } else {
+    const mat w = output.getw();
+    const double avg = sumall(w) / (w.n_rows * w.n_cols);
+    output.randominit(avg);
   }
-  return Layer();
 }
 
-OutputLayer NeuralNet::getoutput() const {
-  return output;
+void NeuralNet::save(const string path) {
+  ofstream out(path, std::ios::out);
+  if (out.is_open()) {
+    // save hidden layer parameter first
+    for (uint32_t i = 0 ; i < hidden.size() ; ++i) {
+      const mat w = hidden[i].getw();
+      for (uint32_t j = 0 ; j < w.n_rows ; ++j) {
+        for (uint32_t k = 0 ; k < w.n_cols ; ++k) {
+          out << w(j, k) << " ";
+        }
+      }
+      out << "\n";
+    }
+    // save output layer
+    const mat w = output.getw();
+    for (uint32_t i = 0 ; i < w.n_rows ; ++i) {
+      for (uint32_t j = 0 ; j < w.n_cols ; ++j) {
+        out << w(i, j) << " ";
+      }
+    }
+    out << "\n";
+    out.close();
+  }
 }
 
+void NeuralNet::load(const string path) {
+  ifstream in(path, std::ios::in);
+  if (in.is_open()) {
+    // read hidden layer first
+    for (uint32_t i = 0 ; i < hidden.size() ; ++i) {
+      mat w = hidden[i].getw();
+      for (uint32_t j = 0 ; j < w.n_rows ; ++j) {
+        for (uint32_t k = 0 ; k < w.n_cols ; ++k) {
+          double val = 0;
+          in >> val;
+          w(j, k) = val;
+        }
+      }
+      hidden[i].setw(w);
+    }
+    // load output layer
+    mat w = output.getw();
+    for (uint32_t i = 0 ; i < w.n_rows ; ++i) {
+      for (uint32_t j = 0 ; j < w.n_cols ; ++j) {
+        double val = 0;
+        in >> val;
+        w(i, j) = val;
+      }
+    }
+    output.setw(w);
+
+    in.close();
+  }
+}
 
 }
