@@ -39,13 +39,13 @@ double sigmoidgrad(double z) {
 }
 
 mat cost(mat y, mat h) {
-  mat J = -(y % nn::funcop(h, log) + (1-y) % nn::funcop(1-h, log));
+  mat J = -(y % nn::funcop(h, log) + (1-y) % nn::funcop(1-h, log)) / y.n_rows;
   return J;
 }
 
 mat costd(mat y, mat a, mat) {
   mat grad = (a - y);
-  return grad;
+  return grad / y.n_rows;
 }
 
 void load(mat &x, mat &y) {
@@ -78,8 +78,8 @@ void loadsample(mat &sample, const int w, const int h) {
 }
 
 int main() {
-  const double lrate = 1e-3;
-  const double lambda = 1e-6;
+  const double lrate = 1e-2;
+  const double lambda = 0;
   const int w = 800;
   const int h = 600;
 
@@ -100,12 +100,12 @@ int main() {
   };
   OutputLayer output(6, 2, lrate, lambda, sigmoid, sigmoidgrad, cost, costd);
   NeuralNet nnet(input, output, hidden);
-  Trainer trainer(nnet);
+  nn::MomentumTrainer trainer(nnet, 0.5);
 
   mat x, y, sample;
   load(x, y); loadsample(sample, w, h);
 
-  trainer.gradcheck(x, y);
+  //trainer.gradcheck(x, y);
   for (int i = 0 ; i < 120000 ; ++i) {
     trainer.feeddata(x, y);
     cout << "\riteration: " << i << " | cost: " << nnet.computecost();
