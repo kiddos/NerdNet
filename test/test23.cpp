@@ -29,7 +29,7 @@ using nn::MomentumTrainer;
 const string IMAGE_PATH = "/home/joseph/Pictures/bear1.png";
 const int IMAGE_WIDTH = 240;
 const int IMAGE_HEIGHT = 135;
-const double NORM = 25.5;
+const double NORM = 1;
 const double thresh = 1e128;
 
 double relu(double z) {
@@ -78,7 +78,7 @@ void draw(cv::Mat& image, NeuralNet& nnet) {
 }
 
 int main() {
-  const double lrate = 1e-7;
+  const double lrate = 1e-6;
   const double lambda = 0;
   const int batchsize = 0;
   const int n = 2;
@@ -96,7 +96,7 @@ int main() {
   //KullbackLeiblerOutput output(hsize, o, lrate, lambda);
   QuadraticOutput output(hsize, o, lrate, lambda);
   NeuralNet nnet(input, output, hidden);
-  MomentumTrainer trainer(nnet, 0.9);
+  nn::Trainer trainer(nnet);
 
   mat x, y;
   load(x, y);
