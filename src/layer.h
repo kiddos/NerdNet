@@ -5,6 +5,7 @@
 #include "matop.h"
 #include "type.h"
 #include "act.h"
+#include "config.h"
 
 namespace nn {
 

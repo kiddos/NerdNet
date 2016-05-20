@@ -20,14 +20,14 @@ Layer::Layer(const int pnnodes, const int nnodes,
              func act, func actd)
     : lrate(lrate), lambda(lambda), act(act), actd(actd),
       W(pnnodes+1, nnodes), grad(pnnodes+1, nnodes) {
-  randominit(6.0);
+  randominit(sqrt(pnnodes));
 }
 
 Layer::Layer(const int pnnodes, const int nnodes, const double lrate,
              const double lambda, ActFunc actfunc)
     : lrate(lrate), lambda(lambda), act(actfunc.act), actd(actfunc.actd),
       W(pnnodes+1, nnodes), grad(pnnodes+1, nnodes) {
-  randominit(6.0);
+  randominit(sqrt(pnnodes));
 }
 
 Layer& Layer::operator= (const Layer& layer) {
