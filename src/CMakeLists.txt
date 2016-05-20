@@ -1,6 +1,7 @@
 include (CheckIncludeFiles)
 check_include_files(armadillo HAVE_ARMADILLO)
 check_include_files(mat.h HAVE_MAT)
+check_include_files(omp.h HAVE_OPENMP)
 
 set(BASE_SOURCE act.cpp matop.cpp)
 
@@ -19,7 +20,7 @@ set(TRAINER_SOURCE ${TRAINER_SOURCE} batchtrainer.cpp)
 set(SOURCE ${BASE_SOURCE} ${LAYER_SOURCE} neuralnet.cpp ${TRAINER_SOURCE})
 
 
-set(BASE_HEADER act.h type.h matop.h debug.h)
+set(BASE_HEADER act.h type.h matop.h debug.h config.h)
 set(LAYER_HEADER layer.h inputlayer.h convlayer.h softmaxlayer.h)
 set(OUTPUT_LAYER_HEADER outputlayer.h)
 set(OUTPUT_LAYER_HEADER ${OUTPUT_LAYER_HEADER} softmaxoutput.h)
@@ -35,8 +36,12 @@ set(TRAINER_HEADER ${TRAINER_HEADER} batchtrainer.h)
 
 set(HEADER ${LAYER_HEADER} ${BASE_HEADER} neuralnet.h nnet.h ${TRAINER_HEADER})
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -O3 -g -std=c++11")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DDEBUG ")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -O2 -g -std=c++11")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DDEBUG")
+if (HAVE_OPENMP)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DHAVE_OPENMP -fopenmp")
+  message("Using Openmp")
+endif (HAVE_OPENMP)
 
 add_library(nnet ${SOURCE} ${HEADER})
 target_link_libraries(nnet armadillo)
