@@ -249,6 +249,11 @@ mat NeuralNet::computengrad(const int nrows, const int ncols, const int idx) {
   return wgrad;
 }
 
+void NeuralNet::randomize() {
+  int index = rand() % (hidden.size()+1);
+  randomize(index);
+}
+
 void NeuralNet::randomize(uint32_t index) {
   if (index < hidden.size()) {
     const mat w = hidden[index].getw();

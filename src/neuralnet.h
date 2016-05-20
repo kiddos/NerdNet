@@ -29,6 +29,7 @@ class NeuralNet {
   void update(const mat& ograd, const std::vector<mat>& hgrad);
   bool gradcheck(const mat& x, const mat& y);
   double computecost();
+  void randomize();
   void randomize(uint32_t index);
   void save(const std::string path);
   void load(const std::string path);
