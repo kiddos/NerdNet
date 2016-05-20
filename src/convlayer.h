@@ -9,12 +9,12 @@ class ConvLayer : public Layer {
  public:
   ConvLayer();
   ConvLayer(const int inputwidth, const int inputheight,
-            const int nfilter, const int spatial,
-            const int stride, const int padding,
+            const int pnfilter, const int nfilter,
+            const int spatial, const int stride, const int padding,
             const double lrate, func act, func actd);
   ConvLayer(const int inputwidth, const int inputheight,
-            const int nfilter, const int spatial,
-            const int stride, const int padding,
+            const int pnfilter, const int nfilter,
+            const int spatial, const int stride, const int padding,
             const double lrate, ActFunc actfunc);
   ConvLayer(const ConvLayer& conv);
   ConvLayer& operator= (const ConvLayer& conv);
@@ -30,8 +30,9 @@ class ConvLayer : public Layer {
   mat toimage(const mat& sample) const;
   mat addzeropadding(const mat& image) const;
   mat convolve(const mat& image, const int x, const int y) const;
+  mat image(const mat& pa, const int pnfilter) const;
 
-  int inputwidth, inputheight;
+  int inputwidth, inputheight, inputsize;
   int nfilter, spatial, stride, padding;
 };
 
