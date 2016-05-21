@@ -7,6 +7,7 @@
 #include <time.h>
 namespace nn {
   typedef arma::mat mat;
+  typedef arma::cube cube;
 }
 #else
 #include "mat.h"
