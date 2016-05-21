@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <string>
-#include "../src/nnet.h"
+#include "nnet.h"
 
 #include <opencv2/core.hpp>
 #include <opencv2/highgui.hpp>
