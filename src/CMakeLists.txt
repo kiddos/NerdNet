@@ -5,7 +5,7 @@ check_include_files(omp.h HAVE_OPENMP)
 
 set(BASE_SOURCE act.cpp matop.cpp)
 
-set(LAYER_SOURCE layer.cpp inputlayer.cpp)
+set(LAYER_SOURCE layer.cpp inputlayer.cpp convlayer.cpp)
 set(OUTPUT_LAYER_SOURCE outputlayer.cpp)
 set(OUTPUT_LAYER_SOURCE ${OUTPUT_LAYER_SOURCE} softmaxoutput.cpp)
 set(OUTPUT_LAYER_SOURCE ${OUTPUT_LAYER_SOURCE} crossentropyoutput.cpp)
