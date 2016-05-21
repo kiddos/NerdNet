@@ -18,24 +18,25 @@ class ConvLayer : public Layer {
             const double lrate, ActFunc actfunc);
   ConvLayer(const ConvLayer& conv);
   ConvLayer& operator= (const ConvLayer& conv);
-  virtual mat forwardprop(const mat pa);
-  virtual mat backprop(const mat delta);
+  virtual mat forwardprop(const mat& pa);
+  virtual mat backprop(const mat& delta);
 
-  int getnfilter() const;
-  int getspatialsize() const;
-  int getstride() const;
-  int getzeropadding() const;
-
-
- protected:
-  mat toimage(const mat& pa, int pnfilter) const;
-  mat addzeropadding(const mat& image) const;
-  mat flip(int pn, int n) const;
-  void convole(const mat& x, const mat& y, mat& output) const;
+  int getnfilter() const { return nfilter; }
+  int getspatialsize() const { return spatial; }
+  int getstride() const { return stride; }
+  int getzeropadding() const { return padding; }
 
   int inputwidth, inputheight, inputsize;
+  int outputwidth, outputheight, outputsize;
+
+ protected:
+  mat toimage(const mat& pa, int filter, int w, int h) const;
+  mat addzeropadding(const mat& image) const;
+  mat flip(int pn, int n) const;
+  void convolve(const mat& x, const mat& y, mat& output) const;
+
   int pnfilter, nfilter, spatial, stride, padding;
-  mat padinput;
+  cube images;
 };
 
 }
