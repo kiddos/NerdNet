@@ -26,14 +26,16 @@ class ConvLayer : public Layer {
   int getstride() const;
   int getzeropadding() const;
 
+
  protected:
-  mat toimage(const mat& sample) const;
+  mat toimage(const mat& pa, int pnfilter) const;
   mat addzeropadding(const mat& image) const;
-  mat convolve(const mat& image, const int x, const int y) const;
-  mat image(const mat& pa, const int pnfilter) const;
+  mat flip(int pn, int n) const;
+  void convole(const mat& x, const mat& y, mat& output) const;
 
   int inputwidth, inputheight, inputsize;
-  int nfilter, spatial, stride, padding;
+  int pnfilter, nfilter, spatial, stride, padding;
+  mat padinput;
 };
 
 }
