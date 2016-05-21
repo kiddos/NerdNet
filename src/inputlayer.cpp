@@ -22,7 +22,7 @@ InputLayer& InputLayer::operator= (const InputLayer& input) {
   return *this;
 }
 
-mat InputLayer::forwardprop(const mat input) {
+mat InputLayer::forwardprop(const mat& input) {
   z = input;
   a = input;
   return a;

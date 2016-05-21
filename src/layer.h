@@ -20,8 +20,8 @@ class Layer {
         const double lrate, const double lambda,
         ActFunc actfunc);
   virtual Layer& operator= (const Layer& layer);
-  virtual mat forwardprop(const mat pa);
-  virtual mat backprop(const mat delta);
+  virtual mat forwardprop(const mat& pa);
+  virtual mat backprop(const mat& delta);
   virtual void update();
   virtual void update(const mat grad);
   void randominit(const double eps);

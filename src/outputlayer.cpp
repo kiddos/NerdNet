@@ -36,7 +36,7 @@ OutputLayer& OutputLayer::operator= (const OutputLayer& output) {
   return *this;
 }
 
-mat OutputLayer::backprop(const mat label) {
+mat OutputLayer::backprop(const mat& label) {
   y = label;
   delta = costd(y, a, z);
   grad = pa.t() * delta;

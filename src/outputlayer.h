@@ -19,7 +19,7 @@ class OutputLayer : public Layer {
               const ActFunc actfunc,
               matfunc cost, matfuncd costd);
   virtual OutputLayer& operator= (const OutputLayer& output);
-  virtual mat backprop(const mat label);
+  virtual mat backprop(const mat& label);
   mat argmax() const;
   double getcostval() const;
   matfunc getcost() const;

@@ -58,7 +58,7 @@ void Layer::randominit(const double eps) {
   }
 }
 
-mat Layer::forwardprop(const mat pa) {
+mat Layer::forwardprop(const mat& pa) {
   this->pa = addcol(pa);
   z = this->pa * W;
   a = funcop(z, act);
@@ -66,7 +66,7 @@ mat Layer::forwardprop(const mat pa) {
   return a;
 }
 
-mat Layer::backprop(const mat d) {
+mat Layer::backprop(const mat& d) {
   // compute this delta and grad
   mat actdz = funcop(z, actd);
   mat delta = d;
