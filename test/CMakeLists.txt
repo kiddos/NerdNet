@@ -1,5 +1,6 @@
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -O3 -g -std=c++11 -DDEBUG -fopenmp")
 
+include_directories(${CMAKE_SOURCE_DIR}/src)
 link_directories(/usr/lib ${CMAKE_BINARY_DIR}/src)
 
 add_executable(XORProblem test1.cpp)
@@ -13,10 +14,12 @@ add_executable(Gametest test22.cpp)
 add_executable(Drawimagetest test23.cpp)
 add_executable(Complex test24.cpp)
 add_executable(MomentumTest test25.cpp)
-add_executable(ConvLayerTest test26.cpp)
+
+add_executable(ConvLayerTest convlayer_test.cpp)
 
 set(OPENCV_LIBS opencv_core opencv_highgui opencv_imgproc opencv_imgcodecs)
-set(LIBS nnet armadillo ${OPENCV_LIBS} mgl mgl-qt)
+set(MATHGL_LIBS mgl mgl-qt)
+set(LIBS nnet armadillo ${OPENCV_LIBS} ${MATHGL_LIBS})
 
 target_link_libraries(XORProblem ${LIBS})
 target_link_libraries(MNIST ${LIBS})
