@@ -57,18 +57,45 @@ int main(int argc, char *argv[]) {
   mat sample(0, 0);
   resizeimg(sample, img);
   double start = omp_get_wtime();
-  mat out;
-  for (int i = 0 ; i < 3000 ; ++i)
+  mat out, delta;
+  for (int i = 0 ; i < 1000 ; ++i) {
     out = layer.forwardprop(sample);
+  }
   double pass = omp_get_wtime() - start;
   cout << "time used: " << pass << endl;;
-  cout << out << endl;;
-  cout << "partial image: " << endl;
-  mat outimage = out;
-  outimage.reshape(w, outimage.n_cols/w);
-  cout << outimage.n_rows << ", " << outimage.n_cols << endl;
-  for (uint32_t i = 0 ; i*h < outimage.n_cols ; ++i) {
-    cout << outimage.submat(0, i*h, w-1, (i+1)*h-1).t() << endl;
+
+  start = omp_get_wtime();
+  for (int i = 0 ; i < 1000 ; ++i) {
+    delta = layer.backprop(out);
   }
+  pass = omp_get_wtime() - start;
+  cout << "time used: " << pass << endl;;
+
+  start = omp_get_wtime();
+  for (int i = 0 ; i < 1000 ; ++i) {
+    layer.forwardprop(sample);
+    layer.backprop(out);
+  }
+  pass = omp_get_wtime() - start;
+  cout << "time used: " << pass << endl;;
+
+  //cout << "partial output image: " << endl;
+  //mat outimage = out;
+  //outimage.reshape(w, outimage.n_cols/w);
+  //cout << outimage.n_rows << ", " << outimage.n_cols << endl;
+  //for (uint32_t i = 0 ; i*h < outimage.n_cols ; ++i) {
+    //cout << outimage.submat(0, i*h, w-1, (i+1)*h-1).t() << endl;
+  //}
+
+  //cout << "partial delta" << endl;
+  //cout << delta << endl;
+  //delta.reshape(img.channels(), delta.n_cols / img.channels());
+  //for (uint32_t i = 0 ; i < delta.n_rows ; ++i) {
+    //mat image = delta.row(i);
+    //image.reshape(w, h);
+    //image = image.t();
+    //cout << image << endl;
+  //}
+
   return 0;
 }
