@@ -50,7 +50,7 @@ ConvLayer& ConvLayer::operator= (const ConvLayer& conv) {
   m.submat(j*spatial, k*spatial, (j+1)*spatial-1, (k+1)*spatial-1)
 
 mat ConvLayer::forwardprop(const mat& pa) {
-  mat output(pa.n_rows, outputsize * nfilter, arma::fill::zeros);
+  a = mat(pa.n_rows, outputsize * nfilter, arma::fill::zeros);
   images = cube(inputheight + 2*padding, inputwidth + 2*padding, pa.n_rows);
 
   for (uint32_t i = 0 ; i < pa.n_rows ; ++i) {
@@ -61,30 +61,32 @@ mat ConvLayer::forwardprop(const mat& pa) {
       images.slice(i) = addzeropadding(img);
 
 #ifdef HAVE_OPENMP
-#pragma omp parallel for default(none) shared(output,j,i) if (nfilter >= 16)
+#pragma omp parallel for default(none) shared(j,i) if (nfilter >= 16)
 #endif
       for (int k = 0 ; k < nfilter ; ++k) {
         mat partialoutput;
         convolve(images.slice(i), SPATIAL(W, j, k), partialoutput);
-        output.submat(i, k*outputsize, i, (k+1)*outputsize-1) += partialoutput;
+        a.submat(i, k*outputsize, i, (k+1)*outputsize-1) += partialoutput;
       }
     }
   }
-  return funcop(output, act);
+  return funcop(a, act);
 }
 
-mat ConvLayer::backprop(const mat& delta) {
-  mat nextdelta(delta.n_rows, inputsize * pnfilter, arma::fill::zeros);
+mat ConvLayer::backprop(const mat& del) {
+  delta = mat(del.n_rows, inputsize * pnfilter, arma::fill::zeros);
   grad.zeros();
 
-  for (uint32_t i = 0 ; i < delta.n_rows ; ++i) {
-    mat deltay = pa.row(i);
+  mat d = funcop(del, actd);
+
+  for (uint32_t i = 0 ; i < d.n_rows ; ++i) {
+    mat deltay = d.row(i);
 
     for (int k = 0 ; k < nfilter ; ++k) {
-      mat dimg = toimage(deltay, k, outputwidth, outputheight);
+      const mat dimg = toimage(deltay, k, outputwidth, outputheight);
 
 #ifdef HAVE_OPENMP
-#pragma omp parallel for default(none) shared(nextdelta,dimg,k,i) if (pnfilter >= 16)
+#pragma omp parallel for default(none) shared(k,i) if (pnfilter >= 16)
 #endif
       for (int j = 0 ; j < pnfilter ; ++j) {
         // compute grad
@@ -94,14 +96,16 @@ mat ConvLayer::backprop(const mat& delta) {
         SPATIAL(grad, j, k) += partialgrad;
 
         // compute next delta to pass
+        const mat paddimg = addzeropadding(dimg);
         mat partialdelta;
-        convolve(dimg, SPATIAL(W, j, k), partialdelta);
-        nextdelta.submat(i, j*inputsize, i, (j+1)*inputsize-1) += partialdelta;
+        convolve(paddimg, flip(j, k), partialdelta);
+
+        delta.submat(i, j*inputsize, i, (j+1)*inputsize-1) += partialdelta;
       }
     }
   }
 
-  return nextdelta;
+  return delta;
 }
 
 mat ConvLayer::toimage(const mat& pa, int filter, int w, int h) const {
