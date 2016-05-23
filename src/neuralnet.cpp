@@ -10,7 +10,7 @@ namespace nn {
 NeuralNet::NeuralNet() : eps(1e-4) {}
 
 NeuralNet::NeuralNet(const NeuralNet& nnet)
-    : eps(nnet.eps), x(nnet.x), y(nnet.y), result(nnet.result),
+    : eps(nnet.eps), result(nnet.result),
       cost(nnet.cost), costd(nnet.costd),
       input(nnet.input), hidden(nnet.hidden), output(nnet.output) {}
 
@@ -20,8 +20,6 @@ NeuralNet::NeuralNet(const InputLayer input, const OutputLayer output,
       input(input), hidden(hidden), output(output) {}
 
 NeuralNet& NeuralNet::operator= (const NeuralNet& nnet) {
-  x = nnet.x;
-  y = nnet.y;
   result = nnet.result;
   cost = nnet.cost;
   costd = nnet.costd;
@@ -32,8 +30,6 @@ NeuralNet& NeuralNet::operator= (const NeuralNet& nnet) {
 }
 
 mat NeuralNet::forwardprop(const mat& x) {
-  this->x = x;
-
   mat current = input.forwardprop(x);
   for (uint32_t i = 0 ; i < hidden.size() ; ++i) {
     const mat n = hidden[i].forwardprop(current);
@@ -44,8 +40,6 @@ mat NeuralNet::forwardprop(const mat& x) {
 }
 
 void NeuralNet::backprop(const mat& y) {
-  this->y = y;
-
   mat currentdelta = output.backprop(y);
   for (int i = hidden.size()-1 ; i >= 0 ; --i) {
     mat p = hidden[i].backprop(currentdelta);
@@ -67,7 +61,7 @@ void NeuralNet::update(const mat& ograd, const vector<mat>& hgrad) {
   }
 }
 
-mat NeuralNet::predict(const mat sample) {
+mat NeuralNet::predict(const mat& sample) {
   // prediction is simply forwardprop
   result = forwardprop(sample);
   mat argmax = output.argmax();
@@ -85,7 +79,7 @@ bool NeuralNet::gradcheck(const mat& x, const mat& y) {
 
   bool success = true;
   mat w = output.getw();
-  mat ngrad = computengrad(w.n_rows, w.n_cols, hidden.size());
+  mat ngrad = computengrad(x, y, w.n_rows, w.n_cols, hidden.size());
   mat grad = output.getgrad();
 
   if (!issame(grad, ngrad)) {
@@ -105,7 +99,7 @@ bool NeuralNet::gradcheck(const mat& x, const mat& y) {
 
   for (int i = hidden.size()-1 ; i >= 0 ; --i) {
     w = hidden[i].getw();
-    ngrad = computengrad(w.n_rows, w.n_cols, i);
+    ngrad = computengrad(x, y, w.n_rows, w.n_cols, i);
     grad = hidden[i].getgrad();
 
     if (!issame(grad, ngrad)) {
@@ -134,8 +128,8 @@ bool NeuralNet::gradcheck(const mat& x, const mat& y) {
   return success;
 }
 
-double NeuralNet::computecost() {
-  mat J = cost(y, result);
+double NeuralNet::computecost(const mat& pred, const mat& y) {
+  mat J = cost(y, pred);
   return sumall(J);
 }
 
@@ -146,7 +140,7 @@ void NeuralNet::setlrate(const double lrate) {
   output.setlrate(lrate);
 }
 
-bool NeuralNet::issame(const mat m1, const mat m2) {
+bool NeuralNet::issame(const mat& m1, const mat& m2) {
   const double scale = 1.0 / eps;
   for (uint32_t i = 0 ; i < m1.n_rows ; ++i) {
     for (uint32_t j = 0 ; j < m1.n_cols ; ++j) {
@@ -165,7 +159,8 @@ bool NeuralNet::issame(const mat m1, const mat m2) {
   return true;
 }
 
-double NeuralNet::computecost(const mat perturb, const uint32_t idx) {
+double NeuralNet::computecost(const mat& x, const mat&y,
+                              const mat& perturb, uint32_t idx) {
   if (idx > hidden.size()) return DBL_MAX;
 
   // forward propagation
@@ -229,7 +224,8 @@ double NeuralNet::computecost(const mat perturb, const uint32_t idx) {
   return val;
 }
 
-mat NeuralNet::computengrad(const int nrows, const int ncols, const int idx) {
+mat NeuralNet::computengrad(const mat&x, const mat&y,
+                            int nrows, int ncols, int idx) {
   mat wgrad(nrows, ncols);
   mat perturb(nrows, ncols);
   wgrad.zeros();
@@ -238,8 +234,8 @@ mat NeuralNet::computengrad(const int nrows, const int ncols, const int idx) {
   for (int i = 0 ; i < nrows ; ++i) {
     for (int j = 0 ; j < ncols ; ++j) {
       perturb(i, j) = eps;
-      const double loss1 = computecost(perturb, idx);
-      const double loss2 = computecost(-perturb, idx);
+      const double loss1 = computecost(x, y, perturb, idx);
+      const double loss2 = computecost(x, y, -perturb, idx);
       wgrad(i, j) = (loss1 - loss2) / (2 * eps);
 
       perturb(i, j) = 0;

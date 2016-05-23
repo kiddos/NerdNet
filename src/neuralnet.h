@@ -22,13 +22,13 @@ class NeuralNet {
             std::vector<Layer> layers);
   NeuralNet& operator= (const NeuralNet& nnet);
 
-  mat predict(const mat sample);
+  mat predict(const mat& sample);
   mat forwardprop(const mat& x);
   void backprop(const mat& y);
   void update();
   void update(const mat& ograd, const std::vector<mat>& hgrad);
   bool gradcheck(const mat& x, const mat& y);
-  double computecost();
+  double computecost(const mat& pred, const mat& y);
   void randomize();
   void randomize(uint32_t index);
   void save(const std::string path);
@@ -37,19 +37,19 @@ class NeuralNet {
   mat getresult() const { return result; };
   uint32_t getnumhidden() const { return hidden.size(); };
   InputLayer getinput() const { return input; };
-  Layer gethidden(const uint32_t index) const { return hidden[index]; };
+  Layer gethidden(uint32_t index) const { return hidden[index]; };
   OutputLayer getoutput() const { return output; };
-  void setlrate(const double lrate);
-  void sethiddenw(uint32_t index, const mat w) { hidden[index].setw(w); }
-  void setoutputw(const mat w) { output.setw(w); }
+  void setlrate(double lrate);
+  void sethiddenw(uint32_t index, const mat& w) { hidden[index].setw(w); }
+  void setoutputw(const mat& w) { output.setw(w); }
 
  private:
-  bool issame(const mat m1, const mat m2);
-  double computecost(const mat perturb, const uint32_t idx);
-  mat computengrad(const int nrows, const int ncols, const int idx);
+  bool issame(const mat& m1, const mat& m2);
+  double computecost(const mat& x, const mat& y,
+                     const mat& perturb, uint32_t idx);
+  mat computengrad(const mat& x, const mat& y, int nrows, int ncols, int idx);
 
   const double eps;
-  mat x, y;
   mat result;
   matfunc cost;
   matfuncd costd;
@@ -60,7 +60,4 @@ class NeuralNet {
 
 }
 
-
 #endif /* end of include guard: NEURALNET_H */
-
-
