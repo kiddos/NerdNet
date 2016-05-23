@@ -35,12 +35,15 @@ def download():
 
 def extract():
     output_path = './'
+    data = []
     for item in download_list:
         f = open(item, 'rb')
         z = zipfile.ZipFile(f)
         for filename in z.namelist():
             z.extract(filename, output_path)
+            data.append(filename)
         f.close()
+    return data
 
 if __name__ == '__main__':
     download()
