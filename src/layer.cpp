@@ -91,4 +91,3 @@ void Layer::update(const mat grad) {
 }
 
 }
-

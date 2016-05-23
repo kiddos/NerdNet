@@ -17,4 +17,3 @@ class InputLayer : public Layer {
 }
 
 #endif /* end of include guard: INPUTLAYER_H */
-
