@@ -104,9 +104,8 @@ int main() {
   //cout << sample.row(0) << endl;
   trainer.gradcheck(x.row(0), y.row(0));
   for (int i = 0 ; i < 36000 ; ++i) {
-    trainer.feeddata(x, y);
-    //nnet.feeddata(x, y, true);
-    cout << "\riteration: " << i << " | cost: " << nnet.computecost();
+    const double cost = trainer.feeddata(x, y, true);
+    cout << "\riteration: " << i << " | cost: " << cost;
   }
   cout << endl;
   mat result = nnet.predict(sample);

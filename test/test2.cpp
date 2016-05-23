@@ -118,10 +118,9 @@ int main() {
   for (int i = 0 ; i < datasize * 26; ++i) {
     const int start = i % (datasize-batchsize);
     const int end = start + batchsize;
-    trainer.feeddata(x.rows(start, end), y.rows(start, end));
+    const double cost = trainer.feeddata(x.rows(start, end), y.rows(start, end));
 
     if (i % datasize == 0) {
-      const double cost = nnet.computecost();
       if (cost < 0.01) break;
       cout << "iteration: " << i << " cost: " << cost << endl;
       cout << nnet.getresult() << endl;

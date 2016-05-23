@@ -136,8 +136,7 @@ int main() {
 
   trainer.gradcheck(trainx.row(1), trainy.row(1));
   for (int i = 0 ; i < datasize * 30 ; ++i) {
-    trainer.feeddata(trainx, trainy);
-    const double newcost = trainer.evalcost();
+    const double newcost = trainer.feeddata(trainx, trainy, true);
     cout << "\riteration: " << i+1 << " cost: " << newcost;
 
     if (i % 10 == 0) {

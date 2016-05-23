@@ -119,16 +119,10 @@ int main() {
 
   InputLayer input(2);
   vector<Layer> hidden = {
-    //Layer(2, 2, lrate, rectifier, rectifiergrad),
-    //Layer(2, 6, lrate, atan, [](double x) {return 1.0/(1.0+x*x);}),
     Layer(2, 6, lrate, lambda, atan, [](double x) {return 1.0/(1.0+x*x);}),
     Layer(6, 6, lrate, lambda, rectifier, rectifiergrad),
     Layer(6, 6, lrate, lambda, sigmoid, sigmoidgrad),
     Layer(6, 6, lrate, lambda, atan, [](double x) {return 1.0/(1.0+x*x);}),
-    //Layer(2, 6, lrate, sigmoid, sigmoidgrad),
-    //Layer(6, 6, lrate, sigmoid, sigmoidgrad),
-    //Layer(6, 6, lrate, sigmoid, sigmoidgrad),
-    //Layer(6, 6, lrate, sigmoid, sigmoidgrad),
   };
   OutputLayer output(6, 2, lrate, lambda, identity, identitygrad, cost, costd);
   NeuralNet nnet(input, output, hidden);
@@ -138,9 +132,8 @@ int main() {
   load(x, y); loadsample(sample, w, h);
   trainer.gradcheck(x, y);
   for (int i = 0 ; i < 120000 ; ++i) {
-    trainer.feeddata(x, y);
-    //nnet.feeddata(x, y, true);
-    cout << "\riteration: " << i << " | cost: " << nnet.computecost();
+    const double cost = trainer.feeddata(x, y, true);
+    cout << "\riteration: " << i << " | cost: " << cost;
   }
   cout << endl;
   mat result = nnet.predict(sample);

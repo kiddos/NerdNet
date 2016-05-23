@@ -76,11 +76,8 @@ int main() {
   load(x, y); loadsample(sample, w, h);
   trainer.gradcheck(x, y);
   for (int i = 0 ; i < 210000 ; ++i) {
-    //nnet.feeddata(x.row(i % x.n_rows), y.row(i % y.n_rows), false);
-    trainer.feeddata(x, y);
-    cout << "\riteration: " << i << " | cost: " << nnet.computecost();
-    //if (i % (x.n_rows * 50) == 0)
-      //cout << endl << "iteration: " << i << " | cost: " << nnet.computecost();
+    const double cost =trainer.feeddata(x, y);
+    cout << "\riteration: " << i << " | cost: " << cost;
   }
   cout << endl;
   mat result = nnet.predict(sample);

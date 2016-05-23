@@ -133,12 +133,12 @@ int main() {
     //const int start = i % (x.n_rows-batchsize);
     //const int end = start + batchsize;
     //nnet.feeddata(x.rows(start, end), y.rows(start, end), false);
-    trainer.feeddata(x.row(i%x.n_rows), y.row(i%x.n_rows));
+    cost = trainer.feeddata(x.row(i%x.n_rows), y.row(i%x.n_rows));
     //nnet.feeddata(x, y, false);
-    cout << "\riteration: " << i+1 << " cost: " << nnet.computecost()
+    cout << "\riteration: " << i+1 << " cost: " << cost
           << "       ";
     if (i % (x.n_rows*10) == 0) {
-      double costtemp = nnet.computecost();
+      double costtemp = nnet.computecost(nnet.getresult(), y);
       if (costtemp > cost || costtemp < 1e-7) break;
 
       cost = costtemp;
