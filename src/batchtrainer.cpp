@@ -25,7 +25,7 @@ BatchTrainer::~BatchTrainer() {
   nnet = nullptr;
 }
 
-void BatchTrainer::feeddata(const mat& x, const mat& y) {
+double BatchTrainer::feeddata(const mat& x, const mat& y, bool ccost) {
   this->x = x;
   this->y = y;
 
@@ -34,6 +34,7 @@ void BatchTrainer::feeddata(const mat& x, const mat& y) {
   trainx.insert_rows(trainx.n_rows, x.submat(0, 0, batchsize-2, x.n_cols-1));
   trainy.insert_rows(trainy.n_rows, y.submat(0, 0, batchsize-2, y.n_cols-1));
 
+  double cost = 0;
   for (uint32_t i = 0 ; i < x.n_rows ; i += batchsize) {
     const int start = i;
     const int end = i + batchsize - 1;
@@ -42,17 +43,17 @@ void BatchTrainer::feeddata(const mat& x, const mat& y) {
     nnet->update();
 
     iters ++;
+
+    if (ccost) {
+      cost += nnet->computecost(nnet->getresult(), y);
+    }
   }
 
   if (usedecay && iters == step) {
     nnet->setlrate(r0 * exp(-k*iters));
   }
-}
 
-double BatchTrainer::evalcost() const {
-  nnet->forwardprop(x);
-  nnet->backprop(y);
-  return nnet->computecost();
+  return cost;
 }
 
 }

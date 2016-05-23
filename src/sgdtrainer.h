@@ -14,11 +14,7 @@ class SGDTrainer : public Trainer {
   SGDTrainer& operator= (const SGDTrainer& trainer);
   ~SGDTrainer();
 
-  virtual void feeddata(const mat& x, const mat& y);
-  virtual double evalcost() const;
-
- protected:
-  mat x, y;
+  virtual double feeddata(const mat& x, const mat& y, bool ccost=false);
 };
 
 }

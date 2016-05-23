@@ -17,7 +17,7 @@ class MomentumTrainer : public Trainer {
   MomentumTrainer& operator= (const MomentumTrainer& trainer);
   ~MomentumTrainer();
 
-  virtual void feeddata(const mat& x, const mat& y);
+  virtual double feeddata(const mat& x, const mat& y, bool ccost=false);
 
  protected:
   void initmomentum();
