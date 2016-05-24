@@ -6,6 +6,7 @@ import os
 import zipfile
 
 url = 'http://sci2s.ugr.es/keel/dataset/data/'
+output_path = './data'
 
 download_list = [
     'classification/iris.zip',
@@ -21,29 +22,27 @@ download_list = [
 ]
 
 def download():
-    if not os.path.exists('classification'):
-        os.mkdir('classification')
-    if not os.path.exists('regression'):
-        os.mkdir('regression')
+    if not os.path.exists(output_path + '/classification'):
+        os.mkdir(output_path + '/classification')
+    if not os.path.exists(output_path + '/regression'):
+        os.mkdir(output_path + '/regression')
 
     for item in download_list:
-        if not os.path.exists(item):
+        if not os.path.exists(output_path + '/' + item):
             print 'downloading ' + item + '...'
             full_url = url + item
-            urllib.urlretrieve(full_url, item)
-
+            urllib.urlretrieve(full_url, output_path + '/' + item)
 
 def extract():
-    output_path = './'
-    data = []
+    data_path = []
     for item in download_list:
-        f = open(item, 'rb')
+        f = open(output_path + '/' + item, 'rb')
         z = zipfile.ZipFile(f)
         for filename in z.namelist():
             z.extract(filename, output_path)
-            data.append(filename)
+            data_path.append(output_path + '/' + filename)
         f.close()
-    return data
+    return data_path
 
 if __name__ == '__main__':
     download()
