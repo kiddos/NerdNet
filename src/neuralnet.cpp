@@ -253,12 +253,10 @@ void NeuralNet::randomize() {
 void NeuralNet::randomize(uint32_t index) {
   if (index < hidden.size()) {
     const mat w = hidden[index].getw();
-    const double avg = sumall(w) / (w.n_rows * w.n_cols);
-    hidden[index].randominit(avg);
+    hidden[index] = Layer(hidden[index]);
   } else {
     const mat w = output.getw();
-    const double avg = sumall(w) / (w.n_rows * w.n_cols);
-    output.randominit(avg);
+    output.randominit(sqrt(w.n_rows));
   }
 }
 
