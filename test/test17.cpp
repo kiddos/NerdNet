@@ -105,7 +105,7 @@ double accuracy(mat answer, mat prediction) {
 int main() {
   //const double lrate0 = 5e-2;
   const double lrate0 = 8e-2;
-  const double lratedecayfactor = 50000;
+  //const double lratedecayfactor = 50000;
   const double lambda = 0;
   double lrate = lrate0;
 
@@ -124,6 +124,7 @@ int main() {
   };
   nn::SoftmaxOutput output(n, o, lrate, lambda);
   NeuralNet nnet(input, output, hidden);
+  nn::SGDTrainer trainer(nnet);
 
   mat trainx, trainy, testx, testy;
   load(trainx, trainy, testx, testy);
@@ -135,30 +136,24 @@ int main() {
   //cout << trainx << endl;
 
   //const int batchsize = 100;
-  nnet.feeddata(trainx.row(1), trainy.row(1), true);
-  for (int i = 0 ; i < datasize * 30 ; ++i) {
+  //for (int i = 0 ; i < datasize * 30 ; ++i) {
+  for (int i = 0 ; i < 60 ; ++i) {
     //const int start = i % (trainx.n_rows-batchsize);
     //const int end = start + batchsize;
     //nnet.feeddata(trainx.rows(start, end), trainy.rows(start, end), false);
-    nnet.feeddata(trainx.row(i%trainx.n_rows), trainy.row(i%trainy.n_rows), false);
-    //nnet.feeddata(x, y, false);
-    const double newcost = nnet.computecost();
-    cout << "\riteration: " << i+1 << " cost: " << newcost;
+    //const double cost = trainer.feeddata(trainx.row(i%trainx.n_rows),
+                                         //trainy.row(i%trainy.n_rows), true);
+    const double cost = trainer.feeddata(trainx, trainy, true);
+    //cout << "\riteration: " << i+1 << " cost: " << cost;
+    cout << "iteration: " << i+1 << " cost: " << cost << endl;
     if (i % datasize == 0) {
       mat result = nnet.predict(trainx);
       cout << endl << "accuracy: " << accuracy(trainy, result) * 100 << endl;
-      //cout << endl << "iteration: " << i+1 << " cost: " << nnet.computecost();
-      //cout << nnet.gethidden(0).getgrad() << endl;
-      //cout << nnet.gethidden(1).getgrad() << endl;
-      //cout << nnet.gethidden(2).getgrad() << endl;
-      //cout << nnet.getoutput().getgrad() << endl;
-      //cout << endl << nnet.getresult() << endl;
-      //cout << y.row(i% datasize) << endl;
     }
-    if (i % (datasize * 1) == 0) {
-      lrate = lrate0 * exp(-i / lratedecayfactor);
-      nnet.setlrate(lrate);
-    }
+    //if (i % (datasize * 1) == 0) {
+      //lrate = lrate0 * exp(-i / lratedecayfactor);
+      //nnet.setlrate(lrate);
+    //}
   }
 
   cout << endl;

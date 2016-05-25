@@ -3,6 +3,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -O3 -g -std=c++11 -DDEBUG -fopenmp
 include_directories(${CMAKE_SOURCE_DIR}/src)
 link_directories(/usr/lib ${CMAKE_BINARY_DIR}/src)
 
+add_executable(ModelTest model_test.cpp)
 add_executable(XORProblem test1.cpp)
 add_executable(MNIST test2.cpp)
 add_executable(Softmaxtest test9.cpp)
@@ -14,6 +15,7 @@ add_executable(Gametest test22.cpp)
 add_executable(Drawimagetest test23.cpp)
 add_executable(SpiralDataTest spiraldata_test.cpp)
 add_executable(MomentumTest test25.cpp)
+add_executable(nursery test17.cpp)
 
 add_executable(ConvLayerTest convlayer_test.cpp)
 
@@ -21,6 +23,7 @@ set(OPENCV_LIBS opencv_core opencv_highgui opencv_imgproc opencv_imgcodecs)
 set(MATHGL_LIBS mgl mgl-qt)
 set(LIBS nnet armadillo ${OPENCV_LIBS} ${MATHGL_LIBS})
 
+target_link_libraries(ModelTest ${LIBS})
 target_link_libraries(XORProblem ${LIBS})
 target_link_libraries(MNIST ${LIBS})
 target_link_libraries(Softmaxtest ${LIBS})
@@ -33,7 +36,9 @@ target_link_libraries(Drawimagetest ${LIBS})
 target_link_libraries(SpiralDataTest ${LIBS})
 target_link_libraries(MomentumTest ${LIBS})
 target_link_libraries(ConvLayerTest ${LIBS})
+target_link_libraries(nursery ${LIBS})
 
+add_test(ModelTest ${LIBS})
 add_test(XORProblem ./XORProblem)
 add_test(MNIST ./MNIST)
 add_test(softmaxtest ./softmaxtest)

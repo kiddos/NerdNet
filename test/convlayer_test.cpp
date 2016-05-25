@@ -14,7 +14,7 @@
 using std::string;
 using std::endl;
 using std::cout;
-using nn::ConvLayer;
+using nn::Conv2DLayer;
 using nn::mat;
 
 void resizeimg(mat& sample, cv::Mat img) {
@@ -51,8 +51,8 @@ int main(int argc, char *argv[]) {
 
   cv::resize(img, img, cv::Size(w, h));
 
-  ConvLayer layer(w, h, img.channels(), nfilter, spatial, stride, padding,
-                  lrate, nn::relu);
+  Conv2DLayer layer(w, h, img.channels(), nfilter, spatial, stride, padding,
+                    lrate, nn::relu);
 
   mat sample(0, 0);
   resizeimg(sample, img);
