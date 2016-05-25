@@ -23,7 +23,7 @@ SGDTrainer::~SGDTrainer() {
 
 double SGDTrainer::feeddata(const mat& x, const mat& y, bool ccost) {
   iters ++;
-  if (usedecay && iters == step) {
+  if (usedecay && (iters == step)) {
     nnet->setlrate(r0 * exp(-k*iters));
   }
 
@@ -34,7 +34,8 @@ double SGDTrainer::feeddata(const mat& x, const mat& y, bool ccost) {
     nnet->update();
 
     if (ccost) {
-      cost += nnet->computecost(nnet->getresult(), y);
+      nnet->predict(x.row(i));
+      cost += nnet->computecost(nnet->getresult(), y.row(i));
     }
   }
   return cost;
