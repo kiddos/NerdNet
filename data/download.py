@@ -34,13 +34,14 @@ def download():
             urllib.urlretrieve(full_url, output_path + '/' + item)
 
 def extract():
-    data_path = []
+    data_path = {'c': [], 'r': []}
     for item in download_list:
         f = open(output_path + '/' + item, 'rb')
         z = zipfile.ZipFile(f)
         for filename in z.namelist():
             z.extract(filename, output_path)
-            data_path.append(output_path + '/' + filename)
+            if (item.startswith('classification')):
+                data_path['c'].append(output_path + '/' + filename)
         f.close()
     return data_path
 
