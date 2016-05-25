@@ -2,7 +2,7 @@
 #define NNET_H
 
 #include "layer.h"
-#include "convlayer.h"
+#include "conv2dlayer.h"
 #include "softmaxlayer.h"
 #include "inputlayer.h"
 

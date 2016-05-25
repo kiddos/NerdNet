@@ -1,14 +1,13 @@
-#include "convlayer.h"
+#include "conv2dlayer.h"
 
 namespace nn {
 
-ConvLayer::ConvLayer() : inputwidth(0), inputheight(0), pnfilter(0), nfilter(0),
-                         spatial(0), stride(0), padding(0) {}
+Conv2DLayer::Conv2DLayer() : inputwidth(0), inputheight(0), pnfilter(0),
+                             nfilter(0), spatial(0), stride(0), padding(0) {}
 
-ConvLayer::ConvLayer(const int inputwidth, const int inputheight,
-                     const int pnfilter, const int nfilter,
-                     const int spatial, const int stride, const int padding,
-                     const double lrate, func act, func actd)
+Conv2DLayer::Conv2DLayer(int inputwidth, int inputheight, int pnfilter,
+                         int nfilter, int spatial, int stride, int padding,
+                         double lrate, func act, func actd)
     : Layer(spatial*pnfilter-1, spatial*nfilter, lrate, 0, act, actd),
       inputwidth(inputwidth), inputheight(inputheight),
       inputsize(inputwidth*inputheight), pnfilter(pnfilter), nfilter(nfilter),
@@ -20,22 +19,21 @@ ConvLayer::ConvLayer(const int inputwidth, const int inputheight,
   outputsize = outputwidth * outputheight;
 }
 
-ConvLayer::ConvLayer(const int inputwidth, const int inputheight,
-                     const int pnfilter, const int nfilter,
-                     const int spatial, const int stride, const int padding,
-                     const double lrate, ActFunc actfunc)
-    : ConvLayer(inputwidth, inputheight, pnfilter, nfilter,
+Conv2DLayer::Conv2DLayer(int inputwidth, int inputheight, int pnfilter,
+                         int nfilter, int spatial, int stride, int padding,
+                         double lrate, ActFunc actfunc)
+    : Conv2DLayer(inputwidth, inputheight, pnfilter, nfilter,
                 spatial, stride, padding, lrate,
                 actfunc.act, actfunc.actd) {
 }
 
-ConvLayer::ConvLayer(const ConvLayer& conv)
+Conv2DLayer::Conv2DLayer(const Conv2DLayer& conv)
     : Layer(conv.spatial*conv.pnfilter-1, conv.spatial*conv.nfilter,
             conv.lrate, 0, conv.act, conv.actd) {
-  ConvLayer::operator= (conv);
+  Conv2DLayer::operator= (conv);
 }
 
-ConvLayer& ConvLayer::operator= (const ConvLayer& conv) {
+Conv2DLayer& Conv2DLayer::operator= (const Conv2DLayer& conv) {
   inputwidth = conv.inputwidth;
   inputheight = conv.inputheight;
   pnfilter = conv.pnfilter;
@@ -49,7 +47,7 @@ ConvLayer& ConvLayer::operator= (const ConvLayer& conv) {
 #define SPATIAL(m, j, k) \
   m.submat(j*spatial, k*spatial, (j+1)*spatial-1, (k+1)*spatial-1)
 
-mat ConvLayer::forwardprop(const mat& pa) {
+mat Conv2DLayer::forwardprop(const mat& pa) {
   a = mat(pa.n_rows, outputsize * nfilter, arma::fill::zeros);
   images = cube(inputheight + 2*padding, inputwidth + 2*padding, pa.n_rows);
 
@@ -73,7 +71,7 @@ mat ConvLayer::forwardprop(const mat& pa) {
   return funcop(a, act);
 }
 
-mat ConvLayer::backprop(const mat& del) {
+mat Conv2DLayer::backprop(const mat& del) {
   delta = mat(del.n_rows, inputsize * pnfilter, arma::fill::zeros);
   grad.zeros();
 
@@ -108,14 +106,14 @@ mat ConvLayer::backprop(const mat& del) {
   return delta;
 }
 
-mat ConvLayer::toimage(const mat& pa, int filter, int w, int h) const {
+mat Conv2DLayer::toimage(const mat& pa, int filter, int w, int h) const {
   const int size = w * h;
   mat img = pa.cols(filter*size, (filter+1)*size-1);
   img.reshape(h, w);
   return img;
 }
 
-mat ConvLayer::addzeropadding(const mat& image) const {
+mat Conv2DLayer::addzeropadding(const mat& image) const {
   mat newimage = image;
   for (int i = 0 ; i < padding ; ++i) {
     newimage = addrows(newimage, 0, 0);
@@ -128,14 +126,14 @@ mat ConvLayer::addzeropadding(const mat& image) const {
   return newimage;
 }
 
-mat ConvLayer::flip(int pn, int n) const {
+mat Conv2DLayer::flip(int pn, int n) const {
   const mat filter = SPATIAL(W, pn, n);
   return arma::fliplr(arma::flipud(filter));
 }
 
 #undef SPATIAL
 
-void ConvLayer::convolve(const mat& x, const mat& y, mat& output) const {
+void Conv2DLayer::convolve(const mat& x, const mat& y, mat& output) const {
   const int ow = (x.n_cols - y.n_cols) / stride + 1;
   const int oh = (x.n_rows - y.n_rows) / stride + 1;
   output = mat(1, ow * oh);

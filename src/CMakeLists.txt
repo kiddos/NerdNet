@@ -5,7 +5,7 @@ check_include_files(omp.h HAVE_OPENMP)
 
 set(BASE_SOURCE act.cpp matop.cpp)
 
-set(LAYER_SOURCE layer.cpp inputlayer.cpp convlayer.cpp)
+set(LAYER_SOURCE layer.cpp inputlayer.cpp conv2dlayer.cpp)
 set(OUTPUT_LAYER_SOURCE outputlayer.cpp)
 set(OUTPUT_LAYER_SOURCE ${OUTPUT_LAYER_SOURCE} softmaxoutput.cpp)
 set(OUTPUT_LAYER_SOURCE ${OUTPUT_LAYER_SOURCE} crossentropyoutput.cpp)
@@ -21,7 +21,7 @@ set(SOURCE ${BASE_SOURCE} ${LAYER_SOURCE} neuralnet.cpp ${TRAINER_SOURCE})
 
 
 set(BASE_HEADER act.h type.h matop.h debug.h config.h)
-set(LAYER_HEADER layer.h inputlayer.h convlayer.h softmaxlayer.h)
+set(LAYER_HEADER layer.h inputlayer.h conv2dlayer.h softmaxlayer.h)
 set(OUTPUT_LAYER_HEADER outputlayer.h)
 set(OUTPUT_LAYER_HEADER ${OUTPUT_LAYER_HEADER} softmaxoutput.h)
 set(OUTPUT_LAYER_HEADER ${OUTPUT_LAYER_HEADER} crossentropyoutput.h)

@@ -5,19 +5,17 @@
 
 namespace nn {
 
-class ConvLayer : public Layer {
+class Conv2DLayer : public Layer {
  public:
-  ConvLayer();
-  ConvLayer(const int inputwidth, const int inputheight,
-            const int pnfilter, const int nfilter,
-            const int spatial, const int stride, const int padding,
-            const double lrate, func act, func actd);
-  ConvLayer(const int inputwidth, const int inputheight,
-            const int pnfilter, const int nfilter,
-            const int spatial, const int stride, const int padding,
-            const double lrate, ActFunc actfunc);
-  ConvLayer(const ConvLayer& conv);
-  ConvLayer& operator= (const ConvLayer& conv);
+  Conv2DLayer();
+  Conv2DLayer(int inputwidth, int inputheight, int pnfilter, int nfilter,
+              int spatial, int stride, int padding,
+              double lrate, func act, func actd);
+  Conv2DLayer(int inputwidth, int inputheight, int pnfilter, int nfilter,
+              int spatial, int stride, int padding,
+              double lrate, ActFunc actfunc);
+  Conv2DLayer(const Conv2DLayer& conv);
+  Conv2DLayer& operator= (const Conv2DLayer& conv);
   virtual mat forwardprop(const mat& pa);
   virtual mat backprop(const mat& delta);
 
