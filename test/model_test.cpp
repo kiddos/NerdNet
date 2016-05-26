@@ -9,8 +9,11 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/shape.hpp>
 
+#include <mgl2/mgl.h>
+
 #include "nnet.h"
 
+using std::ofstream;
 using std::vector;
 using std::string;
 using std::cout;
@@ -82,7 +85,7 @@ void load(mat& trainx, mat& trainy, mat& testx, mat& testy) {
   testx = x.submat(trainsize, 0, x.n_rows-1, x.n_cols-1);
   testy = y.submat(trainsize, 0, y.n_rows-1, y.n_cols-1);
 }
-void buildmodel(NeuralNet& nnet, int n, int o) {
+void buildmodel(NeuralNet& nnet, int n, int o, ofstream& outputcsv) {
   InputLayer input(n);
   OutputLayer output;
   vector<Layer> hidden;
@@ -90,6 +93,7 @@ void buildmodel(NeuralNet& nnet, int n, int o) {
 
   int lastnnode = n;
   cin >> nhidden;
+  outputcsv << "number of hidden," << nhidden << endl;
   for (int i = 0 ; i < nhidden ; ++i) {
     double lrate = 0, lambda = 0;
     int nnodes = 0;
@@ -127,6 +131,8 @@ void buildmodel(NeuralNet& nnet, int n, int o) {
 
     cout << "hidden " << i << " size: " << lastnnode << ", " << nnodes
         << " activation: " << actfunc << endl;
+    outputcsv << "hidden " << i << "," << lastnnode << ", " << nnodes
+        << "," << actfunc << endl;
     hidden.push_back(Layer(lastnnode, nnodes, lrate, lambda, act));
     lastnnode = nnodes;
   }
@@ -150,7 +156,8 @@ void buildmodel(NeuralNet& nnet, int n, int o) {
 
   nnet = NeuralNet(input, output, hidden);
 }
-void setuptrainer(NeuralNet& nnet, Trainer& trainer, unsigned long& maxiters) {
+void setuptrainer(NeuralNet& nnet, Trainer& trainer,
+                  unsigned long& maxiters, ofstream& outputcsv) {
   string name;
   unsigned long iters = 0;
   double r0 = 0, k = 0;
@@ -177,6 +184,8 @@ void setuptrainer(NeuralNet& nnet, Trainer& trainer, unsigned long& maxiters) {
 
   maxiters = iters;
   cout << "trainer setup: " << name << " | maxiters: " << maxiters << endl;
+  outputcsv << name << "," << maxiters << "," << r0 << "," << k
+      << "," << step << endl;
 }
 double accuracy(mat answer, mat prediction) {
   double correct = 0;
@@ -189,18 +198,31 @@ double accuracy(mat answer, mat prediction) {
   return correct / static_cast<double>(answer.n_rows);
 }
 void train(Trainer& trainer, NeuralNet& nnet,
-           mat& x, mat& y, unsigned long maxiters) {
+           mat& x, mat& y, unsigned long maxiters, mglData& data) {
+  vector<double> costdata;
+  time_t start = time(nullptr);
+  time_t pass = time(nullptr) - start;
   for (uint32_t i = 0 ; i < maxiters ; ++i) {
-    if (i % (maxiters / 10) == 0) {
+    if (i % 10 == 0 || pass > 1) {
       const double cost = trainer.feeddata(x, y, true);
-      cout << "iteration: " << i << " | cost: " << cost << endl;
+      costdata.push_back(cost);
+
+      cout << "\riteration: " << i << " | cost: " << cost;
       mat pred = nnet.predict(x);
-      cout << "training accuracy: " << accuracy(y, pred) << endl;
+      cout << " | training accuracy: " << accuracy(y, pred);
+
+      start = time(nullptr);
     } else {
       trainer.feeddata(x, y, false);
     }
+    pass = time(nullptr) - start;
   }
   cout << endl << "Training Complete!!" << endl;
+
+  data = mglData(costdata.size());
+  for (uint32_t i = 0 ; i < costdata.size() ; ++i) {
+    data.a[i] = costdata[i];
+  }
 }
 Accuracy evaluate(NeuralNet& nnet, mat& trainx, mat& trainy,
                   mat& testx, mat& testy) {
@@ -212,6 +234,18 @@ Accuracy evaluate(NeuralNet& nnet, mat& trainx, mat& trainy,
   accu.test = accuracy(testy, pred);
   return accu;
 }
+void draw(mglGraph* graph, const mglData& data,
+          unsigned long maxiters, string outputfile) {
+  graph->AddLegend("cost", "b");
+  graph->SetRanges(0, maxiters, 0, data.a[0]*2);
+  graph->Axis("y");
+  graph->Axis("x");
+  graph->Label('y', "cost");
+  graph->Label('x', "epoch");
+  graph->Plot(data, "-b5");
+
+  graph->WritePNG(outputfile.c_str());
+}
 void savedata() {
 }
 
@@ -220,8 +254,15 @@ int main(void) {
   Trainer trainer;
   unsigned long maxiters = 0;
   int ntrail = 0;
+  string name;
+  cin >> name;
+  ofstream outputcsv(name+".csv", std::ios::out);
+
   mat trainx, trainy, testx, testy;
   load(trainx, trainy, testx, testy);
+
+  srand(time(NULL));
+
   //cout << trainx << endl;
   //cout << trainy << endl;
   cout << "train x size: " << trainx.n_rows << ", " << trainx.n_cols << endl;
@@ -230,17 +271,30 @@ int main(void) {
   cout << "test y size: " << testy.n_rows << ", " << testy.n_cols << endl;
 
   // setup
-  buildmodel(raw, trainx.n_cols, trainy.n_cols);
+  buildmodel(raw, trainx.n_cols, trainy.n_cols, outputcsv);
   nnet = raw;
-  setuptrainer(nnet, trainer, maxiters);
+  setuptrainer(nnet, trainer, maxiters, outputcsv);
+  mglData data;
+  string trailname;
 
   cin >> ntrail;
   for (int i = 0 ; i < ntrail ; ++i) {
     cout << "trail " << (i+1) << endl;
-    train(trainer, nnet, trainx, trainy, maxiters);
+    train(trainer, nnet, trainx, trainy, maxiters, data);
+
     Accuracy accu = evaluate(nnet, trainx, trainy, testx, testy);
     cout << "Train accuracy: " << accu.train << endl;
     cout << "Test accuracy: " << accu.test << endl;
+
+    outputcsv << "Trail" << i+1 << endl;
+    outputcsv << "Train accuracy," << accu.train << endl;
+    outputcsv << "Test accuracy," << accu.test << endl;
+
+    // save the graph
+    mglGraph graph;
+    trailname = name + "-trail-" + std::to_string(i) + ".png";
+    draw(&graph, data, maxiters, trailname);
+
     nnet = raw;
     for (uint32_t j = 0 ; j < nnet.getnumhidden() * 2 ; ++j) {
       nnet.randomize();
@@ -248,6 +302,6 @@ int main(void) {
   }
   cout << "All trail completed!!" << endl;
 
+  outputcsv.close();
   return 0;
 }
-
