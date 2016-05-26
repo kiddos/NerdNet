@@ -233,6 +233,101 @@ def replace(training_data, index, old, new):
             training_data[i][index] = new
     return training_data
 
+def prepare_input_data(training_data, n, o, m):
+    input_data = n + ' ' + o + ' ' + m + '\n'
+    if os.path.exists(executable):
+        for sample in training_data:
+            for entry in sample:
+                input_data = input_data + (str(entry) + ' ')
+            input_data = input_data + '\n'
+
+        if name in params:
+            param = params[name]
+            # hidden layer params
+            nhlayer = param['nhidden']
+            input_data = input_data + str(nhlayer) + '\n'
+
+            for k in range(nhlayer):
+                hlayer_param = param['h'+str(k)]
+                lrate = hlayer_param['lrate']
+                lb = hlayer_param['lambda']
+                nnodes = hlayer_param['nodes']
+                actfunc = hlayer_param['act']
+
+                input_data = input_data + str(lrate) + '\n'
+                input_data = input_data + str(lb) + '\n'
+                input_data = input_data + str(nnodes) + '\n'
+                input_data = input_data + actfunc + '\n'
+
+            # output layer params
+            input_data = input_data + param['output']['cost'] + '\n'
+            input_data = input_data + str(param['output']['lrate']) + '\n'
+            input_data = input_data + str(param['output']['lambda']) + '\n'
+
+            # trainer params
+            input_data = input_data + param['trainer']['name'] + '\n'
+            input_data = input_data + \
+                    str(param['trainer']['max_iterations']) + '\n'
+            input_data = input_data + str(param['trainer']['r0']) + '\n'
+            input_data = input_data + str(param['trainer']['k']) + '\n'
+            input_data = input_data + str(param['trainer']['step']) + '\n'
+
+            # trail
+            input_data = input_data + str(param['trail']) + '\n'
+            return input_data
+        else:
+            print 'no parameter setup yet!!'
+
+    else:
+        print 'build the project first!!'
+    return None
+
+
+def process(data, name):
+    print 'model for ' + name
+    f = open(data, 'r')
+    content = []
+    for line in f:
+        if not line.startswith('@'):
+            content.append(line.replace(' ', '').split(','))
+
+    # read the data
+    training_data = [[0 for i in range(len(content[0]))] for c in content]
+    for i in range(len(content[0])):
+        if isallnum([x[i] for x in content]):
+            for j in range(len(training_data)):
+                training_data[j][i] = float(content[j][i])
+        else:
+            mapping = {}
+            num = 0
+            for j in range(len(training_data)):
+                if not content[j][i] in mapping:
+                    mapping[content[j][i]] = num
+                    num = num + 1
+                training_data[j][i] = mapping[content[j][i]]
+
+    # alter label if exceed index
+    if int(max_label(training_data)) == geto(training_data):
+        training_data = replace(training_data, getn(training_data),
+                                max_label(training_data), 0)
+
+    n = str(getn(training_data))
+    o = str(geto(training_data))
+    m = str(len(training_data))
+
+    # for line in training_data:
+        # print line
+
+    print 'n = ', n
+    print 'o = ', o
+    print 'm = ', m
+
+    # read all param and send to subprocess' stdin
+    input_data = prepare_input_data(training_data, n, o, m)
+    if input_data is not None:
+        p = subprocess.Popen('./test/ModelTest', stdin=subprocess.PIPE)
+        p.communicate(input=input_data)
+
 if __name__ == '__main__':
     download.download()
     data_path = download.extract()
@@ -245,92 +340,6 @@ if __name__ == '__main__':
 
         if name != sys.argv[1]:
             continue
-
-        print 'model for ' + name
-        f = open(data, 'r')
-        content = []
-        for line in f:
-            if not line.startswith('@'):
-                content.append(line.replace(' ', '').split(','))
-
-        training_data = [[0 for i in range(len(content[0]))] for c in content]
-        for i in range(len(content[0])):
-            if isallnum([x[i] for x in content]):
-                for j in range(len(training_data)):
-                    training_data[j][i] = float(content[j][i])
-            else:
-                mapping = {}
-                num = 0
-                for j in range(len(training_data)):
-                    if not content[j][i] in mapping:
-                        mapping[content[j][i]] = num
-                        num = num + 1
-                    training_data[j][i] = mapping[content[j][i]]
-
-
-        n = str(getn(training_data))
-        o = str(geto(training_data))
-        m = str(len(training_data))
-
-        if int(max_label(training_data)) == geto(training_data):
-            training_data = replace(training_data, getn(training_data),
-                                    max_label(training_data), 0)
-
-        for line in training_data:
-            print line
-
-        print 'n = ', n
-        print 'o = ', o
-        print 'm = ', m
-
-        input_data = n + ' ' + o + ' ' + m + '\n'
-        if os.path.exists(executable):
-            p = subprocess.Popen('./test/ModelTest', stdin=subprocess.PIPE)
-            for sample in training_data:
-                for entry in sample:
-                    input_data = input_data + (str(entry) + ' ')
-                input_data = input_data + '\n'
-
-            if name in params:
-                param = params[name]
-                # hidden layer params
-                nhlayer = param['nhidden']
-                input_data = input_data + str(nhlayer) + '\n'
-
-                for k in range(nhlayer):
-                    hlayer_param = param['h'+str(k)]
-                    lrate = hlayer_param['lrate']
-                    lb = hlayer_param['lambda']
-                    nnodes = hlayer_param['nodes']
-                    actfunc = hlayer_param['act']
-
-                    input_data = input_data + str(lrate) + '\n'
-                    input_data = input_data + str(lb) + '\n'
-                    input_data = input_data + str(nnodes) + '\n'
-                    input_data = input_data + actfunc + '\n'
-
-                # output layer params
-                input_data = input_data + param['output']['cost'] + '\n'
-                input_data = input_data + str(param['output']['lrate']) + '\n'
-                input_data = input_data + str(param['output']['lambda']) + '\n'
-
-                # trainer params
-                input_data = input_data + param['trainer']['name'] + '\n'
-                input_data = input_data + \
-                        str(param['trainer']['max_iterations']) + '\n'
-                input_data = input_data + str(param['trainer']['r0']) + '\n'
-                input_data = input_data + str(param['trainer']['k']) + '\n'
-                input_data = input_data + str(param['trainer']['step']) + '\n'
-
-                # trail
-                input_data = input_data + str(param['trail']) + '\n'
-
-                # print input_data[:10]
-                p.communicate(input=input_data)
-            else:
-                print 'no parameter setup yet!!'
-
-        else:
-            print 'build the project first!!'
+        process(data, name)
         break
 
