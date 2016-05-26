@@ -15,7 +15,7 @@ params = {
     'iris': {
         'nhidden': 3,
         'h0': {
-            'lrate': 0.01,
+            'lrate': 0.1,
             'lambda': 1e-6,
             'nodes': 6,
             'act': 'arctan'
@@ -39,12 +39,12 @@ params = {
         },
         'trainer': {
             'name': 'gd',
-            'max_iterations': 300000,
+            'max_iterations': 60000,
             'r0': 0.01,
             'k': 1e-4,
             'step': 300000
         },
-        'trail': 3
+        'trail': 5
     },
     'nursery': {
         'nhidden': 4,
@@ -87,44 +87,32 @@ params = {
         'trail': 1
     },
     'movement_libras': {
-        'nhidden': 4,
+        'nhidden': 2,
         'h0': {
-            'lrate': 1e1,
-            'lambda': 0,
-            'nodes': 10,
+            'lrate': 1e-1,
+            'lambda': 1e-3,
+            'nodes': 90,
             'act': 'sigmoid'
         },
         'h1': {
-            'lrate': 1e1,
-            'lambda': 0,
-            'nodes': 10,
-            'act': 'sigmoid'
-        },
-        'h2': {
             'lrate': 1e-1,
-            'lambda': 0,
-            'nodes': 10,
-            'act': 'sigmoid'
-        },
-        'h3': {
-            'lrate': 1e-1,
-            'lambda': 0,
-            'nodes': 10,
+            'lambda': 1e-3,
+            'nodes': 30,
             'act': 'sigmoid'
         },
         'output': {
             'cost': 'softmax',
             'lrate': 1e-1,
-            'lambda': 0
+            'lambda': 1e-3
         },
         'trainer': {
             'name': 'sgd',
-            'max_iterations': 1000,
-            'r0': 1e-1,
-            'k': 1e-8,
-            'step': 1000
+            'max_iterations': 30000,
+            'r0': 1e-2,
+            'k': 1e-6,
+            'step': 25000
         },
-        'trail': 1
+        'trail': 5
     },
     'phoneme': {
         'nhidden': 4,
@@ -233,8 +221,10 @@ def replace(training_data, index, old, new):
             training_data[i][index] = new
     return training_data
 
-def prepare_input_data(training_data, n, o, m):
-    input_data = n + ' ' + o + ' ' + m + '\n'
+def prepare_input_data(name, training_data, n, o, m):
+    input_data = ''
+    input_data = input_data + name + '\n'
+    input_data = input_data + n + ' ' + o + ' ' + m + '\n'
     if os.path.exists(executable):
         for sample in training_data:
             for entry in sample:
@@ -323,7 +313,7 @@ def process(data, name):
     print 'm = ', m
 
     # read all param and send to subprocess' stdin
-    input_data = prepare_input_data(training_data, n, o, m)
+    input_data = prepare_input_data(name, training_data, n, o, m)
     if input_data is not None:
         p = subprocess.Popen('./test/ModelTest', stdin=subprocess.PIPE)
         p.communicate(input=input_data)
