@@ -18,9 +18,8 @@ class MeanPoolLayer : public Conv2DLayer {
   virtual void update(const mat);
 
  private:
-  void meanpool(const mat& image, mat& output, mat& index);
+  void meanpool(const mat& image, mat& output);
   double meanval(const mat& partialimage);
-  mat averages;
 
 };
 
