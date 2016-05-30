@@ -3,6 +3,7 @@
 
 #include "layer.h"
 #include "conv2dlayer.h"
+#include "poollayer.h"
 #include "softmaxlayer.h"
 #include "inputlayer.h"
 

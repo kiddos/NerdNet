@@ -5,13 +5,14 @@ check_include_files(omp.h HAVE_OPENMP)
 
 set(BASE_SOURCE act.cpp matop.cpp)
 
-set(LAYER_SOURCE layer.cpp inputlayer.cpp conv2dlayer.cpp)
+set(LAYER_SOURCE layer.cpp inputlayer.cpp)
+set(LAYER2D_SOURCE conv2dlayer.cpp maxpoollayer.cpp meanpoollayer.cpp)
 set(OUTPUT_LAYER_SOURCE outputlayer.cpp)
 set(OUTPUT_LAYER_SOURCE ${OUTPUT_LAYER_SOURCE} softmaxoutput.cpp)
 set(OUTPUT_LAYER_SOURCE ${OUTPUT_LAYER_SOURCE} crossentropyoutput.cpp)
 set(OUTPUT_LAYER_SOURCE ${OUTPUT_LAYER_SOURCE} quadraticoutput.cpp)
 set(OUTPUT_LAYER_SOURCE ${OUTPUT_LAYER_SOURCE} kullbackleibleroutput.cpp)
-set(LAYER_SOURCE ${LAYER_SOURCE} ${OUTPUT_LAYER_SOURCE})
+set(LAYER_SOURCE ${LAYER_SOURCE} ${OUTPUT_LAYER_SOURCE} ${LAYER2D_SOURCE})
 
 set(TRAINER_SOURCE trainer.cpp)
 set(TRAINER_SOURCE ${TRAINER_SOURCE} momentumtrainer.cpp)
