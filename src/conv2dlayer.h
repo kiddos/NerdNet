@@ -31,13 +31,15 @@ class Conv2DLayer : public Layer {
   mat toimage(const mat& pa, int filter, int w, int h) const;
   mat addzeropadding(const mat& image) const;
   mat flip(int pn, int n) const;
-  void convolve(const mat& x, const mat& y, mat& output) const;
 
   int pnfilter, nfilter, spatial, stride, padding;
   cube images;
+
+ private:
+  void convolve(const mat& x, const mat& y, mat& output) const;
+
 };
 
 }
 
 #endif /* end of include guard: CONLAYER_H */
-

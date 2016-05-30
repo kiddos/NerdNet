@@ -23,9 +23,8 @@ Conv2DLayer::Conv2DLayer(int inputwidth, int inputheight, int pnfilter,
                          int nfilter, int spatial, int stride, int padding,
                          double lrate, ActFunc actfunc)
     : Conv2DLayer(inputwidth, inputheight, pnfilter, nfilter,
-                spatial, stride, padding, lrate,
-                actfunc.act, actfunc.actd) {
-}
+                  spatial, stride, padding, lrate,
+                  actfunc.act, actfunc.actd) {}
 
 Conv2DLayer::Conv2DLayer(const Conv2DLayer& conv)
     : Layer(conv.spatial*conv.pnfilter-1, conv.spatial*conv.nfilter,
@@ -41,6 +40,7 @@ Conv2DLayer& Conv2DLayer::operator= (const Conv2DLayer& conv) {
   spatial = conv.spatial;
   stride = conv.spatial;
   padding = conv.padding;
+  images = conv.images;
   return *this;
 }
 
