@@ -11,8 +11,7 @@ before_install:
   - sudo apt-get update
 
 install:
-  - sudo apt-get install libarmadillo-dev
-  - sudo apt-get install cmake
+  - sudo apt-get install -y libarmadillo-dev cmake
 
 script:
   - mkdir build
