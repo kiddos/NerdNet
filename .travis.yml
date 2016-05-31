@@ -3,6 +3,9 @@ os:
 
 language: cpp
 
+sudo: required
+dist: trusty
+
 before_install:
   - sudo add-apt-repository ppa:george-edison55/cmake-3.x --yes
   - sudo apt-get update
