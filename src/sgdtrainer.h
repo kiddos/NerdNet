@@ -14,7 +14,8 @@ class SGDTrainer : public Trainer {
   SGDTrainer& operator= (const SGDTrainer& trainer);
   ~SGDTrainer();
 
-  virtual double feeddata(const mat& x, const mat& y, bool ccost=false);
+  virtual void feeddata(const mat& x, const mat& y);
+  virtual double feeddata(const mat& x, const mat& y, bool ccost);
 };
 
 }

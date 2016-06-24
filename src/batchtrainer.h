@@ -15,7 +15,8 @@ class BatchTrainer : public Trainer {
   BatchTrainer& operator= (const BatchTrainer& trainer);
   ~BatchTrainer();
 
-  virtual double feeddata(const mat& x, const mat& y, bool ccost=false);
+  virtual void feeddata(const mat& x, const mat& y);
+  virtual double feeddata(const mat& x, const mat& y, bool ccost);
 
  protected:
   mat x, y;
