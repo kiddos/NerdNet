@@ -55,7 +55,7 @@ void MomentumTrainer::initmomentum() {
   }
 }
 
-double MomentumTrainer::feeddata(const mat& x, const mat& y, bool ccost) {
+void MomentumTrainer::feeddata(const mat& x, const mat& y) {
   iters ++;
   if (usedecay && iters == step) {
     nnet->setlrate(r0 * exp(-k*iters));
@@ -75,6 +75,10 @@ double MomentumTrainer::feeddata(const mat& x, const mat& y, bool ccost) {
   }
 
   nnet->update(ograd, hgrads);
+}
+
+double MomentumTrainer::feeddata(const mat& x, const mat& y, bool ccost) {
+  feeddata(x, y);
 
   double cost = 0;
   if (ccost) {

@@ -32,7 +32,7 @@ bool Trainer::gradcheck(const mat& x, const mat& y) {
   return nnet->gradcheck(x, y);
 }
 
-double Trainer::feeddata(const mat& x, const mat& y, bool ccost) {
+void Trainer::feeddata(const mat& x, const mat& y) {
   iters ++;
   if (usedecay && iters == step) {
     nnet->setlrate(r0 * exp(-k*iters));
@@ -41,6 +41,10 @@ double Trainer::feeddata(const mat& x, const mat& y, bool ccost) {
   nnet->forwardprop(x);
   nnet->backprop(y);
   nnet->update();
+}
+
+double Trainer::feeddata(const mat& x, const mat& y, bool ccost) {
+  feeddata(x, y);
 
   double cost = 0;
   if (ccost) {

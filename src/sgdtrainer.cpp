@@ -21,18 +21,24 @@ SGDTrainer::~SGDTrainer() {
   nnet = nullptr;
 }
 
-double SGDTrainer::feeddata(const mat& x, const mat& y, bool ccost) {
+void SGDTrainer::feeddata(const mat& x, const mat& y) {
   iters ++;
   if (usedecay && (iters == step)) {
     nnet->setlrate(r0 * exp(-k*iters));
   }
 
-  double cost = 0;
   for (uint32_t i = 0 ; i < x.n_rows ; ++i) {
     nnet->forwardprop(x.row(i));
     nnet->backprop(y.row(i));
     nnet->update();
+  }
+}
 
+double SGDTrainer::feeddata(const mat& x, const mat& y, bool ccost) {
+  feeddata(x, y);
+
+  double cost = 0;
+  for (uint32_t i = 0 ; i < x.n_rows; ++i) {
     if (ccost) {
       nnet->predict(x.row(i));
       cost += nnet->computecost(nnet->getresult(), y.row(i));
