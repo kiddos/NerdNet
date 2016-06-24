@@ -76,7 +76,7 @@ int main() {
   load(x, y); loadsample(sample, w, h);
   trainer.feeddata(x, y);
   for (int i = 0 ; i < 210000 ; ++i) {
-    const double cost = trainer.feeddata(x, y);
+    const double cost = trainer.feeddata(x, y, true);
     cout << "\riteration: " << i << " | cost: " << cost;
   }
   cout << endl;

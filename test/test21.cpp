@@ -133,7 +133,7 @@ int main() {
     //const int start = i % (x.n_rows-batchsize);
     //const int end = start + batchsize;
     //nnet.feeddata(x.rows(start, end), y.rows(start, end), false);
-    cost = trainer.feeddata(x.row(i%x.n_rows), y.row(i%x.n_rows));
+    cost = trainer.feeddata(x.row(i%x.n_rows), y.row(i%x.n_rows), true);
     //nnet.feeddata(x, y, false);
     cout << "\riteration: " << i+1 << " cost: " << cost
           << "       ";

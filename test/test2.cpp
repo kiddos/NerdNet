@@ -118,7 +118,7 @@ int main() {
   for (int i = 0 ; i < datasize * 26; ++i) {
     const int start = i % (datasize-batchsize);
     const int end = start + batchsize;
-    const double cost = trainer.feeddata(x.rows(start, end), y.rows(start, end));
+    const double cost = trainer.feeddata(x.rows(start, end), y.rows(start, end), true);
 
     if (i % datasize == 0) {
       if (cost < 0.01) break;
