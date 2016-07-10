@@ -1,16 +1,19 @@
 #include <iostream>
 #include <vector>
 #include <fstream>
+#include <memory>
 #include <math.h>
 #include <stdlib.h>
 #include <time.h>
-#include "../src/nnet.h"
+
+#include "nnet.h"
 
 #include <opencv2/core.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/shape.hpp>
 
 using std::vector;
+using std::shared_ptr;
 using std::cout;
 using std::endl;
 using nn::mat;
@@ -21,34 +24,6 @@ using nn::NeuralNet;
 using nn::Trainer;
 using cv::Scalar;
 using cv::Vec3b;
-
-double rectifier(double z) {
-  return z >= 0 ? z : 0;
-}
-
-double rectifiergrad(double z) {
-  return z >= 0 ? 1 : 0;
-}
-
-double sigmoid(double z) {
-  return 1.0 / (1.0 + exp(-z));
-}
-
-double sigmoidgrad(double z) {
-  const double e = exp(-z);
-  const double b = 1 + e;
-  return e / (b * b);
-}
-
-mat cost(mat y, mat h) {
-  mat J = -(y % nn::funcop(h, log) + (1-y) % nn::funcop(1-h, log));
-  return J;
-}
-
-mat costd(mat y, mat a, mat) {
-  mat grad = (a - y);
-  return grad;
-}
 
 void load(mat &x, mat &y) {
   std::ifstream xinput("./data/samplex3.data", std::ios::in);
@@ -89,27 +64,32 @@ int main() {
 
   srand(time(NULL));
 
+  // set up model
   InputLayer input(2);
-  vector<Layer> hidden = {
-    Layer(2, 100, lrate, lambda, nn::arctan),
+  vector<shared_ptr<Layer>> hidden = {
+    std::make_shared<Layer>(2, 128, lrate, lambda, nn::arctan)
   };
-  nn::SoftmaxOutput output(100, 3, lrate, lambda);
+  nn::SoftmaxOutput output(128, 3, lrate, lambda);
   NeuralNet nnet(input, output, hidden);
   Trainer trainer(nnet);
 
+  // loading data
   mat x, y, sample;
   load(x, y); loadsample(sample, w, h);
-  //cout << y << endl;
-  //cout << sample << endl;
-  //cout << sample.row(0) << endl;
+
+  // gradient check
   trainer.gradcheck(x.row(0), y.row(0));
+  // training
   for (int i = 0 ; i < 36000 ; ++i) {
     const double cost = trainer.feeddata(x, y, true);
     cout << "\riteration: " << i << " | cost: " << cost;
   }
   cout << endl;
+
+  // perform prediction
   mat result = nnet.predict(sample);
 
+  // draw the prediction
   cv::Mat canvas = cv::Mat::zeros(h, w, CV_8UC3);
   for (uint32_t i = 0 ; i < result.n_rows ; ++i) {
     if (result(i,0) == 0) {
@@ -120,6 +100,8 @@ int main() {
       canvas.at<Vec3b>(i/w, i%w) = Vec3b(100, 100, 255);
     }
   }
+
+  // draw the sample
   cout << "drawing training sample..." << endl;
   for (uint32_t i = 0 ; i < x.n_rows ; ++i) {
     if (y(i,0) == 1) {
