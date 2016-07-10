@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <fstream>
+#include <memory>
 #include <math.h>
 #include <stdlib.h>
 #include <time.h>
@@ -10,6 +11,7 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/shape.hpp>
 
+using std::shared_ptr;
 using std::vector;
 using std::cout;
 using std::endl;
@@ -19,24 +21,6 @@ using nn::InputLayer;
 using nn::OutputLayer;
 using nn::NeuralNet;
 using nn::Trainer;
-
-double rectifier(double z) {
-  return z >= 0 ? z : 0;
-}
-
-double rectifiergrad(double z) {
-  return z >= 0 ? 1 : 0;
-}
-
-double sigmoid(double z) {
-  return 1.0 / (1.0 + exp(-z));
-}
-
-double sigmoidgrad(double z) {
-  const double e = exp(-z);
-  const double b = 1 + e;
-  return e / (b * b);
-}
 
 mat cost(mat y, mat h) {
   mat J = -(y % nn::funcop(h, log) + (1-y) % nn::funcop(1-h, log)) / y.n_rows;
@@ -83,36 +67,36 @@ int main() {
   const int w = 800;
   const int h = 600;
 
-  srand(time(NULL));
+  srand(time(nullptr));
 
   InputLayer input(2);
-  vector<Layer> hidden = {
-    //Layer(2, 2, lrate, rectifier, rectifiergrad),
-    //Layer(2, 6, lrate, atan, [](double x) {return 1.0/(1.0+x*x);}),
-    Layer(2, 6, lrate, lambda, atan, [](double x) {return 1.0/(1.0+x*x);}),
-    Layer(6, 6, lrate, lambda, rectifier, rectifiergrad),
-    Layer(6, 6, lrate, lambda, sigmoid, sigmoidgrad),
-    Layer(6, 6, lrate, lambda, atan, [](double x) {return 1.0/(1.0+x*x);}),
-    //Layer(2, 6, lrate, sigmoid, sigmoidgrad),
-    //Layer(6, 6, lrate, sigmoid, sigmoidgrad),
-    //Layer(6, 6, lrate, sigmoid, sigmoidgrad),
-    //Layer(6, 6, lrate, sigmoid, sigmoidgrad),
+  vector<shared_ptr<Layer>> hidden = {
+    std::make_shared<Layer>(2, 6, lrate, lambda, nn::arctan),
+    std::make_shared<Layer>(6, 6, lrate, lambda, nn::relu),
+    std::make_shared<Layer>(6, 6, lrate, lambda, nn::sigmoid),
+    std::make_shared<Layer>(6, 6, lrate, lambda, nn::arctan),
   };
-  OutputLayer output(6, 2, lrate, lambda, sigmoid, sigmoidgrad, cost, costd);
+  OutputLayer output(6, 2, lrate, lambda, nn::sigmoid, cost, costd);
   NeuralNet nnet(input, output, hidden);
   nn::MomentumTrainer trainer(nnet, 0.5);
 
   mat x, y, sample;
   load(x, y); loadsample(sample, w, h);
 
-  //trainer.gradcheck(x, y);
+  // perform gradient check
+  trainer.gradcheck(x.row(0), y.row(0));
+
+  // training test
   for (int i = 0 ; i < 120000 ; ++i) {
     const double cost = trainer.feeddata(x, y, true);
     cout << "\riteration: " << i << " | cost: " << cost;
   }
   cout << endl;
+
+  // prediction test
   mat result = nnet.predict(sample);
 
+  // draw the output to visualize
   cv::Mat canvas = cv::Mat::zeros(h, w, CV_8UC1);
   for (uint32_t i = 0 ; i < result.n_rows ; ++i) {
     canvas.at<uchar>(i/w, i%w) = result(i, 0) == 1 ? 128 : 0;
