@@ -3,9 +3,10 @@ check_include_files(armadillo HAVE_ARMADILLO)
 check_include_files(mat.h HAVE_MAT)
 check_include_files(omp.h HAVE_OPENMP)
 
+# sources
 set(BASE_SOURCE act.cpp matop.cpp)
 
-set(LAYER_SOURCE layer.cpp inputlayer.cpp)
+set(LAYER_SOURCE layer.cpp inputlayer.cpp normlayer.cpp)
 set(LAYER2D_SOURCE conv2dlayer.cpp maxpoollayer.cpp meanpoollayer.cpp)
 set(OUTPUT_LAYER_SOURCE outputlayer.cpp)
 set(OUTPUT_LAYER_SOURCE ${OUTPUT_LAYER_SOURCE} softmaxoutput.cpp)
@@ -20,7 +21,7 @@ set(TRAINER_SOURCE ${TRAINER_SOURCE} sgdtrainer.cpp)
 set(TRAINER_SOURCE ${TRAINER_SOURCE} batchtrainer.cpp)
 set(SOURCE ${BASE_SOURCE} ${LAYER_SOURCE} neuralnet.cpp ${TRAINER_SOURCE})
 
-
+# header
 set(BASE_HEADER act.h type.h matop.h debug.h config.h)
 set(LAYER_HEADER layer.h inputlayer.h conv2dlayer.h softmaxlayer.h)
 set(OUTPUT_LAYER_HEADER outputlayer.h)
