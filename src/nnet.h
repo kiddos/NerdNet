@@ -6,6 +6,7 @@
 #include "poollayer.h"
 #include "softmaxlayer.h"
 #include "inputlayer.h"
+#include "normlayer.h"
 
 #include "outputlayer.h"
 #include "softmaxoutput.h"
