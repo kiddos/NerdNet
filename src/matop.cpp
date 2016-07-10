@@ -66,4 +66,8 @@ mat normalize(const mat& m) {
   return arma::normalise(m);
 }
 
+mat norm(const mat& m) {
+  return arma::sqrt(arma::sum(m % m, 1));
+}
+
 }
