@@ -1,6 +1,7 @@
 #include "neuralnet.h"
 
 using std::vector;
+using std::shared_ptr;
 using std::string;
 using std::ifstream;
 using std::ofstream;
@@ -15,7 +16,7 @@ NeuralNet::NeuralNet(const NeuralNet& nnet)
       input(nnet.input), hidden(nnet.hidden), output(nnet.output) {}
 
 NeuralNet::NeuralNet(const InputLayer input, const OutputLayer output,
-                     vector<Layer> hidden)
+                     vector<shared_ptr<Layer>> hidden)
     : eps(1e-4), cost(output.getcost()), costd(output.getcostd()),
       input(input), hidden(hidden), output(output) {}
 
@@ -32,7 +33,7 @@ NeuralNet& NeuralNet::operator= (const NeuralNet& nnet) {
 mat NeuralNet::forwardprop(const mat& x) {
   mat current = input.forwardprop(x);
   for (uint32_t i = 0 ; i < hidden.size() ; ++i) {
-    const mat n = hidden[i].forwardprop(current);
+    const mat n = hidden[i]->forwardprop(current);
     current = n;
   }
   result = output.forwardprop(current);
@@ -42,7 +43,7 @@ mat NeuralNet::forwardprop(const mat& x) {
 void NeuralNet::backprop(const mat& y) {
   mat currentdelta = output.backprop(y);
   for (int i = hidden.size()-1 ; i >= 0 ; --i) {
-    mat p = hidden[i].backprop(currentdelta);
+    mat p = hidden[i]->backprop(currentdelta);
     currentdelta = p;
   }
 }
@@ -50,14 +51,14 @@ void NeuralNet::backprop(const mat& y) {
 void NeuralNet::update() {
   output.update();
   for (uint32_t i = 0 ; i < hidden.size() ; ++i) {
-    hidden[i].update();
+    hidden[i]->update();
   }
 }
 
 void NeuralNet::update(const mat& ograd, const vector<mat>& hgrad) {
   output.update(ograd);
   for (uint32_t i = 0 ; i < hidden.size() ; ++i) {
-    hidden[i].update(hgrad[i]);
+    hidden[i]->update(hgrad[i]);
   }
 }
 
@@ -98,9 +99,9 @@ bool NeuralNet::gradcheck(const mat& x, const mat& y) {
   }
 
   for (int i = hidden.size()-1 ; i >= 0 ; --i) {
-    w = hidden[i].getw();
+    w = hidden[i]->getw();
     ngrad = computengrad(x, y, w.n_rows, w.n_cols, i);
-    grad = hidden[i].getgrad();
+    grad = hidden[i]->getgrad();
 
     if (!issame(grad, ngrad)) {
       if (success) {
@@ -136,7 +137,7 @@ double NeuralNet::computecost(const mat& pred, const mat& y) {
 void NeuralNet::setlrate(const double lrate) {
   input.setlrate(lrate);
   for (uint32_t i = 0 ; i < hidden.size() ; ++i)
-    hidden[i].setlrate(lrate);
+    hidden[i]->setlrate(lrate);
   output.setlrate(lrate);
 }
 
@@ -167,14 +168,14 @@ double NeuralNet::computecost(const mat& x, const mat&y,
   mat current = input.forwardprop(x);
   for (uint32_t i = 0 ; i < hidden.size() ; ++i) {
     if (i == idx) {
-      mat tempw = hidden[i].getw();
+      mat tempw = hidden[i]->getw();
 
-      hidden[i].setw(tempw + perturb);
-      mat n = hidden[i].forwardprop(current);
+      hidden[i]->setw(tempw + perturb);
+      mat n = hidden[i]->forwardprop(current);
       current = n;
-      hidden[i].setw(tempw);
+      hidden[i]->setw(tempw);
     } else {
-      mat n = hidden[i].forwardprop(current);
+      mat n = hidden[i]->forwardprop(current);
       current = n;
     }
   }
@@ -198,12 +199,12 @@ double NeuralNet::computecost(const mat& x, const mat&y,
 
   // regularization
   for (uint32_t i = 0 ; i < hidden.size() ; ++i) {
-    mat tempw = hidden[i].getw();
+    mat tempw = hidden[i]->getw();
     if (i == idx) {
       tempw = tempw + perturb;
     }
 
-    const mat regterm = (hidden[i].getlambda() / 2.0) * (tempw % tempw);
+    const mat regterm = (hidden[i]->getlambda() / 2.0) * (tempw % tempw);
     for (uint32_t j = 0 ; j < regterm.n_rows ; ++j) {
       for (uint32_t k = 0 ; k < regterm.n_cols ; ++k) {
         val += regterm(j, k);
@@ -252,8 +253,8 @@ void NeuralNet::randomize() {
 
 void NeuralNet::randomize(uint32_t index) {
   if (index < hidden.size()) {
-    const mat w = hidden[index].getw();
-    hidden[index] = Layer(hidden[index]);
+    const mat w = hidden[index]->getw();
+    hidden[index]->randominit(sqrt(w.n_rows));
   } else {
     const mat w = output.getw();
     output.randominit(sqrt(w.n_rows));
@@ -265,7 +266,7 @@ void NeuralNet::save(const string path) {
   if (out.is_open()) {
     // save hidden layer parameter first
     for (uint32_t i = 0 ; i < hidden.size() ; ++i) {
-      const mat w = hidden[i].getw();
+      const mat w = hidden[i]->getw();
       for (uint32_t j = 0 ; j < w.n_rows ; ++j) {
         for (uint32_t k = 0 ; k < w.n_cols ; ++k) {
           out << w(j, k) << " ";
@@ -290,7 +291,7 @@ void NeuralNet::load(const string path) {
   if (in.is_open()) {
     // read hidden layer first
     for (uint32_t i = 0 ; i < hidden.size() ; ++i) {
-      mat w = hidden[i].getw();
+      mat w = hidden[i]->getw();
       for (uint32_t j = 0 ; j < w.n_rows ; ++j) {
         for (uint32_t k = 0 ; k < w.n_cols ; ++k) {
           double val = 0;
@@ -298,7 +299,7 @@ void NeuralNet::load(const string path) {
           w(j, k) = val;
         }
       }
-      hidden[i].setw(w);
+      hidden[i]->setw(w);
     }
     // load output layer
     mat w = output.getw();

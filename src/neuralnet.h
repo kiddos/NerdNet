@@ -5,6 +5,7 @@
 #include <vector>
 #include <string>
 #include <fstream>
+#include <memory>
 
 #include "debug.h"
 #include "act.h"
@@ -19,7 +20,7 @@ class NeuralNet {
   NeuralNet();
   NeuralNet(const NeuralNet& nnet);
   NeuralNet(const InputLayer input, const OutputLayer output,
-            std::vector<Layer> layers);
+            std::vector<std::shared_ptr<Layer>> layers);
   NeuralNet& operator= (const NeuralNet& nnet);
 
   mat predict(const mat& sample);
@@ -37,10 +38,10 @@ class NeuralNet {
   mat getresult() const { return result; };
   uint32_t getnumhidden() const { return hidden.size(); };
   InputLayer getinput() const { return input; };
-  Layer gethidden(uint32_t index) const { return hidden[index]; };
+  Layer gethidden(uint32_t index) const { return *hidden[index]; };
   OutputLayer getoutput() const { return output; };
   void setlrate(double lrate);
-  void sethiddenw(uint32_t index, const mat& w) { hidden[index].setw(w); }
+  void sethiddenw(uint32_t index, const mat& w) { hidden[index]->setw(w); }
   void setoutputw(const mat& w) { output.setw(w); }
 
  private:
@@ -54,7 +55,7 @@ class NeuralNet {
   matfunc cost;
   matfuncd costd;
   InputLayer input;
-  std::vector<Layer> hidden;
+  std::vector<std::shared_ptr<Layer>> hidden;
   OutputLayer output;
 };
 
