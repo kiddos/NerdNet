@@ -62,12 +62,4 @@ double sumall(const mat& m) {
   return arma::accu(temp);
 }
 
-mat normalize(const mat& m) {
-  return arma::normalise(m);
-}
-
-mat norm(const mat& m) {
-  return arma::repmat(arma::sqrt(arma::sum(m % m, 1)), 1, m.n_cols);
-}
-
 }
