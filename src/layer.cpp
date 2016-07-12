@@ -68,17 +68,14 @@ mat Layer::forwardprop(const mat& pa) {
 
 mat Layer::backprop(const mat& d) {
   // compute this delta and grad
-  mat actdz = funcop(z, actd);
-  mat delta = d;
-  delta = delta % addcol(actdz);
-
-  delta.shed_col(0);
+  delta = d % funcop(z, actd);
   grad = pa.t() * delta;
   // regularization
   grad = grad + lambda * W;
 
   // compute new delta to throw to next layer
   mat newdelta = delta * W.t();
+  newdelta.shed_col(0);
   return newdelta;
 }
 

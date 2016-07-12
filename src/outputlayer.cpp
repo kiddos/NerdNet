@@ -44,6 +44,7 @@ mat OutputLayer::backprop(const mat& label) {
   grad = grad + lambda * W;
   // compute next layer delta
   mat newdelta = delta * W.t();
+  newdelta.shed_col(0);
   return newdelta;
 }
 
