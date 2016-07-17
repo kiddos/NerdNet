@@ -24,7 +24,7 @@ class Layer {
   virtual mat backprop(const mat& delta);
   virtual void update();
   virtual void update(const mat grad);
-  void randominit(const double eps);
+  virtual void randominit(const double eps);
 
   int getpnnodes() const { return W.n_rows; };
   int getnnodes() const { return W.n_cols; };
