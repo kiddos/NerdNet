@@ -14,7 +14,7 @@ KullbackLeiblerOutput::KullbackLeiblerOutput(const int pnnodes, const int output
                   KullbackLeiblerOutput::costfuncdelta) {}
 
 mat KullbackLeiblerOutput::costfunc(mat y, mat h) {
-  const mat J = y % arma::log(y / h) / y.n_rows;
+  const mat J = y % logorithm(y / h) / y.n_rows;
   return J;
 }
 
