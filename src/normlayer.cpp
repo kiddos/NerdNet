@@ -31,4 +31,10 @@ mat NormLayer::backprop(const mat& d) {
   return result;
 }
 
+void NormLayer::update() {}
+
+void NormLayer::update(const mat) {}
+
+void NormLayer::randominit(const double) {}
+
 }
