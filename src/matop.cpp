@@ -74,4 +74,8 @@ mat repeat(const mat& m, const int row, const int col) {
   return arma::repmat(m, row, col);
 }
 
+mat logorithm(const mat& m) {
+  return arma::log(m);
+}
+
 }

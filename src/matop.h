@@ -11,5 +11,6 @@ double sumall(const mat& m);
 mat rowsum(const mat& m);
 mat exponential(const mat& m);
 mat repeat(const mat& m, const int row, const int col);
+mat logorithm(const mat& m);
 
 }
