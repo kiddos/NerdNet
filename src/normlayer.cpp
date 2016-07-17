@@ -5,20 +5,13 @@ using namespace std;
 
 namespace nn {
 
-NormLayer::NormLayer() {
-  lrate = 0;
-  lambda = 0;
-  act = nn::identity.act;
-  actd = nn::identity.actd;
-}
+NormLayer::NormLayer() : Layer(0, 0, 0, 0, nn::identity) {}
 
-NormLayer::NormLayer(const NormLayer& normlayer)
-    : Layer(normlayer.getpnnodes(), normlayer.getw().n_cols,
-            normlayer.getlrate(), normlayer.getlambda(),
-            normlayer.getact(), normlayer.getactd()) {}
+NormLayer::NormLayer(const NormLayer& layer) : Layer(layer) {}
 
-NormLayer& NormLayer::operator= (const NormLayer& normlayer) {
-  Layer::operator= (normlayer);
+NormLayer& NormLayer::operator= (const NormLayer& layer) {
+  Layer::operator= (layer);
+  normval = layer.normval;
   return *this;
 }
 
