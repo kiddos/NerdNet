@@ -16,7 +16,6 @@ NormLayer& NormLayer::operator= (const NormLayer& layer) {
 }
 
 mat NormLayer::forwardprop(const mat& pa) {
-  this->pa = pa;
   const double maxval = pa.max();
   const double minval = pa.min();
   if (normval == 0)
