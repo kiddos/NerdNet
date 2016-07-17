@@ -3,6 +3,7 @@
 
 # ignore vim temp files
 *.swp
+*.swo
 
 # ignore builds
 build/*
