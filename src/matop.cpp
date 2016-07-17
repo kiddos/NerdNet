@@ -62,4 +62,16 @@ double sumall(const mat& m) {
   return arma::accu(temp);
 }
 
+mat rowsum(const mat& m) {
+  return arma::sum(m, 1);
+}
+
+mat exponential(const mat& m) {
+  return arma::exp(m);
+}
+
+mat repeat(const mat& m, const int row, const int col) {
+  return arma::repmat(m, row, col);
+}
+
 }
