@@ -1,19 +1,19 @@
-set(OPENCV_LIBS opencv_core opencv_highgui opencv_imgproc opencv_imgcodecs)
-set(MATHGL_LIBS mgl mgl-qt)
-set(REQUIRED_LIBS ${OPENCV_LIBS} ${MATHGL_LIBS})
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -g -std=c++11 -fopenmp")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DDEBUG")
 
-find_library(HAVE_LIBS NAMES ${REQUIRED_LIBS})
-
-if(HAVE_LIBS)
-  message("-- found required libraries for building tests")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -O3 -g -std=c++11 -DDEBUG -fopenmp")
-
+if (LIBS_FOUND)
+  message("--> 'test' will be build.")
   include_directories(${CMAKE_SOURCE_DIR}/src)
   link_directories(/usr/lib ${CMAKE_BINARY_DIR}/src)
 
-  add_executable(XORProblem xor_problem.cpp)
-  add_executable(SpiralDataTest spiraldata_test.cpp)
-  add_executable(NormLayerTest normlayer_test.cpp)
+  set(TEST_LIBS nnet armadillo ${OPENCV_LIBS} ${MATHGL_LIBS} ${BOOST_LIBS})
+
+  add_executable(normlayer_test normlayer_test.cpp)
+  add_executable(act_test act_test.cpp)
+
+  target_link_libraries(normlayer_test ${TEST_LIBS})
+  target_link_libraries(act_test ${TEST_LIBS})
   # add_executable(ModelTest model_test.cpp)
   # add_executable(MNIST test2.cpp)
   # add_executable(Softmaxtest test9.cpp)
@@ -28,13 +28,6 @@ if(HAVE_LIBS)
   # add_executable(nursery test17.cpp)
   # add_executable(ConvLayerTest convlayer_test.cpp)
 
-  set(OPENCV_LIBS opencv_core opencv_highgui opencv_imgproc opencv_imgcodecs)
-  set(MATHGL_LIBS mgl mgl-qt)
-  set(LIBS nnet armadillo ${OPENCV_LIBS} ${MATHGL_LIBS})
-
-  target_link_libraries(XORProblem ${LIBS})
-  target_link_libraries(SpiralDataTest ${LIBS})
-  target_link_libraries(NormLayerTest ${LIBS})
   # target_link_libraries(ModelTest ${LIBS})
   # target_link_libraries(MNIST ${LIBS})
   # target_link_libraries(Softmaxtest ${LIBS})
@@ -59,5 +52,5 @@ if(HAVE_LIBS)
   # add_test(softmaxtest2 ./softmaxtest2)
   # add_test(quadratictest ./quadratictest)
   # add_test(kullbackleiblertest ./kullbackleiblertest)
-endif(HAVE_LIBS)
+endif (LIBS_FOUND)
 
