@@ -33,27 +33,27 @@ static inline double _tanhgrad(double z) {
 }
 
 static inline double _bipolarsigmoid(double z) {
-  const double expo = exp(-z);
-  return (1.0 - expo) / (1.0 + expo);
+  return 2.0 / (1 + exp(-z)) - 1;
 }
 static inline double _bipolarsigmoidgrad(double z) {
-  const double expo = exp(-z);
-  return 2.0 * expo / (1 + expo) / (1 + expo);
+  const double f = _bipolarsigmoid(z);
+  return (1.0 - f * f) / 2;
 }
 
 static inline double _comploglog(double z) {
   return 1.0 - exp(-exp(z));
 }
 static inline double _complogloggrad(double z) {
-  const double expo = exp(-z);
-  return - expo * exp(-expo);
+  const double expo = exp(z);
+  return expo * exp(-expo);
 }
 
 static inline double _lecuntanh(double z) {
   return 1.7159 * tanh(2.0/3.0*z);
 }
 static inline double _lecuntanhgrad(double z) {
-  return 1.143933 / (1.0 - 4.0/9.0*z*z);
+  const double x = 2.0 / 3.0 * z;
+  return 1.14393333 * 4 / (exp(x) + exp(-x)) / (exp(x) + exp(-x));
 }
 
 static inline double _hardtanh(double z) {
