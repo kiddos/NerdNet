@@ -9,6 +9,19 @@
 
 namespace nn {
 
+struct LayerParam {
+  LayerParam() {
+    previous_nodes = nodes = 0;
+    standard_dev = 1.0;
+    learning_rate = 1e-2;
+    lambda = 0;
+    actfunc = identity;
+  }
+  int previous_nodes, nodes;
+  double standard_dev, learning_rate, lambda;
+  ActFunc actfunc;
+};
+
 class Layer {
  public:
   Layer();
