@@ -74,9 +74,7 @@ mat Layer::backprop(const mat& d) {
   grad = grad + lambda * W;
 
   // compute new delta to throw to next layer
-  mat newdelta = delta * W.t();
-  newdelta.shed_col(0);
-  return newdelta;
+  return mat(delta * W.t()).submat(0, 1, delta.n_rows-1, W.n_rows-1);
 }
 
 void Layer::update() {
