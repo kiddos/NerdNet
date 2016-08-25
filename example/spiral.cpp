@@ -62,14 +62,13 @@ int main() {
   const int w = 800;
   const int h = 600;
 
-  srand(time(NULL));
-
   // set up model
   InputLayer input(2);
   vector<shared_ptr<Layer>> hidden = {
-    std::make_shared<Layer>(2, 128, lrate, lambda, nn::arctan)
+    std::make_shared<Layer>(2, 64, lrate, 1e-2, lambda, nn::arctan),
+    std::make_shared<Layer>(64, 16, lrate, 1e-2, lambda, nn::arctan)
   };
-  nn::SoftmaxOutput output(128, 3, lrate, lambda);
+  nn::SoftmaxOutput output(16, 3, lrate, lambda);
   NeuralNet nnet(input, output, hidden);
   Trainer trainer(nnet);
 
