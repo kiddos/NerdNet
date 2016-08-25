@@ -11,11 +11,6 @@ class OutputLayer : public Layer {
   OutputLayer(const OutputLayer& output);
   OutputLayer(const int pnnodes, const int outputnodes,
               const double lrate, const double lambda,
-              func act, func actd,
-              matfunc cost, matfuncd costd);
-  OutputLayer(const int pnnodes, const int outputnodes,
-              const double lrate,
-              const double lambda,
               const ActFunc actfunc,
               matfunc cost, matfuncd costd);
   virtual OutputLayer& operator= (const OutputLayer& output);

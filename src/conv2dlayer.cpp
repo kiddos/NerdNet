@@ -7,8 +7,8 @@ Conv2DLayer::Conv2DLayer() : inputwidth(0), inputheight(0), pnfilter(0),
 
 Conv2DLayer::Conv2DLayer(int inputwidth, int inputheight, int pnfilter,
                          int nfilter, int spatial, int stride, int padding,
-                         double lrate, func act, func actd)
-    : Layer(spatial*pnfilter-1, spatial*nfilter, lrate, 0, act, actd),
+                         double lrate, ActFunc actfunc)
+    : Layer(spatial*pnfilter-1, spatial*nfilter, lrate, 0, actfunc),
       inputwidth(inputwidth), inputheight(inputheight),
       inputsize(inputwidth*inputheight), pnfilter(pnfilter), nfilter(nfilter),
       spatial(spatial), stride(stride), padding(padding) {
@@ -19,16 +19,9 @@ Conv2DLayer::Conv2DLayer(int inputwidth, int inputheight, int pnfilter,
   outputsize = outputwidth * outputheight;
 }
 
-Conv2DLayer::Conv2DLayer(int inputwidth, int inputheight, int pnfilter,
-                         int nfilter, int spatial, int stride, int padding,
-                         double lrate, ActFunc actfunc)
-    : Conv2DLayer(inputwidth, inputheight, pnfilter, nfilter,
-                  spatial, stride, padding, lrate,
-                  actfunc.act, actfunc.actd) {}
-
 Conv2DLayer::Conv2DLayer(const Conv2DLayer& conv)
     : Layer(conv.spatial*conv.pnfilter-1, conv.spatial*conv.nfilter,
-            conv.lrate, 0, conv.act, conv.actd) {
+            conv.lrate, 0, conv.actfunc) {
   Conv2DLayer::operator= (conv);
 }
 
@@ -68,14 +61,14 @@ mat Conv2DLayer::forwardprop(const mat& pa) {
       }
     }
   }
-  return funcop(a, act);
+  return funcop(a, actfunc.act);
 }
 
 mat Conv2DLayer::backprop(const mat& del) {
   delta = mat(del.n_rows, inputsize * pnfilter, arma::fill::zeros);
   grad.zeros();
 
-  mat d = funcop(del, actd);
+  mat d = funcop(del, actfunc.actd);
 
   for (uint32_t i = 0 ; i < d.n_rows ; ++i) {
     mat deltay = d.row(i);

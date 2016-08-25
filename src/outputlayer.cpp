@@ -12,15 +12,6 @@ OutputLayer::OutputLayer(const OutputLayer& output)
 
 OutputLayer::OutputLayer(const int pnnodes, const int outputnodes,
                          const double lrate, const double lambda,
-                         func act, func actd,
-                         matfunc cost, matfuncd costd)
-    : Layer(pnnodes, outputnodes, lrate, lambda, act, actd) {
-  this->cost = cost;
-  this->costd = costd;
-}
-
-OutputLayer::OutputLayer(const int pnnodes, const int outputnodes,
-                         const double lrate, const double lambda,
                          const ActFunc actfunc,
                          matfunc cost, matfuncd costd)
     : Layer(pnnodes, outputnodes, lrate, lambda, actfunc) {

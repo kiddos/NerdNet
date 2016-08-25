@@ -38,7 +38,7 @@ mat MeanPoolLayer::forwardprop(const mat& pa) {
       }
     }
   }
-  return funcop(a, act);
+  return funcop(a, actfunc.act);
 }
 
 mat MeanPoolLayer::backprop(const mat& ) {

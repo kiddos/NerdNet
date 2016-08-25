@@ -10,9 +10,6 @@ class Conv2DLayer : public Layer {
   Conv2DLayer();
   Conv2DLayer(int inputwidth, int inputheight, int pnfilter, int nfilter,
               int spatial, int stride, int padding,
-              double lrate, func act, func actd);
-  Conv2DLayer(int inputwidth, int inputheight, int pnfilter, int nfilter,
-              int spatial, int stride, int padding,
               double lrate, ActFunc actfunc);
   Conv2DLayer(const Conv2DLayer& conv);
   Conv2DLayer& operator= (const Conv2DLayer& conv);
