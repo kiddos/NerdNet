@@ -28,36 +28,36 @@ class Layer {
   Layer(const Layer& layer);
   Layer(const int pnnodes, const int nnodes,
         const double lrate, const double lambda,
-        func act, func actd);
-  Layer(const int pnnodes, const int nnodes,
-        const double lrate, const double lambda,
         ActFunc actfunc);
+  Layer(const int pnnodes, const int nnodes,
+        const double lrate, const double standard_dev,
+        const double lambda, ActFunc actfunc);
+  explicit Layer(const LayerParam param);
   virtual Layer& operator= (const Layer& layer);
   virtual mat forwardprop(const mat& pa);
   virtual mat backprop(const mat& delta);
   virtual void update();
   virtual void update(const mat grad);
-  virtual void randominit(const double eps);
+  virtual void randominit(const double standard_dev);
 
-  int getpnnodes() const { return W.n_rows; };
-  int getnnodes() const { return W.n_cols; };
-  double getlrate() const { return lrate; };
-  double getlambda() const { return lambda; };
-  mat getz() const { return z; };
-  mat geta() const { return a; };
-  mat getw() const { return W; };
-  mat getgrad() const { return grad; };
-  mat getdelta() const {return delta; };
-  func getact() const { return act; };
-  func getactd() const { return actd; };
-  void setw(mat w) { W = w; };
-  void setlrate(const double lrate) { this->lrate = lrate; };
-  void setlambda(const double lambda) { this->lambda = lambda; };
+  int getpnnodes() const { return W.n_rows; }
+  int getnnodes() const { return W.n_cols; }
+  double getlrate() const { return lrate; }
+  double getlambda() const { return lambda; }
+  mat getz() const { return z; }
+  mat geta() const { return a; }
+  mat getw() const { return W; }
+  mat getgrad() const { return grad; }
+  mat getdelta() const {return delta; }
+  ActFunc getactfunc() const { return actfunc; }
+  void setw(mat w) { W = w; }
+  void setlrate(const double lrate) { this->lrate = lrate; }
+  void setlambda(const double lambda) { this->lambda = lambda; }
 
  protected:
   double lrate;
   double lambda;
-  func act, actd;
+  ActFunc actfunc;
   mat pa, z, a, delta;
   mat W, grad;
 };
