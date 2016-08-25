@@ -19,6 +19,21 @@ OutputLayer::OutputLayer(const int pnnodes, const int outputnodes,
   this->costd = costd;
 }
 
+OutputLayer::OutputLayer(const int pnnodes, const int outputnodes,
+                         const double lrate, const double stddev,
+                         const double lambda, const ActFunc actfunc,
+                         matfunc cost, matfuncd costd)
+    : Layer(pnnodes, outputnodes, lrate, stddev, lambda, actfunc) {
+  this->cost = cost;
+  this->costd = costd;
+}
+
+OutputLayer::OutputLayer(LayerParam param, matfunc cost, matfuncd costd)
+    : Layer(param) {
+  this->cost = cost;
+  this->costd = costd;
+}
+
 OutputLayer& OutputLayer::operator= (const OutputLayer& output) {
   Layer::operator= (output);
 

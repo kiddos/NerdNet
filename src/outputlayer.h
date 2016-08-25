@@ -13,6 +13,11 @@ class OutputLayer : public Layer {
               const double lrate, const double lambda,
               const ActFunc actfunc,
               matfunc cost, matfuncd costd);
+  OutputLayer(const int pnnodes, const int outputnodes,
+              const double lrate, const double stddev,
+              const double lambda, const ActFunc actfunc,
+              matfunc cost, matfuncd costd);
+  OutputLayer(LayerParam param, matfunc cost, matfuncd costd);
   virtual OutputLayer& operator= (const OutputLayer& output);
   virtual mat backprop(const mat& label);
   mat argmax() const;
