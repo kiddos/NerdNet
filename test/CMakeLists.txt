@@ -5,7 +5,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DDEBUG -DDEBUG_MESSAGE")
 # use g++ for running boost tests
 set(CMAKE_CXX_COMPILER g++)
 
-if (LIBS_FOUND)
+if (TEST_LIBS_FOUND)
   message("--> 'test' will be build.")
   include_directories(${CMAKE_SOURCE_DIR}/src)
   link_directories(/usr/lib ${CMAKE_BINARY_DIR}/src)
@@ -27,5 +27,5 @@ if (LIBS_FOUND)
 
   add_test(NormLayerTest ./normlayer_test)
   add_test(ActTest ./act_test)
-endif (LIBS_FOUND)
+endif (TEST_LIBS_FOUND)
 
