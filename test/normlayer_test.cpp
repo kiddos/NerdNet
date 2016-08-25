@@ -2,16 +2,14 @@
 #include <string>
 #include <cstdlib>
 #include <memory>
-
-#include <omp.h>
 #include <time.h>
-
 #include <opencv2/core.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc.hpp>
 
 #include "nnet.h"
+#include "gradient_checker.h"
 
 using std::shared_ptr;
 using std::string;
@@ -58,11 +56,15 @@ int main(void) {
   };
   nn::QuadraticOutput output(3, 1, lrate, lambda);
   NeuralNet nnet(input, output, hidden);
-  Trainer trainer(nnet);
-
-  if (!trainer.gradcheck(sample, arma::zeros(8, 1))) {
+  nn::GradientChecker checker(nnet);
+  if (!checker.check()) {
     cout << "gradient check failed" << endl;
   }
+  // Trainer trainer(nnet);
+
+  // if (!trainer.gradcheck(sample, arma::zeros(8, 1))) {
+  //   cout << "gradient check failed" << endl;
+  // }
 
   return 0;
 }
