@@ -28,10 +28,6 @@ Trainer::~Trainer() {
   nnet = nullptr;
 }
 
-bool Trainer::gradcheck(const mat& x, const mat& y) {
-  return nnet->gradcheck(x, y);
-}
-
 void Trainer::feeddata(const mat& x, const mat& y) {
   iters ++;
   if (usedecay && iters == step) {

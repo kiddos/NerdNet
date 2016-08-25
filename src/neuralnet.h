@@ -28,10 +28,9 @@ class NeuralNet {
   void backprop(const mat& y);
   void update();
   void update(const mat& ograd, const std::vector<mat>& hgrad);
-  bool gradcheck(const mat& x, const mat& y);
   double computecost(const mat& pred, const mat& y);
-  void randomize();
-  void randomize(uint32_t index);
+  void randomize(const double stddev);
+  void randomize(const uint32_t index, const double stddev);
   void save(const std::string path);
   void load(const std::string path);
 
@@ -45,11 +44,6 @@ class NeuralNet {
   void setoutputw(const mat& w) { output.setw(w); }
 
  private:
-  bool issame(const mat& m1, const mat& m2);
-  double computecost(const mat& x, const mat& y,
-                     const mat& perturb, uint32_t idx);
-  mat computengrad(const mat& x, const mat& y, int nrows, int ncols, int idx);
-
   const double eps;
   mat result;
   matfunc cost;

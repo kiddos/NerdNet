@@ -16,7 +16,6 @@ class Trainer {
   Trainer& operator= (const Trainer& trainer);
   ~Trainer();
 
-  virtual bool gradcheck(const mat& x, const mat& y);
   virtual void feeddata(const mat& x, const mat& y);
   virtual double feeddata(const mat& x, const mat& y, bool ccost);
 
