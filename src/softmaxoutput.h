@@ -11,6 +11,9 @@ class SoftmaxOutput : public OutputLayer {
   SoftmaxOutput(const SoftmaxOutput& output);
   SoftmaxOutput(const int pnnodes, const int outputnodes,
                 const double lrate, const double lambda);
+  SoftmaxOutput(const int pnnodes, const int outputnodes,
+                const double lrate, const double stddev, const double lambda);
+  SoftmaxOutput(LayerParam param);
 
   static mat costfunc(mat y, mat h);
   static mat costfuncdelta(mat y, mat a, mat z);

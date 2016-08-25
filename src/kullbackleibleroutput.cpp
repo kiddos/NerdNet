@@ -7,10 +7,25 @@ KullbackLeiblerOutput::KullbackLeiblerOutput() {}
 KullbackLeiblerOutput::KullbackLeiblerOutput(const KullbackLeiblerOutput& output)
     : OutputLayer(output) {}
 
-KullbackLeiblerOutput::KullbackLeiblerOutput(const int pnnodes, const int outputnodes,
-                                             const double lrate, const double lambda)
+KullbackLeiblerOutput::KullbackLeiblerOutput(const int pnnodes,
+                                             const int outputnodes,
+                                             const double lrate,
+                                             const double lambda)
     : OutputLayer(pnnodes, outputnodes, lrate, lambda, identity,
                   KullbackLeiblerOutput::costfunc,
+                  KullbackLeiblerOutput::costfuncdelta) {}
+
+KullbackLeiblerOutput::KullbackLeiblerOutput(const int pnnodes,
+                                             const int outputnodes,
+                                             const double lrate,
+                                             const double stddev,
+                                             const double lambda)
+    : OutputLayer(pnnodes, outputnodes, lrate, stddev, lambda, identity,
+                  KullbackLeiblerOutput::costfunc,
+                  KullbackLeiblerOutput::costfuncdelta) {}
+
+KullbackLeiblerOutput::KullbackLeiblerOutput(LayerParam param)
+    : OutputLayer(param, KullbackLeiblerOutput::costfunc,
                   KullbackLeiblerOutput::costfuncdelta) {}
 
 mat KullbackLeiblerOutput::costfunc(mat y, mat h) {

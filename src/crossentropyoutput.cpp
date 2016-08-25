@@ -7,10 +7,25 @@ CrossEntropyOutput::CrossEntropyOutput() {}
 CrossEntropyOutput::CrossEntropyOutput(const CrossEntropyOutput& output)
     : OutputLayer(output) {}
 
-CrossEntropyOutput::CrossEntropyOutput(const int pnnodes, const int outputnodes,
-                                       const double lrate, const double lambda)
+CrossEntropyOutput::CrossEntropyOutput(const int pnnodes,
+                                       const int outputnodes,
+                                       const double lrate,
+                                       const double lambda)
     : OutputLayer(pnnodes, outputnodes, lrate, lambda, sigmoid,
                   CrossEntropyOutput::costfunc,
+                  CrossEntropyOutput::costfuncdelta) {}
+
+CrossEntropyOutput::CrossEntropyOutput(const int pnnodes,
+                                       const int outputnodes,
+                                       const double lrate,
+                                       const double stddev,
+                                       const double lambda)
+    : OutputLayer(pnnodes, outputnodes, lrate, stddev, lambda, sigmoid,
+                  CrossEntropyOutput::costfunc,
+                  CrossEntropyOutput::costfuncdelta) {}
+
+CrossEntropyOutput::CrossEntropyOutput(LayerParam param)
+    : OutputLayer(param, CrossEntropyOutput::costfunc,
                   CrossEntropyOutput::costfuncdelta) {}
 
 mat CrossEntropyOutput::costfunc(mat y, mat h) {

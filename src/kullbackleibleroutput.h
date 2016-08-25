@@ -11,6 +11,10 @@ class KullbackLeiblerOutput : public OutputLayer {
   KullbackLeiblerOutput(const KullbackLeiblerOutput& output);
   KullbackLeiblerOutput(const int pnnodes, const int outputnodes,
                         const double lrate, const double lambda);
+  KullbackLeiblerOutput(const int pnnodes, const int outputnodes,
+                        const double lrate, const double stddev,
+                        const double lambda);
+  KullbackLeiblerOutput(LayerParam);
 
   static mat costfunc(mat y, mat h);
   static mat costfuncdelta(mat y, mat a, mat z);

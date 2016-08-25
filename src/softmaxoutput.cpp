@@ -13,6 +13,17 @@ SoftmaxOutput::SoftmaxOutput(const int pnnodes, const int outputnodes,
                   SoftmaxOutput::costfunc,
                   SoftmaxOutput::costfuncdelta) {}
 
+SoftmaxOutput::SoftmaxOutput(const int pnnodes, const int outputnodes,
+                             const double lrate, const double stddev,
+                             const double lambda)
+    : OutputLayer(pnnodes, outputnodes, lrate, stddev, lambda, identity,
+                  SoftmaxOutput::costfunc,
+                  SoftmaxOutput::costfuncdelta) {}
+
+SoftmaxOutput::SoftmaxOutput(LayerParam param)
+    : OutputLayer(param, SoftmaxOutput::costfunc,
+                  SoftmaxOutput::costfuncdelta) {}
+
 mat SoftmaxOutput::costfunc(mat y, mat h) {
   const mat expo = exponential(h);
   const mat sumexpo = repeat(rowsum(expo), 1, y.n_cols);

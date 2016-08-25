@@ -11,6 +11,10 @@ class CrossEntropyOutput : public OutputLayer {
   CrossEntropyOutput(const CrossEntropyOutput& output);
   CrossEntropyOutput(const int pnnodes, const int outputnodes,
                      const double lrate, const double lambda);
+  CrossEntropyOutput(const int pnnodes, const int outputnodes,
+                     const double lrate, const double stddev,
+                     const double lambda);
+  CrossEntropyOutput(LayerParam param);
 
   static mat costfunc(mat y, mat h);
   static mat costfuncdelta(mat y, mat a, mat z);

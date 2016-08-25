@@ -13,6 +13,17 @@ QuadraticOutput::QuadraticOutput(const int pnnodes, const int outputnodes,
                   QuadraticOutput::costfunc,
                   QuadraticOutput::costfuncdelta) {}
 
+QuadraticOutput::QuadraticOutput(const int pnnodes, const int outputnodes,
+                                 const double lrate, const double stddev,
+                                 const double lambda)
+    : OutputLayer(pnnodes, outputnodes, lrate, stddev, lambda, identity,
+                  QuadraticOutput::costfunc,
+                  QuadraticOutput::costfuncdelta) {}
+
+QuadraticOutput::QuadraticOutput(LayerParam param)
+    : OutputLayer(param, QuadraticOutput::costfunc,
+                  QuadraticOutput::costfuncdelta) {}
+
 mat QuadraticOutput::costfunc(mat y, mat h) {
   const mat diff = y - h;
   return (diff % diff) / 2.0 / y.n_rows;
