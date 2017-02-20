@@ -1,5 +1,5 @@
-#include <tensor/tensor_shape.h>
 #include <cassert>
+#include "tensor/tensor_shape.h"
 
 namespace nn {
 namespace tensor {
