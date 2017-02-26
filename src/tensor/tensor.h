@@ -25,6 +25,8 @@ class Tensor {
   static Tensor Eyes(int size);
   static Tensor Gaussian(const TensorShape& shape,
                          DType mean, DType stddev);
+  static Tensor Gaussian(const std::vector<int>& shape,
+                         DType mean, DType stddev);
 
   // reshape
   // total size must be equal
@@ -33,6 +35,7 @@ class Tensor {
 
   TensorShape shape() const { return shape_; }
   DType data(int i) const { return data_[i]; }
+  DType& operator[](int i) { return data_[i]; }
   template <typename T>
   T* ptr() { return reinterpret_cast<T*>(data_); }
 

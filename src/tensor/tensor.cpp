@@ -88,8 +88,8 @@ Tensor<DType> Tensor<DType>::Eyes(int size) {
 }
 
 template <typename DType>
-Tensor<DType> Tensor<DType>::Gaussian(const TensorShape& shape, DType mean,
-                                        DType stddev) {
+Tensor<DType> Tensor<DType>::Gaussian(const TensorShape& shape,
+                                      DType mean, DType stddev) {
   mt19937 gen(std::chrono::system_clock::now().time_since_epoch().count());
   normal_distribution<DType> dist(mean, stddev);
   Tensor<DType> output(shape);
@@ -97,6 +97,12 @@ Tensor<DType> Tensor<DType>::Gaussian(const TensorShape& shape, DType mean,
     output.data_[i] = dist(gen);
   }
   return output;
+}
+
+template <typename DType>
+Tensor<DType> Tensor<DType>::Gaussian(const vector<int>& shape,
+                                      DType mean, DType stddev) {
+  return Gaussian(TensorShape(shape), mean, stddev);
 }
 
 template <typename DType>
