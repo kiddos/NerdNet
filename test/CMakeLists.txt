@@ -18,4 +18,8 @@ if (TARGET tensor)
   add_executable(test_tensor_add tensor/ops/test_tensor_add.cpp)
   target_link_libraries(test_tensor_add ${TEST_LIBS})
   add_test(TestTensorOpsAdd test_tensor_add)
+
+  add_executable(test_tensor_sub tensor/ops/test_tensor_sub.cpp)
+  target_link_libraries(test_tensor_sub ${TEST_LIBS})
+  add_test(TestTensorOpsSub test_tensor_sub)
 endif ()
