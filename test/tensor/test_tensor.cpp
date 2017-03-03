@@ -23,6 +23,14 @@ TEST(Tensor, ConstructorWithShape) {
   EXPECT_EQ(dtensor.ptr<double>()[100*200-1], 0);
 }
 
+TEST(Tensor, ConstructorWithSingleValue) {
+  Tensor<float> ftensor(1.0f);
+  EXPECT_EQ(ftensor.data(0), 1.0f);
+
+  Tensor<double> dtensor(9.0f);
+  EXPECT_EQ(dtensor.data(0), 9.0f);
+}
+
 template <typename DType>
 testing::AssertionResult TestCreateZeroTensor(int d1, int d2, int d3) {
   Tensor<DType> ft = Tensor<DType>::Zeros({d1, d2, d3});
