@@ -15,6 +15,10 @@ template <typename DType>
 Tensor<DType>::Tensor() : data_(nullptr) {}
 
 template <typename DType>
+Tensor<DType>::Tensor(const DType val)
+    : shape_(TensorShape()), data_(new DType{val}) {}
+
+template <typename DType>
 Tensor<DType>::~Tensor() {
   if (data_) delete[] data_;
 }
