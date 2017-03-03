@@ -31,7 +31,8 @@ Tensor<DType>::Tensor(const TensorShape& shape) : shape_(shape) {
 template <typename DType>
 Tensor<DType>::Tensor(const Tensor& tensor)
     : shape_(tensor.shape_), data_(nullptr) {
-  Tensor<DType>::operator=(tensor);
+  data_ = new DType[shape_.chunk(0)]{0};
+  for (int i = 0; i < shape_.chunk(0); ++i) data_[i] = tensor.data_[i];
 }
 
 template <typename DType>
@@ -41,7 +42,15 @@ Tensor<DType>::Tensor(Tensor&& tensor) : shape_(tensor.shape_), data_(nullptr) {
 
 template <typename DType>
 Tensor<DType>& Tensor<DType>::operator=(const Tensor& tensor) {
-  data_ = new DType[shape_.chunk(0)]{0};
+  if (data_) {
+    if (shape_.chunk(0) < tensor.shape_.chunk(0)) {
+      delete[] data_;
+      data_ = new DType[tensor.shape_.chunk(0)];
+    }
+    shape_ = tensor.shape_;
+  } else {
+    data_ = new DType[shape_.chunk(0)]{0};
+  }
   for (int i = 0; i < shape_.chunk(0); ++i) data_[i] = tensor.data_[i];
   return *this;
 }

@@ -11,8 +11,9 @@ class Tensor {
  public:
   Tensor();
   ~Tensor();
-  Tensor(const std::vector<int>& shape);
-  Tensor(const TensorShape& shape);
+  explicit Tensor(const DType val);
+  explicit Tensor(const std::vector<int>& shape);
+  explicit Tensor(const TensorShape& shape);
   Tensor(const Tensor& tensor);
   Tensor(Tensor&& tensor);
   Tensor& operator=(const Tensor& tensor);
