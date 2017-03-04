@@ -1,4 +1,7 @@
 #include <gtest/gtest.h>
+#include <chrono>
+#include <random>
+#include <cmath>
 #include "tensor/tensor.h"
 
 using nn::tensor::Tensor;
@@ -31,117 +34,115 @@ TEST(Tensor, ConstructorWithSingleValue) {
   EXPECT_EQ(dtensor.data(0), 9.0f);
 }
 
+int randrange(int begin, int end) {
+  std::mt19937 gen(std::chrono::system_clock::now().time_since_epoch().count());
+  std::uniform_int_distribution<int> dist(begin, end);
+  return dist(gen) + 1;
+}
+
 template <typename DType>
-testing::AssertionResult TestCreateZeroTensor(int d1, int d2, int d3) {
+void TestCreateZeroTensor(int d1, int d2, int d3) {
   Tensor<DType> ft = Tensor<DType>::Zeros({d1, d2, d3});
   for (int i = 0 ; i < ft.shape().chunk(0) ; ++i) {
-    if (ft.data(i) != 0) {
-      return testing::AssertionFailure();
-    }
+    EXPECT_EQ(ft.data(i), 0);
   }
-  return testing::AssertionSuccess();
 }
 
 TEST(Tensor, CreateZerosTensor) {
-  EXPECT_TRUE(TestCreateZeroTensor<float>(200, 200, 10));
-  EXPECT_TRUE(TestCreateZeroTensor<double>(200, 200, 20));
+  int d1 = randrange(100, 200);
+  int d2 = randrange(100, 200);
+  int d3 = randrange(10, 20);
+  TestCreateZeroTensor<float>(d1, d2, d3);
+  TestCreateZeroTensor<double>(d1, d2, d3);
 }
 
 template <typename DType>
-testing::AssertionResult TestCreateOneTensor(int d1, int d2, int d3) {
+void TestCreateOneTensor(int d1, int d2, int d3) {
   Tensor<DType> ft = Tensor<DType>::Ones({d1, d2, d3});
   for (int i = 0 ; i < ft.shape().chunk(0) ; ++i) {
-    if (ft.data(i) != 1) {
-      return testing::AssertionFailure();
-    }
+    EXPECT_EQ(ft.data(i), 1);
   }
-  return testing::AssertionSuccess();
 }
 
 TEST(Tensor, CreateOnesTensor) {
-  EXPECT_TRUE(TestCreateOneTensor<float>(300, 200, 10));
-  EXPECT_TRUE(TestCreateOneTensor<double>(100, 200, 20));
+  int d1 = randrange(100, 200);
+  int d2 = randrange(100, 200);
+  int d3 = randrange(10, 20);
+  TestCreateOneTensor<float>(d1, d2, d3);
+  TestCreateOneTensor<double>(d1, d2, d3);
 }
 
 template <typename DType>
-testing::AssertionResult TestCreateIdentityMatixTensor(int size) {
+void TestCreateIdentityMatixTensor(int size) {
   Tensor<DType> ft = Tensor<DType>::Eyes(size);
   for (int i = 0 ; i < ft.shape().shape(0) ; ++i) {
     for (int j = 0 ; j < ft.shape().shape(1) ; ++j) {
       if (i == j) {
-        if (ft.data(i * ft.shape().shape(1) + j) != 1) {
-          return testing::AssertionFailure();
-        }
+        EXPECT_EQ(ft.data(i * ft.shape().shape(1) + j), 1);
       } else {
-        if (ft.data(i * ft.shape().shape(1) + j) != 0) {
-          return testing::AssertionFailure();
-        }
+        EXPECT_EQ(ft.data(i * ft.shape().shape(1) + j), 0);
       }
     }
   }
-  return testing::AssertionSuccess();
 }
 
 TEST(Tensor, CreateIdentityMatrixTensor) {
-  EXPECT_TRUE(TestCreateIdentityMatixTensor<float>(300));
-  EXPECT_TRUE(TestCreateIdentityMatixTensor<float>(600));
+  int d = randrange(100, 600);
+  TestCreateIdentityMatixTensor<float>(d);
+  TestCreateIdentityMatixTensor<double>(d);
 }
 
 template <typename DType>
-testing::AssertionResult TestCreateGaussianTensor(int d1, int d2, int d3) {
-  Tensor<DType> ft = Tensor<DType>::Gaussian({d1, d2, d3}, 0, 1.0);
-  for (int i = 0 ; i < ft.shape().shape(0) ; ++i) {
-    for (int j = 0 ; j < ft.shape().shape(1) ; ++j) {
-      if (i == j) {
-        if (ft.data(i * ft.shape().shape(1) + j) != 1) {
-          testing::AssertionFailure();
-        }
-      } else {
-        if (ft.data(i * ft.shape().shape(1) + j) != 0) {
-          testing::AssertionFailure();
-        }
-      }
-    }
+void TestCreateGaussianTensor(int d1, int d2, int d3) {
+  Tensor<DType> t = Tensor<DType>::Gaussian({d1, d2, d3}, 0, 1.0);
+  int chunk = t.shape().chunk(0);
+  DType sum = 0;
+  for (int i = 0 ; i < chunk ; ++i) {
+    sum += t.data(i);
   }
-  return testing::AssertionSuccess();
+  DType mean = sum / chunk;
+
+  DType sq = 0;
+  for (int i = 0 ; i < chunk ; ++i) {
+    sq += std::pow(mean - t.data(i), 2);
+  }
+  EXPECT_LT(std::abs(mean), 1e-2);
+  DType stddev = std::sqrt(sq / chunk);
+  EXPECT_LT(std::abs(stddev - 1.0), 1e-2);
 }
 
 TEST(TestTensor, CreateGaussianTensor) {
-  EXPECT_TRUE(TestCreateGaussianTensor<float>(100, 200, 10));
-  EXPECT_TRUE(TestCreateGaussianTensor<double>(200, 100, 20));
+  int d1 = randrange(100, 200);
+  int d2 = randrange(100, 200);
+  int d3 = randrange(10, 20);
+  TestCreateGaussianTensor<float>(d1, d2, d3);
+  TestCreateGaussianTensor<double>(d1, d2, d3);
 }
 
 template <typename DType>
-testing::AssertionResult TestReshapeTensor() {
-  Tensor<DType> ft = Tensor<DType>::Eyes(300);
-  ft.Reshape({300*300});
-  if (ft.shape().chunk(0) == 300 * 300 && ft.shape().shape(0)) {
-    return testing::AssertionSuccess();
-  } else {
-    return testing::AssertionFailure();
-  }
+void TestReshapeTensor(int size) {
+  Tensor<DType> ft = Tensor<DType>::Eyes(size);
+  ft.Reshape({size*size});
+  EXPECT_EQ(ft.shape().chunk(0), size * size);
+  EXPECT_EQ(ft.shape().shape(0), size * size);
 }
 
 TEST(Tensor, ReshapeTensor) {
-  EXPECT_TRUE(TestReshapeTensor<float>());
-  EXPECT_TRUE(TestReshapeTensor<double>());
+  int d = randrange(300, 600);
+  TestReshapeTensor<float>(d);
+  TestReshapeTensor<double>(d);
 }
 
 template <typename DType>
-testing::AssertionResult TestCopyTensor(int d1, int d2) {
+void TestCopyTensor(int d1, int d2) {
   Tensor<DType> t1 = Tensor<DType>::Gaussian({d1, d2}, 0.0f, 1.0f);
   Tensor<DType> t2 = Tensor<DType>::Gaussian({d1, d2}, 0.0f, 1.0f);
   DType* original_ptr = &t1[0];
   t1 = t2;
-  if (original_ptr == &t1[0]) {
-    return testing::AssertionSuccess() << "No reallocation of memeory";
-  } else {
-    return testing::AssertionFailure()
-        << "Tensor data pointer changed, Memory reallocation occur";
-  }
+  EXPECT_EQ(original_ptr, &t1[0]);
 }
 
 TEST(Tensor, CopyTensor) {
-  EXPECT_TRUE(TestCopyTensor<float>(300, 300));
-  EXPECT_TRUE(TestCopyTensor<double>(300, 300));
+  TestCopyTensor<float>(300, 300);
+  TestCopyTensor<double>(300, 300);
 }
