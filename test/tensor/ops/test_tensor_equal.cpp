@@ -2,7 +2,6 @@
 #include "tensor/ops/equal.h"
 #include "tensor/ops/sub.h"
 
-
 template <typename DType>
 void TestEqual(int size) {
   using namespace nn::tensor;
