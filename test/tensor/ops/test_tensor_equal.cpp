@@ -32,7 +32,7 @@ void TestEqual(int size) {
   }
 }
 
-TEST(TestTensorOps, ArgmaxSmallScale) {
+TEST(TestTensorOps, EqualSmallScale) {
   TestEqual<float>(10);
   TestEqual<double>(10);
 
@@ -40,7 +40,7 @@ TEST(TestTensorOps, ArgmaxSmallScale) {
   TestEqual<double>(100);
 }
 
-TEST(TestTensorOps, ArgmaxLargeScale) {
+TEST(TestTensorOps, EqualLargeScale) {
   TestEqual<float>(1000);
   TestEqual<double>(1000);
 
