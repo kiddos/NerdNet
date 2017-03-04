@@ -143,6 +143,8 @@ void TestCopyTensor(int d1, int d2) {
 }
 
 TEST(Tensor, CopyTensor) {
-  TestCopyTensor<float>(300, 300);
-  TestCopyTensor<double>(300, 300);
+  int d1 = randrange(300, 600);
+  int d2 = randrange(300, 600);
+  TestCopyTensor<float>(d1, d2);
+  TestCopyTensor<double>(d1, d2);
 }
