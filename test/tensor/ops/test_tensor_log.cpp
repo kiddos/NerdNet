@@ -21,14 +21,14 @@ TEST(TestTensorOps, LogSmallScale) {
   TestLog<float>(10, 10, 1);
   TestLog<double>(10, 10, 1);
 
-  TestLog<float>(100, 10, 10);
-  TestLog<double>(100, 10, 10);
+  TestLog<float>(10, 10, 10);
+  TestLog<double>(10, 10, 10);
 }
 
 TEST(TestTensorOps, LogLargeScale) {
-  TestLog<float>(100, 100, 100);
-  TestLog<double>(100, 100, 100);
+  TestLog<float>(100, 100, 10);
+  TestLog<double>(100, 100, 10);
 
-  TestLog<float>(600, 200, 10);
-  TestLog<double>(600, 200, 10);
+  TestLog<float>(300, 100, 10);
+  TestLog<double>(300, 100, 10);
 }
