@@ -22,4 +22,12 @@ if (TARGET tensor)
   add_executable(test_tensor_sub tensor/ops/test_tensor_sub.cpp)
   target_link_libraries(test_tensor_sub ${TEST_LIBS})
   add_test(TestTensorOpsSub test_tensor_sub)
+
+  add_executable(test_tensor_mul tensor/ops/test_tensor_mul.cpp)
+  target_link_libraries(test_tensor_mul ${TEST_LIBS})
+  add_test(TestTensorOpsMul test_tensor_mul)
+
+  add_executable(test_tensor_div tensor/ops/test_tensor_div.cpp)
+  target_link_libraries(test_tensor_div ${TEST_LIBS})
+  add_test(TestTensorOpsDiv test_tensor_div)
 endif ()
