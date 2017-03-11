@@ -5,5 +5,6 @@
 #include "tensor/ops/sub.h"
 #include "tensor/ops/mul.h"
 #include "tensor/ops/div.h"
+#include "tensor/ops/power.h"
 
 #endif /* end of include guard: TENSOR_BASIC_OPS_H */
