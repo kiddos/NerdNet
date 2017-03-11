@@ -21,9 +21,9 @@ if (TARGET tensor)
   add_test(TestTensorBasicOps test_tensor_basic_ops)
 
   # argmax
-  add_executable(test_tensor_argmax tensor/ops/test_tensor_argmax.cpp)
-  target_link_libraries(test_tensor_argmax ${TEST_LIBS})
-  add_test(TestTensorArgmax test_tensor_argmax)
+  add_executable(test_tensor_arg tensor/ops/test_tensor_arg.cpp)
+  target_link_libraries(test_tensor_arg ${TEST_LIBS})
+  add_test(TestTensorArg test_tensor_arg)
 
   # equal
   add_executable(test_tensor_equal tensor/ops/test_tensor_equal.cpp)
@@ -54,6 +54,24 @@ endif ()
 find_library(BENCHMARK benchmark)
 if (BENCHMARK)
   set(BENCHMARK_LIBS ${BENCHMARK} pthread tensor)
+
+  # basic operations
   add_executable(benchmark_basic_ops tensor/ops/benchmark_tensor_basic_ops.cpp)
   target_link_libraries(benchmark_basic_ops ${BENCHMARK_LIBS})
+
+  # math operations
+  add_executable(benchmark_math_ops tensor/ops/benchmark_tensor_mathops.cpp)
+  target_link_libraries(benchmark_math_ops ${BENCHMARK_LIBS})
+
+  # matrix multiplication
+  add_executable(benchmark_matmul tensor/ops/benchmark_tensor_matmul.cpp)
+  target_link_libraries(benchmark_matmul ${BENCHMARK_LIBS})
+
+  # reduction
+  add_executable(benchmark_reduction tensor/ops/benchmark_tensor_reduction.cpp)
+  target_link_libraries(benchmark_reduction ${BENCHMARK_LIBS})
+
+  # arg max/min
+  add_executable(benchmark_arg tensor/ops/benchmark_tensor_arg.cpp)
+  target_link_libraries(benchmark_arg ${BENCHMARK_LIBS})
 endif ()
