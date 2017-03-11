@@ -4,18 +4,16 @@ os:
 language: cpp
 
 sudo: required
-dist: trusty
 
 before_install:
-  - sudo add-apt-repository ppa:george-edison55/cmake-3.x --yes
   - sudo apt-get update
 
 install:
-  - sudo apt-get install -y libarmadillo-dev libboost-dev cmake
+  - sudo apt-get install -y build-essential cmake
 
 script:
   - mkdir build
   - cd build
-  - cmake ..
+  - cmake -D CMAKE_BUILD_TYPE=Release ..
   - make -j6
-  - ./run_experiment.py
+  - make test
