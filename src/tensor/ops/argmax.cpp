@@ -1,4 +1,5 @@
 #include "tensor/ops/argmax.h"
+#include "tensor/openmp_support.h"
 #include <cassert>
 
 namespace nn {
@@ -12,6 +13,8 @@ Tensor<DType> argmax(const Tensor<DType>& t, int axis) {
   int cols = t.shape().shape(1);
   if (axis == 0) {
     Tensor<DType> output(TensorShape({cols}));
+
+    PARALLEL_FOR()
     for (int i = 0 ; i < cols ; ++i) {
       DType maxval = t.data(i);
       for (int j = 1 ; j < rows ; ++j) {
@@ -25,6 +28,8 @@ Tensor<DType> argmax(const Tensor<DType>& t, int axis) {
     return output;
   } else {
     Tensor<DType> output(TensorShape({rows}));
+
+    PARALLEL_FOR()
     for (int i = 0 ; i < rows ; ++i) {
       DType maxval = t.data(i * cols);
       for (int j = 1 ; j < cols ; ++j) {

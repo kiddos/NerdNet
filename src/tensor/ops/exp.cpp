@@ -1,4 +1,5 @@
 #include "tensor/ops/exp.h"
+#include "tensor/openmp_support.h"
 #include <cmath>
 
 namespace nn {
@@ -8,6 +9,8 @@ template <typename DType>
 Tensor<DType> exp(const Tensor<DType>& t) {
   Tensor<DType> output(t.shape());
   int chunk = t.shape().chunk(0);
+
+  PARALLEL_FOR()
   for (int i = 0 ; i < chunk ; ++i) {
     output[i] = std::exp(t.data(i));
   }

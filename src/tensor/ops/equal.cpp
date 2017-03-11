@@ -1,4 +1,5 @@
 #include "tensor/ops/equal.h"
+#include "tensor/openmp_support.h"
 #include <cassert>
 #include <cmath>
 
@@ -15,6 +16,8 @@ Tensor<DType> operator==(const Tensor<DType>& t1, const Tensor<DType>& t2) {
 
   Tensor<DType> output(t1.shape());
   int chunk = t1.shape().chunk(0);
+
+  PARALLEL_FOR()
   for (int i = 0; i < chunk; ++i) {
     if (t1.data(i) == t2.data(i)) {
       output[i] = 1;
@@ -27,6 +30,8 @@ template <typename DType>
 Tensor<DType> operator==(const Tensor<DType>& t, const DType val) {
   Tensor<DType> output(t.shape());
   int chunk = t.shape().chunk(0);
+
+  PARALLEL_FOR()
   for (int i = 0; i < chunk; ++i) {
     if (t.data(i) == val) {
       output[i] = 1;
@@ -47,6 +52,8 @@ Tensor<DType> equal(const Tensor<DType>& t1, const Tensor<DType>& t2,
 
   Tensor<DType> output(t1.shape());
   int chunk = t1.shape().chunk(0);
+
+  PARALLEL_FOR()
   for (int i = 0; i < chunk; ++i) {
     if (std::abs(t1.data(i) - t2.data(i)) < eps) {
       output[i] = 1;
@@ -60,6 +67,8 @@ Tensor<DType> equal(const Tensor<DType>& t, const DType val, DType eps) {
   assert(eps >= 0);
   Tensor<DType> output(t.shape());
   int chunk = t.shape().chunk(0);
+
+  PARALLEL_FOR()
   for (int i = 0; i < chunk; ++i) {
     if (std::abs(t.data(i) - val) < eps) {
       output[i] = 1;
