@@ -1,11 +1,39 @@
 #include <gtest/gtest.h>
-#include "tensor/ops/add.h"
-#include "tensor/ops/div.h"
-#include "tensor/ops/mul.h"
-#include "tensor/ops/sub.h"
+#include <cmath>
+#include "tensor/ops/basic_ops.h"
 
 using nn::tensor::Tensor;
 using nn::tensor::TensorShape;
+
+template <typename DType>
+void TestBasicOps(TensorShape shape, DType mean, DType stddev, DType val) {
+  Tensor<DType> t = Tensor<DType>::Gaussian(shape, mean, stddev);
+
+  Tensor<DType> t2 = t + val;
+  for (int i = 0; i < shape.chunk(0); ++i) {
+    EXPECT_EQ(t2[i], t[i] + val);
+  }
+
+  t2 = t - val;
+  for (int i = 0; i < shape.chunk(0); ++i) {
+    EXPECT_EQ(t2[i], t[i] - val);
+  }
+
+  t2 = t * val;
+  for (int i = 0; i < shape.chunk(0); ++i) {
+    EXPECT_EQ(t2[i], t[i] * val);
+  }
+
+  t2 = t / val;
+  for (int i = 0; i < shape.chunk(0); ++i) {
+    EXPECT_EQ(t2[i], t[i] / val);
+  }
+
+  t2 = t ^ val;
+  for (int i = 0; i < shape.chunk(0); ++i) {
+    EXPECT_EQ(t2[i], std::pow(t[i], val));
+  }
+}
 
 template <typename DType>
 void TestBasicOps(TensorShape shape, DType mean1, DType mean2, DType stddev1,
@@ -31,6 +59,15 @@ void TestBasicOps(TensorShape shape, DType mean1, DType mean2, DType stddev1,
   t3 = t1 / t2;
   for (int i = 0; i < shape.chunk(0); ++i) {
     EXPECT_EQ(t3[i], t1[i] / t2[i]);
+  }
+
+  t3 = t1 ^ t2;
+  for (int i = 0; i < shape.chunk(0); ++i) {
+    if (std::isnan(t3[i])) {
+      EXPECT_TRUE(std::isnan(t3[i]) == std::isnan(std::pow(t1[i], t2[i])));
+    } else {
+      EXPECT_EQ(t3[i], std::pow(t1[i], t2[i]));
+    }
   }
 }
 
@@ -80,7 +117,7 @@ TEST(TestTensorBasicOps, ZeroShape) {
 }
 
 TEST(TestTensorBasicOps, SmallScale) {
-  for (int i = 1; i < 64; ++i) {
+  for (int i = 64; i >= 1; i /= 2) {
     TestBasicOps(TensorShape({1, i}), 0.0f, 0.0f, 1.0f, 1.0f);
     TestBasicOps(TensorShape({1, i}), 0.0, 0.0, 1.0, 1.0);
 
@@ -93,7 +130,7 @@ TEST(TestTensorBasicOps, SmallScale) {
 }
 
 TEST(TestTensorBroadcastBasicOps, SmallScale) {
-  for (int i = 1; i < 64; ++i) {
+  for (int i = 64; i >= 1; i /= 2) {
     TestBroadcastOpsTensor(TensorShape({i, i}), TensorShape({i}), 0.0f, 0.0f,
                            1.0f, 1.0f);
     TestBroadcastOpsTensor(TensorShape({i, i}), TensorShape({i}), 0.0, 0.0, 1.0,
@@ -102,7 +139,7 @@ TEST(TestTensorBroadcastBasicOps, SmallScale) {
 }
 
 TEST(TestTensorBasicOps, MediumScale) {
-  for (int i = 1; i < 64; ++i) {
+  for (int i = 64; i >= 1; i /= 2) {
     TestBasicOps(TensorShape({1, i, 1}), 0.0f, 0.0f, 1.0f, 1.0f);
     TestBasicOps(TensorShape({1, i, 1}), 0.0, 0.0, 1.0, 1.0);
 
@@ -115,7 +152,7 @@ TEST(TestTensorBasicOps, MediumScale) {
 }
 
 TEST(TestTensorBroadcastBasicOps, MediumScale) {
-  for (int i = 1; i < 64; ++i) {
+  for (int i = 64; i >= 1; i /= 2) {
     TestBroadcastOpsTensor(TensorShape({i, 1, i}), TensorShape({i}), 0.0f,
                            0.0f, 1.0f, 1.0f);
     TestBroadcastOpsTensor(TensorShape({i, 1, i}), TensorShape({i}), 0.0,
@@ -132,7 +169,7 @@ TEST(TestTensorBasicOps, LargeScale) {
   TestBasicOps<float>(TensorShape({1024, 1024}), 0.0f, 0.0f, 1.0f, 1.0f);
   TestBasicOps<double>(TensorShape({1024, 1024}), 0.0f, 0.0f, 1.0, 1.0);
 
-  for (int i = 1; i < 16; ++i) {
+  for (int i = 16; i >= 1; i /= 2) {
     TestBasicOps<float>(TensorShape({1, i, 1, i}), 0.0f, 0.0f, 1.0f, 1.0f);
     TestBasicOps<double>(TensorShape({1, i, 1, i}), 0.0f, 0.0f, 1.0, 1.0);
 
@@ -145,7 +182,7 @@ TEST(TestTensorBasicOps, LargeScale) {
 }
 
 TEST(TestTensorBroadcastBasicOps, LargeScale) {
-  for (int i = 1; i < 64; ++i) {
+  for (int i = 16; i >= 1; i /= 2) {
     TestBroadcastOpsTensor(TensorShape({i, i, i}), TensorShape({i, i}), 0.0f,
                            0.0f, 1.0f, 1.0f);
     TestBroadcastOpsTensor(TensorShape({i, i, i}), TensorShape({i, i}), 0.0,
