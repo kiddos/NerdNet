@@ -30,11 +30,10 @@ if (TARGET tensor)
   target_link_libraries(test_tensor_equal ${TEST_LIBS})
   add_test(TestTensorEqual test_tensor_equal)
 
-  # natural log
-  add_executable(test_tensor_log tensor/ops/test_tensor_exp.cpp
-    tensor/ops/test_tensor_log.cpp)
-  target_link_libraries(test_tensor_log ${TEST_LIBS})
-  add_test(TestTensorLog test_tensor_log)
+  # basic math
+  add_executable(test_tensor_mathops tensor/ops/test_tensor_mathops.cpp)
+  target_link_libraries(test_tensor_mathops ${TEST_LIBS})
+  add_test(TestTensorMathOps test_tensor_mathops)
 
   # matrix multiplication
   add_executable(test_tensor_matmul tensor/ops/test_tensor_matmul.cpp)
@@ -45,6 +44,11 @@ if (TARGET tensor)
   add_executable(test_tensor_negate tensor/ops/test_tensor_negate.cpp)
   target_link_libraries(test_tensor_negate ${TEST_LIBS})
   add_test(TestTensorNegate test_tensor_negate)
+
+  # reduction
+  add_executable(test_tensor_reduce tensor/ops/test_tensor_reduce.cpp)
+  target_link_libraries(test_tensor_reduce ${TEST_LIBS})
+  add_test(TestTensorReduce test_tensor_reduce)
 endif ()
 
 find_library(BENCHMARK benchmark)
