@@ -18,17 +18,15 @@ void TestLog(int d1, int d2, int d3) {
 }
 
 TEST(TestTensorOps, LogSmallScale) {
-  TestLog<float>(10, 10, 1);
-  TestLog<double>(10, 10, 1);
-
-  TestLog<float>(10, 10, 10);
-  TestLog<double>(10, 10, 10);
+  for (int i = 1 ; i < 64 ; ++i) {
+    TestLog<float>(i, i, 1);
+    TestLog<double>(i, i, 1);
+  }
 }
 
 TEST(TestTensorOps, LogLargeScale) {
-  TestLog<float>(100, 100, 10);
-  TestLog<double>(100, 100, 10);
-
-  TestLog<float>(300, 100, 10);
-  TestLog<double>(300, 100, 10);
+  for (int i = 1 ; i < 64 ; ++i) {
+    TestLog<float>(i, i, i);
+    TestLog<double>(i, i, i);
+  }
 }
