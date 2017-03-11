@@ -39,8 +39,10 @@ class Tensor {
   int chunk(int i) const { return shape_.chunk(i); }
   DType data(int i) const { return data_[i]; }
   DType& operator[](int i) { return data_[i]; }
+  // pointers
   template <typename T>
   T* ptr() { return reinterpret_cast<T*>(data_); }
+  DType* data() const { return data_; }
 
  private:
   TensorShape shape_;
