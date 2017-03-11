@@ -25,15 +25,13 @@ Tensor<DType> operator/(const Tensor<DType>& t1, const Tensor<DType>& t2) {
       }
     }
   } else {
-    int chunk = t1.shape().chunk(offset);
-    int shape = t1.shape().shape(offset - 1);
-    for (int i = 0; i < shape; ++i) {
-      for (int j = 0; j < chunk; ++j) {
-        try {
-          output[i * chunk + j] = t1.data(i * chunk + j) / t2.data(j);
-        } catch (std::logic_error e) {
-          std::cerr << e.what() << std::endl;
-        }
+    int chunk = t1.shape().chunk(offset - 1);
+    int mod = t1.shape().chunk(offset);
+    for (int i = 0; i < chunk; ++i) {
+      try {
+        output[i] = t1.data(i) / t2.data(i % mod);
+      } catch (std::logic_error e) {
+        std::cerr << e.what() << std::endl;
       }
     }
   }
