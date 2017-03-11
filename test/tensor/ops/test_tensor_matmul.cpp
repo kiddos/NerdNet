@@ -2,7 +2,7 @@
 #include "tensor/ops/matmul.h"
 
 template <typename DType>
-void TestMatMul(int m, int n, int k) {
+void TestTensorMatMul(int m, int n, int k) {
   using namespace nn::tensor;
 
   Tensor<DType> a = Tensor<DType>::Gaussian({m, k}, 0, 1.0);
@@ -25,36 +25,36 @@ void TestMatMul(int m, int n, int k) {
 
 TEST(TestTensorMatMul, SmallScale) {
   for (int i = 1; i < 64; ++i) {
-    TestMatMul<float>(1, 1, i);
-    TestMatMul<double>(1, 1, i);
+    TestTensorMatMul<float>(1, 1, i);
+    TestTensorMatMul<double>(1, 1, i);
 
-    TestMatMul<float>(i, 1, i);
-    TestMatMul<double>(i, 1, i);
+    TestTensorMatMul<float>(i, 1, i);
+    TestTensorMatMul<double>(i, 1, i);
 
-    TestMatMul<float>(1, i, i);
-    TestMatMul<double>(1, i, i);
+    TestTensorMatMul<float>(1, i, i);
+    TestTensorMatMul<double>(1, i, i);
   }
 }
 
 TEST(TestTensorMatMul, MediumScale) {
   for (int i = 64; i <= 256; i *= 2) {
-    TestMatMul<float>(1, 1, i);
-    TestMatMul<double>(1, 1, i);
+    TestTensorMatMul<float>(1, 1, i);
+    TestTensorMatMul<double>(1, 1, i);
 
-    TestMatMul<float>(1, i, i);
-    TestMatMul<double>(1, i, i);
+    TestTensorMatMul<float>(1, i, i);
+    TestTensorMatMul<double>(1, i, i);
 
-    TestMatMul<float>(i, 1, i);
-    TestMatMul<double>(i, 1, i);
+    TestTensorMatMul<float>(i, 1, i);
+    TestTensorMatMul<double>(i, 1, i);
 
-    TestMatMul<float>(i, i, i);
-    TestMatMul<double>(i, i, i);
+    TestTensorMatMul<float>(i, i, i);
+    TestTensorMatMul<double>(i, i, i);
   }
 }
 
 TEST(TestTensorMatMul, LargeScale) {
   for (int i = 16 ; i >= 1 ; i /= 2) {
-    TestMatMul<float>(i * 1024, i * 1024, i * 1024);
-    TestMatMul<double>(i * 1024, i * 1024, i * 1024);
+    TestTensorMatMul<float>(i * 1024, i * 1024, i * 1024);
+    TestTensorMatMul<double>(i * 1024, i * 1024, i * 1024);
   }
 }
