@@ -10,18 +10,18 @@ void TestEqual(int size) {
   Tensor<DType> t2 = Tensor<DType>::Eyes(size) - static_cast<DType>(1);
 
   Tensor<DType> e = t1 == t1;
-  for (int i = 0 ; i < size * size ; ++i) {
+  for (int i = 0; i < size * size; ++i) {
     EXPECT_EQ(e[i], 1);
   }
 
   e = t1 == t2;
-  for (int i = 0 ; i < size * size ; ++i) {
+  for (int i = 0; i < size * size; ++i) {
     EXPECT_EQ(e[i], 0);
   }
 
   e = t1 == static_cast<DType>(0);
-  for (int i = 0 ; i < size ; ++i) {
-    for (int j = 0 ; j < size ; ++j) {
+  for (int i = 0; i < size; ++i) {
+    for (int j = 0; j < size; ++j) {
       if (i == j) {
         EXPECT_EQ(e[i * size + j], 0);
       } else {
@@ -32,17 +32,15 @@ void TestEqual(int size) {
 }
 
 TEST(TestTensorOps, EqualSmallScale) {
-  TestEqual<float>(10);
-  TestEqual<double>(10);
-
-  TestEqual<float>(100);
-  TestEqual<double>(100);
+  for (int i = 1; i < 64; ++i) {
+    TestEqual<float>(i);
+    TestEqual<double>(i);
+  }
 }
 
 TEST(TestTensorOps, EqualLargeScale) {
-  TestEqual<float>(1000);
-  TestEqual<double>(1000);
-
-  TestEqual<float>(6000);
-  TestEqual<double>(6000);
+  for (int i = 64; i < 1024; i *= 4) {
+    TestEqual<float>(i);
+    TestEqual<double>(i);
+  }
 }
