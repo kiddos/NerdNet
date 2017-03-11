@@ -9,7 +9,7 @@ before_install:
   - sudo apt-get update
 
 install:
-  - sudo apt-get install -y build-essential cmake
+  - sudo apt-get install -y build-essential cmake libgtest-dev
 
 script:
   - mkdir build
