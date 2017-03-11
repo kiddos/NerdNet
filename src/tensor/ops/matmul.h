@@ -10,7 +10,8 @@ template <typename DType>
 Tensor<DType> operator%(const Tensor<DType>& t1, const Tensor<DType>& t2);
 
 template <typename DType>
-Tensor<DType> matmul(const Tensor<DType>& t1, const Tensor<DType>& t2);
+Tensor<DType> matmul(const Tensor<DType>& t1, const Tensor<DType>& t2,
+                     Tensor<DType>& output);
 
 } /* end of tensor namespace */
 } /* end of nn namespace */
