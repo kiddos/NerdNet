@@ -15,11 +15,36 @@ if (TARGET tensor)
   target_link_libraries(test_tensor ${TEST_LIBS})
   add_test(TestTensorObject test_tensor)
 
-  # operations
-  set(TEST_TENSOR_BASIC_OPS tensor/ops/test_tensor_basic_ops.cpp)
-  add_executable(test_tensor_basic_ops ${TEST_TENSOR_BASIC_OPS})
+  # basic operations
+  add_executable(test_tensor_basic_ops tensor/ops/test_tensor_basic_ops.cpp)
   target_link_libraries(test_tensor_basic_ops ${TEST_LIBS})
   add_test(TestTensorBasicOps test_tensor_basic_ops)
+
+  # argmax
+  add_executable(test_tensor_argmax tensor/ops/test_tensor_argmax.cpp)
+  target_link_libraries(test_tensor_argmax ${TEST_LIBS})
+  add_test(TestTensorArgmax test_tensor_argmax)
+
+  # equal
+  add_executable(test_tensor_equal tensor/ops/test_tensor_equal.cpp)
+  target_link_libraries(test_tensor_equal ${TEST_LIBS})
+  add_test(TestTensorEqual test_tensor_equal)
+
+  # natural log
+  add_executable(test_tensor_log tensor/ops/test_tensor_exp.cpp
+    tensor/ops/test_tensor_log.cpp)
+  target_link_libraries(test_tensor_log ${TEST_LIBS})
+  add_test(TestTensorLog test_tensor_log)
+
+  # matrix multiplication
+  add_executable(test_tensor_matmul tensor/ops/test_tensor_matmul.cpp)
+  target_link_libraries(test_tensor_matmul ${TEST_LIBS})
+  add_test(TestTensorMatMul test_tensor_matmul)
+
+  # negation
+  add_executable(test_tensor_negate tensor/ops/test_tensor_negate.cpp)
+  target_link_libraries(test_tensor_negate ${TEST_LIBS})
+  add_test(TestTensorNegate test_tensor_negate)
 endif ()
 
 find_library(BENCHMARK benchmark)
