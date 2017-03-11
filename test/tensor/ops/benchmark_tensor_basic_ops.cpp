@@ -15,7 +15,7 @@ void BM_TensorAdd(benchmark::State& state) {
   }
 }
 
-BENCHMARK(BM_TensorAdd)->Unit(benchmark::kMicrosecond)->Range(2, 2 << 10);
+BENCHMARK(BM_TensorAdd)->Unit(benchmark::kMicrosecond)->Range(1, 1 << 10);
 
 void BM_TensorBroadCastAdd(benchmark::State& state) {
   int size = state.range(0);
@@ -29,7 +29,7 @@ void BM_TensorBroadCastAdd(benchmark::State& state) {
 
 BENCHMARK(BM_TensorBroadCastAdd)
     ->Unit(benchmark::kMicrosecond)
-    ->Range(2, 2 << 10);
+    ->Range(1, 1 << 10);
 
 void BM_TensorSub(benchmark::State& state) {
   int size = state.range(0);
@@ -41,7 +41,7 @@ void BM_TensorSub(benchmark::State& state) {
   }
 }
 
-BENCHMARK(BM_TensorSub)->Unit(benchmark::kMicrosecond)->Range(2, 2 << 10);
+BENCHMARK(BM_TensorSub)->Unit(benchmark::kMicrosecond)->Range(1, 1 << 10);
 
 void BM_TensorBroadCastSub(benchmark::State& state) {
   int size = state.range(0);
@@ -55,7 +55,7 @@ void BM_TensorBroadCastSub(benchmark::State& state) {
 
 BENCHMARK(BM_TensorBroadCastSub)
     ->Unit(benchmark::kMicrosecond)
-    ->Range(2, 2 << 10);
+    ->Range(1, 1 << 10);
 
 void BM_TensorMul(benchmark::State& state) {
   int size = state.range(0);
@@ -67,7 +67,7 @@ void BM_TensorMul(benchmark::State& state) {
   }
 }
 
-BENCHMARK(BM_TensorMul)->Unit(benchmark::kMicrosecond)->Range(2, 2 << 10);
+BENCHMARK(BM_TensorMul)->Unit(benchmark::kMicrosecond)->Range(1, 1 << 10);
 
 void BM_TensorBroadCastMul(benchmark::State& state) {
   int size = state.range(0);
@@ -81,7 +81,7 @@ void BM_TensorBroadCastMul(benchmark::State& state) {
 
 BENCHMARK(BM_TensorBroadCastMul)
     ->Unit(benchmark::kMicrosecond)
-    ->Range(2, 2 << 10);
+    ->Range(1, 1 << 10);
 
 void BM_TensorDiv(benchmark::State& state) {
   int size = state.range(0);
@@ -93,7 +93,7 @@ void BM_TensorDiv(benchmark::State& state) {
   }
 }
 
-BENCHMARK(BM_TensorDiv)->Unit(benchmark::kMicrosecond)->Range(2, 2 << 10);
+BENCHMARK(BM_TensorDiv)->Unit(benchmark::kMicrosecond)->Range(1, 1 << 10);
 
 void BM_TensorBroadCastDiv(benchmark::State& state) {
   int size = state.range(0);
@@ -107,6 +107,6 @@ void BM_TensorBroadCastDiv(benchmark::State& state) {
 
 BENCHMARK(BM_TensorBroadCastDiv)
     ->Unit(benchmark::kMicrosecond)
-    ->Range(2, 2 << 10);
+    ->Range(1, 1 << 10);
 
 BENCHMARK_MAIN();
