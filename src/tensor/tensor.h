@@ -35,6 +35,8 @@ class Tensor {
   void Reshape(const std::vector<int>& shape);
 
   TensorShape shape() const { return shape_; }
+  int shape(int i) const { return shape_.shape(i); }
+  int chunk(int i) const { return shape_.chunk(i); }
   DType data(int i) const { return data_[i]; }
   DType& operator[](int i) { return data_[i]; }
   template <typename T>
