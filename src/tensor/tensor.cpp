@@ -12,7 +12,7 @@ using std::mt19937;
 using std::normal_distribution;
 
 template <typename DType>
-Tensor<DType>::Tensor() : data_(nullptr) {}
+Tensor<DType>::Tensor() : shape_(TensorShape({0})), data_(nullptr) {}
 
 template <typename DType>
 Tensor<DType>::Tensor(const DType val)
@@ -51,11 +51,11 @@ Tensor<DType>& Tensor<DType>::operator=(const Tensor& tensor) {
       delete[] data_;
       data_ = new DType[tensor.shape_.chunk(0)];
     }
-    shape_ = tensor.shape_;
   } else {
     data_ = new DType[shape_.chunk(0)]{0};
   }
   for (int i = 0; i < shape_.chunk(0); ++i) data_[i] = tensor.data_[i];
+  shape_ = tensor.shape_;
   return *this;
 }
 
@@ -63,6 +63,7 @@ template <typename DType>
 Tensor<DType>&& Tensor<DType>::operator=(Tensor&& tensor) {
   data_ = tensor.data_;
   tensor.data_ = nullptr;
+  shape_ = tensor.shape_;
   return std::move(*this);
 }
 
