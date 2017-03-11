@@ -1,8 +1,8 @@
 #include <benchmark/benchmark.h>
-#include "tensor/tensor.h"
-#include "tensor/ops/log.h"
 #include "tensor/ops/exp.h"
+#include "tensor/ops/log.h"
 #include "tensor/ops/sqrt.h"
+#include "tensor/tensor.h"
 
 using nn::tensor::Tensor;
 using nn::tensor::TensorShape;
