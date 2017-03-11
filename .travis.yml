@@ -9,7 +9,15 @@ before_install:
   - sudo apt-get update
 
 install:
-  - sudo apt-get install -y build-essential cmake libgtest-dev libgoogle-glog-dev
+  - sudo apt-get install -y build-essential cmake
+  - git clone https://github.com/google/googletest
+  - cd googletest
+  - mkdir build
+  - cd build
+  - cmake -D CMAKE_BUILD_TYPE=Release ..
+  - make -j6
+  - sudo make install
+  - cd ../..
 
 script:
   - mkdir build
