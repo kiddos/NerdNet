@@ -1,4 +1,5 @@
 #include "tensor/ops/div.h"
+#include "tensor/openmp_support.h"
 #include <cassert>
 #include <stdexcept>
 #include <iostream>
@@ -17,6 +18,8 @@ Tensor<DType> operator/(const Tensor<DType>& t1, const Tensor<DType>& t2) {
   Tensor<DType> output(t1.shape());
   if (offset == 0) {
     int chunk = t1.shape().chunk(0);
+
+    PARALLEL_FOR()
     for (int i = 0; i < chunk; ++i) {
       try {
         output[i] = t1.data(i) / t2.data(i);
@@ -27,6 +30,8 @@ Tensor<DType> operator/(const Tensor<DType>& t1, const Tensor<DType>& t2) {
   } else {
     int chunk = t1.shape().chunk(offset - 1);
     int mod = t1.shape().chunk(offset);
+
+    PARALLEL_FOR()
     for (int i = 0; i < chunk; ++i) {
       try {
         output[i] = t1.data(i) / t2.data(i % mod);
@@ -42,6 +47,8 @@ template <typename DType>
 Tensor<DType> operator/(const Tensor<DType>& t1, const DType val) {
   Tensor<DType> output(t1.shape());
   int chunk = t1.shape().chunk(0);
+
+  PARALLEL_FOR()
   for (int i = 0; i < chunk; ++i) {
     output[i] = t1.data(i) / val;
   }
