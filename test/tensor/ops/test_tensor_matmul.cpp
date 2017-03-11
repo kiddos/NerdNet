@@ -7,8 +7,16 @@ void TestTensorMatMul(int m, int n, int k) {
 
   Tensor<DType> a = Tensor<DType>::Gaussian({m, k}, 0, 1.0);
   Tensor<DType> b = Tensor<DType>::Gaussian({k, n}, 0, 1.0);
-  Tensor<DType> c = matmul(a, b);
+  Tensor<DType> c = a % b;
 
+  Tensor<DType> output;
+  matmul(a, b, output);
+  DType* ptr = output.data();
+  matmul(a, b, output);
+  EXPECT_EQ(ptr, output.data());
+
+  EXPECT_EQ(output.shape().shape(0), m);
+  EXPECT_EQ(output.shape().shape(1), n);
   EXPECT_EQ(c.shape().shape(0), m);
   EXPECT_EQ(c.shape().shape(1), n);
 
@@ -53,8 +61,8 @@ TEST(TestTensorMatMul, MediumScale) {
 }
 
 TEST(TestTensorMatMul, LargeScale) {
-  for (int i = 16 ; i >= 1 ; i /= 2) {
-    TestTensorMatMul<float>(i * 1024, i * 1024, i * 1024);
-    TestTensorMatMul<double>(i * 1024, i * 1024, i * 1024);
+  for (int i = 4 ; i >= 1 ; i /= 2) {
+    TestTensorMatMul<float>(i * 256, i * 256, i * 256);
+    TestTensorMatMul<double>(i * 256, i * 256, i * 256);
   }
 }
