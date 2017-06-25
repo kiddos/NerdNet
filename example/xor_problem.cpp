@@ -84,7 +84,7 @@ int main() {
   load(x, y); loadsample(sample, w, h);
 
   // perform gradient check
-  trainer.gradcheck(x.row(0), y.row(0));
+  // trainer.gradcheck(x.row(0), y.row(0));
 
   // training test
   for (int i = 0 ; i < 120000 ; ++i) {

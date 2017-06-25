@@ -1,15 +1,20 @@
-set(OPENCV_LIBS opencv_core opencv_highgui opencv_imgproc opencv_imgcodecs)
 set(MATHGL_LIBS mgl mgl-qt)
 set(ARMADILLO_LIBS armadillo)
 set(BOOST_LIBS boost_unit_test_framework)
 
+find_package(OpenCV 3.0 COMPONENTS core highgui imgproc imgcodecs)
+if (OpenCV_FOUND)
+  message(STATUS "using OpenCV")
+  set(OPENCV_LIB ${OpenCV_LIBS})
+  link_libraries(${OpenCV_LIBS})
+endif ()
 find_library(OPENCV_FOUND NAMES ${OPENCV_LIBS})
 find_library(MATHGL_FOUND NAMES ${MATHGL_LIBS})
 find_library(ARMADILLO_FOUND NAMES ${ARMADILLO_LIBS})
 find_library(BOOST_FOUND NAMES ${BOOST_LIBS})
 
 if (OPENCV_FOUND)
-  message("--> OpenCV found.")
+  message("--> OpenCV found. ${OPENCV_LIBS}")
 endif (OPENCV_FOUND)
 
 if (MATHGL_FOUND)

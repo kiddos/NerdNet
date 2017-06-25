@@ -77,7 +77,7 @@ int main() {
   load(x, y); loadsample(sample, w, h);
 
   // gradient check
-  trainer.gradcheck(x.row(0), y.row(0));
+  // trainer.gradcheck(x.row(0), y.row(0));
   // training
   for (int i = 0 ; i < 36000 ; ++i) {
     const double cost = trainer.feeddata(x, y, true);
