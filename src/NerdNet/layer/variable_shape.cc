@@ -1,4 +1,4 @@
-#include "NerdNet/variable_shape.h"
+#include "NerdNet/layer/variable_shape.h"
 
 namespace nerd {
 namespace nn {
