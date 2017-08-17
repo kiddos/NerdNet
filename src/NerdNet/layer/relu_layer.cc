@@ -23,7 +23,7 @@ Tensor<float> ReluLayer::BackProp(const Tensor<float>& delta_tensor) {
   arma::Mat<float> delta;
   Tensor2Matrix(delta_tensor, delta);
   arma::Mat<float> deriv = input_;
-  deriv.transform([](float val) { return val < 0 ? 0 : 1; });
+  deriv.transform([](float val) { return val < 0 ? 0 : 1.0f; });
   arma::Mat<float> next_delta = deriv % delta;
 
   Tensor<float> next_delta_tensor;
