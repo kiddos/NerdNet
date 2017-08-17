@@ -1,3 +1,5 @@
+#include <armadillo>
+
 #include "NerdNet/layer/relu_layer.h"
 #include "NerdNet/convert.h"
 

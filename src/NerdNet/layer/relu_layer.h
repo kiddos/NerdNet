@@ -1,8 +1,6 @@
 #ifndef RELU_LAYER_H
 #define RELU_LAYER_H
 
-#include <armadillo>
-
 #include "NerdNet/layer/base_layer.h"
 
 namespace nerd {
