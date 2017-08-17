@@ -9,6 +9,7 @@ Nerual Network
 In order to build examples, optional dependencies need to be installed
 
 * [Armadillo](http://arma.sourceforge.net/)
+* [Boost](http://www.boost.org/)
 * [OpenBLAS](http://www.openblas.net/), ([github link](https://github.com/xianyi/OpenBLAS)) (Optional)
 * [OpenCV](http://opencv.org/) 3.x, ([github link](https://github.com/opencv/opencv)) (Optional)
 * [MathGL](http://mathgl.sourceforge.net/doc_en/Main.html) (Optional)
@@ -19,6 +20,12 @@ In order to build examples, optional dependencies need to be installed
 
 ```shell
 sudo apt-get install libarmadillo-dev
+```
+
+* Boost
+
+```shell
+sudo apt-get install libboost-all-dev
 ```
 
 * OpenBLAS
