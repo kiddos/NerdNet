@@ -1,15 +1,27 @@
-# sources
-file(GLOB NNET_SOURCE *.cpp)
-file(GLOB NNET_HEADER *.h)
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -O2 -g -std=c++11")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DDEBUG")
+# armadillo linear algebra
+find_package(Armadillo REQUIRED)
+include_directories(${ARMADILLO_INCLUDE_DIRS})
+message(STATUS "Armadillo Library Version: ${ARMADILLO_VERSION_STRING}")
+link_libraries(${ARMADILLO_LIBRARIES})
 
-if (LIBS_FOUND)
-  message("--> 'nnet' will be build.")
-  # add_library(nnet ${SOURCE} ${HEADER})
-  add_library(nnet ${NNET_SOURCE} ${NNET_HEADER})
+# OpenBLAS for performance
+find_library(OpenBLAS openblas)
+if (NOT OpenBLAS)
+  message("OpenBLAS not installed")
+endif ()
+link_libraries(${OpenBLAS})
 
-  set(LIBS ${ARMADILLO_LIBS})
-  target_link_libraries(nnet armadillo)
-endif (LIBS_FOUND)
+# boost util
+## Boost
+find_package(Boost COMPONENTS system REQUIRED)
+include_directories(${Boost_INCLUDE_DIRS})
+link_libraries(${Boost_LIBRARIES})
+
+file(GLOB_RECURSE NerdNet_SOURCE NerdNet/**.cc NerdNet/**.h *.cpp *.h)
+
+message("--> 'nnet' will be build.")
+add_library(NerdNet ${NerdNet_SOURCE})
+
+set(LIBS ${ARMADILLO_LIBS})
