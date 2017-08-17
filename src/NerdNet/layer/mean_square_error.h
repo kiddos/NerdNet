@@ -18,7 +18,6 @@ class MeanSquareError : public CostFunction, public FCLayer {
 
   float ComputeCost() override;
   Tensor<float> ComputeDerivative() override;
-  Tensor<float> ForwardProp() override;
   Tensor<float> BackProp(const Tensor<float>& delta_tensor) override;
 
  protected:

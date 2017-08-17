@@ -24,13 +24,7 @@ MeanSquareError& MeanSquareError::operator=(const MeanSquareError& layer) {
   return *this;
 }
 
-float MeanSquareError::ComputeCost() { return ForwardProp().data()[0]; }
-
-Tensor<float> MeanSquareError::ComputeDerivative() {
-  return BackProp(Tensor<float>());
-}
-
-Tensor<float> MeanSquareError::ForwardProp() {
+float MeanSquareError::ComputeCost() {
   Tensor<float> final_result_tensor = FCLayer::ForwardProp();
   Tensor2Matrix(final_result_tensor, final_result_);
   Tensor2Matrix(label_data_, label_);
@@ -38,7 +32,11 @@ Tensor<float> MeanSquareError::ForwardProp() {
   arma::Mat<float> diff = final_result_ - label_;
   arma::Mat<float> error = diff % diff;
   float cost = arma::accu(error) / 2.0f;
-  return Tensor<float>(cost);
+  return cost;
+}
+
+Tensor<float> MeanSquareError::ComputeDerivative() {
+  return BackProp(Tensor<float>());
 }
 
 Tensor<float> MeanSquareError::BackProp(const Tensor<float>&) {
