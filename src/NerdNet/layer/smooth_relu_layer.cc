@@ -28,7 +28,7 @@ Tensor<float> SmoothReluLayer::BackProp(const Tensor<float>& delta_tensor) {
 
   Tensor<float> next_delta_tensor;
   Matrix2Tensor(next_delta, next_delta_tensor);
-  return next_delta_tensor;
+  return prev_layer_->BackProp(next_delta_tensor);
 }
 
 } /* end of nn namespace */

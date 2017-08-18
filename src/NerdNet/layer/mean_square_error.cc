@@ -43,7 +43,7 @@ Tensor<float> MeanSquareError::BackProp(const Tensor<float>&) {
   arma::Mat<float> delta = final_result_ - label_;
   Tensor<float> next_delta_tensor;
   Matrix2Tensor(delta, next_delta_tensor);
-  return prev_layer_->BackProp(FCLayer::BackProp(next_delta_tensor));
+  return FCLayer::BackProp(next_delta_tensor);
 }
 
 } /* end of nn namespace */
