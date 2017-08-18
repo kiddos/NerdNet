@@ -20,9 +20,9 @@ class NerdNet {
   BaseLayer* layer(int index) { return layers_[index].get(); }
   BaseLayer* first() { return layers_[0].get(); }
   BaseLayer* last() { return layers_[layers_.size() - 1].get(); }
-  InputLayer* input_layer() { return reinterpret_cast<InputLayer*>(first()); }
+  InputLayer* input_layer() { return dynamic_cast<InputLayer*>(first()); }
   CostFunction* cost_function() {
-    return reinterpret_cast<CostFunction*>(last());
+    return dynamic_cast<CostFunction*>(last());
   }
   int layer_count() const { return layers_.size(); }
 
