@@ -1,11 +1,12 @@
 #include <gtest/gtest.h>
+#include <memory>
 
+#include "NerdNet/convert.h"
 #include "NerdNet/layer/fc_layer.h"
 #include "NerdNet/layer/input_layer.h"
 #include "NerdNet/layer/mean_square_error.h"
 #include "NerdNet/layer/relu_layer.h"
 #include "NerdNet/layer/variable_shape.h"
-#include "NerdNet/convert.h"
 #include "NerdNet/nerd_net.h"
 
 using nerd::nn::NerdNet;
@@ -19,22 +20,23 @@ using arma::Mat;
 class NerdNetTest : public ::testing::Test {
  public:
   enum { DATA_SIZE = 1024, INPUT_SIZE = 2, HIDDEN_SIZE = 16, OUTPUT_SIZE = 2 };
-  NerdNetTest() {}
 
  protected:
   void SetUp() override {
-    EXPECT_EQ(nerdnet_.layer_count(), 1);
+    nerdnet_ = std::make_shared<NerdNet>();
 
-    nerdnet_.AddLayer<FCLayer>(VariableShape{INPUT_SIZE, HIDDEN_SIZE});
-    nerdnet_.AddLayer<ReluLayer>();
-    nerdnet_.AddLayer<FCLayer>(VariableShape{HIDDEN_SIZE, HIDDEN_SIZE});
-    nerdnet_.AddLayer<ReluLayer>();
-    nerdnet_.AddLayer<MeanSquareError>(
+    EXPECT_EQ(nerdnet_->layer_count(), 1);
+
+    nerdnet_->AddLayer<FCLayer>(VariableShape{INPUT_SIZE, HIDDEN_SIZE});
+    nerdnet_->AddLayer<ReluLayer>();
+    nerdnet_->AddLayer<FCLayer>(VariableShape{HIDDEN_SIZE, HIDDEN_SIZE});
+    nerdnet_->AddLayer<ReluLayer>();
+    nerdnet_->AddLayer<MeanSquareError>(
         VariableShape{HIDDEN_SIZE, OUTPUT_SIZE});
-    EXPECT_EQ(nerdnet_.layer_count(), 6);
+    EXPECT_EQ(nerdnet_->layer_count(), 6);
   }
 
-  NerdNet nerdnet_;
+  std::shared_ptr<NerdNet> nerdnet_;
 };
 
 TEST_F(NerdNetTest, FeedTensor) {
@@ -46,17 +48,17 @@ TEST_F(NerdNetTest, FeedTensor) {
   // unable to work before init
   bool error_occur = false;
   try {
-    nerdnet_.Feed(test_data_tensor);
+    nerdnet_->Feed(test_data_tensor);
   } catch (std::exception& e) {
     error_occur = true;
   }
   EXPECT_TRUE(error_occur);
 
-  EXPECT_TRUE(nerdnet_.Init());
+  EXPECT_TRUE(nerdnet_->Init());
 
   error_occur = false;
   try {
-    nerdnet_.Feed(test_data_tensor);
+    nerdnet_->Feed(test_data_tensor);
   } catch (std::logic_error& e) {
     error_occur = true;
   }
@@ -70,17 +72,17 @@ TEST_F(NerdNetTest, FeedMatrix) {
   // unable to work before init
   bool error_occur = false;
   try {
-    nerdnet_.Feed(test_data);
+    nerdnet_->Feed(test_data);
   } catch (std::exception& e) {
     error_occur = true;
   }
   EXPECT_TRUE(error_occur);
 
-  EXPECT_TRUE(nerdnet_.Init());
+  EXPECT_TRUE(nerdnet_->Init());
 
   error_occur = false;
   try {
-    nerdnet_.Feed(test_data);
+    nerdnet_->Feed(test_data);
   } catch (std::logic_error& e) {
     error_occur = true;
   }
