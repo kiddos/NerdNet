@@ -8,12 +8,13 @@ namespace nn {
 
 class FCLayer : public VariableLayer {
  public:
-  FCLayer(BaseLayer* prev_layer, const VariableShape& shape);
-  FCLayer(BaseLayer* prev_layer, const VariableShape& shape,
+  FCLayer(BaseLayer* prev_layer, const VariableShape& var_shape);
+  FCLayer(BaseLayer* prev_layer, const VariableShape& var_shape,
           std::shared_ptr<VariableInitializer> weight_initializer,
           std::shared_ptr<VariableInitializer> bias_initializer);
   FCLayer(const FCLayer& layer);
   FCLayer& operator=(const FCLayer& layer);
+  virtual ~FCLayer() {}
 
   int input_size() const { return var_shape_[0]; }
   int output_size() const { return var_shape_[1]; }
