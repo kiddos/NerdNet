@@ -2,11 +2,7 @@
 #include <memory>
 
 #include "NerdNet/convert.h"
-#include "NerdNet/layer/fc_layer.h"
-#include "NerdNet/layer/input_layer.h"
-#include "NerdNet/layer/mean_square_error.h"
-#include "NerdNet/layer/relu_layer.h"
-#include "NerdNet/layer/variable_shape.h"
+#include "NerdNet/layer/layers.h"
 #include "NerdNet/nerd_net.h"
 
 using nerd::nn::NerdNet;
