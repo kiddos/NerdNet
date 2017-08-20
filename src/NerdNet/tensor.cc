@@ -9,8 +9,23 @@ template <typename T>
 Tensor<T>::Tensor(T value) : shape_({0}), data_({value}) {}
 
 template <typename T>
-Tensor<T>::Tensor(int data_size, const std::vector<int>& shape)
-    : shape_(shape), data_(data_size) {}
+Tensor<T>::Tensor(const std::vector<int>& shape) : shape_(shape) {
+  int shape_size = shape.size();
+  if (shape_size > 0) {
+    int data_size = shape[0];
+    for (int i = 0; i < shape_size; ++i) {
+      data_size *= shape[i];
+    }
+    data_ = std::vector<T>(data_size);
+  };
+}
+
+template <typename T>
+Tensor<T>::Tensor(const VariableShape& shape) : Tensor(shape.shape()) {}
+
+template <typename T>
+Tensor<T>::Tensor(std::initializer_list<int> shape)
+    : Tensor(std::vector<int>(shape)) {}
 
 template <typename T>
 Tensor<T>::Tensor(const T* data, int data_size, const std::vector<int>& shape)

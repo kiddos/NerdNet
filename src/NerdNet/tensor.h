@@ -1,6 +1,8 @@
 #ifndef TENSOR_H
 #define TENSOR_H
 
+#include "NerdNet/variable_shape.h"
+
 #include <iostream>
 #include <vector>
 
@@ -11,8 +13,10 @@ template <typename T>
 class Tensor {
  public:
   Tensor() = default;
-  explicit Tensor(T value);
-  Tensor(int data_size, const std::vector<int>& shape);
+  Tensor(T value);
+  Tensor(const std::vector<int>& shape);
+  Tensor(std::initializer_list<int> shape);
+  Tensor(const VariableShape& shape);
   Tensor(const T* data, int data_size, const std::vector<int>& shape);
   Tensor(const Tensor<T>& tensor);
   Tensor<T>& operator=(const Tensor<T>& tensor);
