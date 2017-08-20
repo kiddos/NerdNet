@@ -24,6 +24,7 @@ class CostFunction {
 
  protected:
   Tensor<float> label_data_;
+  arma::Mat<float> final_result_, label_;
 };
 
 } /* end of nn namespace */

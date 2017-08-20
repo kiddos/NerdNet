@@ -9,8 +9,8 @@ namespace nn {
 
 class MeanSquareError : public CostFunction, public FCLayer {
  public:
-  MeanSquareError(BaseLayer* layer, const VariableShape& shape);
-  MeanSquareError(BaseLayer* input_layer, const VariableShape& shape,
+  MeanSquareError(BaseLayer* prev_layer, const VariableShape& shape);
+  MeanSquareError(BaseLayer* prev_layer, const VariableShape& shape,
                   VariableInitializer* weight_initializer,
                   VariableInitializer* bias_initializer);
   MeanSquareError(const MeanSquareError& layer);
@@ -19,9 +19,6 @@ class MeanSquareError : public CostFunction, public FCLayer {
   float ComputeCost() override;
   Tensor<float> ComputeDerivative() override;
   Tensor<float> BackProp(const Tensor<float>& delta_tensor) override;
-
- protected:
-  arma::Mat<float> final_result_, label_;
 };
 
 } /* end of nn namespace */
