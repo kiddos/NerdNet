@@ -11,8 +11,8 @@ class MeanSquareError : public CostFunction, public FCLayer {
  public:
   MeanSquareError(BaseLayer* prev_layer, const VariableShape& shape);
   MeanSquareError(BaseLayer* prev_layer, const VariableShape& shape,
-                  VariableInitializer* weight_initializer,
-                  VariableInitializer* bias_initializer);
+                  std::shared_ptr<VariableInitializer> weight_initializer,
+                  std::shared_ptr<VariableInitializer> bias_initializer);
   MeanSquareError(const MeanSquareError& layer);
   MeanSquareError& operator=(const MeanSquareError& layer);
 

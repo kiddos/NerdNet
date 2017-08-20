@@ -10,10 +10,10 @@ MeanSquareError::MeanSquareError(BaseLayer* input_layer,
                                  const VariableShape& var_shape)
     : FCLayer(input_layer, var_shape) {}
 
-MeanSquareError::MeanSquareError(BaseLayer* input_layer,
-                                 const VariableShape& var_shape,
-                                 VariableInitializer* weight_initializer,
-                                 VariableInitializer* bias_initializer)
+MeanSquareError::MeanSquareError(
+    BaseLayer* input_layer, const VariableShape& var_shape,
+    std::shared_ptr<VariableInitializer> weight_initializer,
+    std::shared_ptr<VariableInitializer> bias_initializer)
     : FCLayer(input_layer, var_shape, weight_initializer, bias_initializer) {}
 
 MeanSquareError::MeanSquareError(const MeanSquareError& layer)

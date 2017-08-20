@@ -1,18 +1,18 @@
 #ifndef FC_LAYER_H
 #define FC_LAYER_H
 
-#include "NerdNet/layer/base_layer.h"
 #include "NerdNet/layer/variable_initializer.h"
+#include "NerdNet/layer/variable_layer.h"
 
 namespace nerd {
 namespace nn {
 
-class FCLayer : public BaseLayer {
+class FCLayer : public VariableLayer {
  public:
-  FCLayer(BaseLayer* prev_layer, const VariableShape& var_shape);
-  FCLayer(BaseLayer* prev_layer, const VariableShape& var_shape,
-          VariableInitializer* weight_initializer,
-          VariableInitializer* bias_initializer);
+  FCLayer(BaseLayer* prev_layer, const VariableShape& shape);
+  FCLayer(BaseLayer* prev_layer, const VariableShape& shape,
+          std::shared_ptr<VariableInitializer> weight_initializer,
+          std::shared_ptr<VariableInitializer> bias_initializer);
   FCLayer(const FCLayer& layer);
   FCLayer& operator=(const FCLayer& layer);
 
@@ -33,10 +33,6 @@ class FCLayer : public BaseLayer {
   bool Init() override;
 
  protected:
-  VariableInitializer* weight_initializer_;
-  VariableInitializer* bias_initializer_;
-
-  VariableShape var_shape_;
   arma::Mat<float> w_, w_grad_;
   arma::Row<float> b_, b_grad_;
 };

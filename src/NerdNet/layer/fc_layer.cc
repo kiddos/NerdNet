@@ -11,15 +11,13 @@ namespace nerd {
 namespace nn {
 
 FCLayer::FCLayer(BaseLayer* prev_layer, const VariableShape& var_shape)
-    : FCLayer(prev_layer, var_shape, nullptr, nullptr) {}
+    : VariableLayer(prev_layer, var_shape) {}
 
 FCLayer::FCLayer(BaseLayer* prev_layer, const VariableShape& var_shape,
-                 VariableInitializer* weight_initializer,
-                 VariableInitializer* bias_initializer)
-    : BaseLayer(prev_layer),
-      weight_initializer_(weight_initializer),
-      bias_initializer_(bias_initializer),
-      var_shape_(var_shape) {}
+                 std::shared_ptr<VariableInitializer> weight_initializer,
+                 std::shared_ptr<VariableInitializer> bias_initializer)
+    : VariableLayer(prev_layer, var_shape, weight_initializer,
+                    bias_initializer) {}
 
 FCLayer::FCLayer(const FCLayer& layer)
     : FCLayer(layer.prev_layer_, layer.var_shape_, layer.weight_initializer_,
@@ -28,10 +26,7 @@ FCLayer::FCLayer(const FCLayer& layer)
 }
 
 FCLayer& FCLayer::operator=(const FCLayer& layer) {
-  prev_layer_ = layer.prev_layer_;
-  var_shape_ = layer.var_shape_;
-  weight_initializer_ = layer.weight_initializer_;
-  bias_initializer_ = layer.bias_initializer_;
+  VariableLayer::operator=(layer);
   w_ = layer.w_;
   b_ = layer.b_;
   return *this;
