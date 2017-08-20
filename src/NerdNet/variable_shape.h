@@ -14,6 +14,7 @@ class VariableShape {
   VariableShape(const VariableShape& shape);
   VariableShape& operator=(const VariableShape& shape);
 
+  std::vector<int> shape() const { return shape_; }
   int dim() const { return shape_.size(); }
   int operator[](int index) const { return shape_[index]; }
 
