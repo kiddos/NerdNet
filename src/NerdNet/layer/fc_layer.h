@@ -38,4 +38,5 @@ class FCLayer : public VariableLayer {
 
 } /* end of nn namespace */
 } /* end of nerd namespace */
+
 #endif /* end of include guard: FC_LAYER_H */
