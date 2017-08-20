@@ -18,6 +18,8 @@ class VariableLayer : public BaseLayer {
   VariableLayer(const VariableLayer& layer);
   VariableLayer& operator=(const VariableLayer& layer);
 
+  VariableShape shape() const { return var_shape_; }
+
  protected:
   std::shared_ptr<VariableInitializer> weight_initializer_, bias_initializer_;
   VariableShape var_shape_;
