@@ -24,7 +24,7 @@ void Matrices2Tensor(const arma::field<arma::Mat<float>>& matrices,
     int r = m.n_rows;
     int c = m.n_cols;
     int e = matrices.n_elem;
-    tensor = Tensor<float>(r * c * e, {e, r, c});
+    tensor = Tensor<float>({e, r, c});
 
     int mat_size = r * c;
     float* ptr = tensor.mutable_data();
@@ -46,7 +46,7 @@ void Cubes2Tensor(const arma::field<arma::Cube<float>>& cubes,
     int c = cu.n_cols;
     int s = cu.n_slices;
     int e = cubes.n_elem;
-    tensor = Tensor<float>(r * c * s * e, {e, r, c, s});
+    tensor = Tensor<float>({e, r, c, s});
 
     int cube_size = r * c * s;
     float* ptr = tensor.mutable_data();
