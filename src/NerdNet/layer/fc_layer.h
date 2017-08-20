@@ -3,7 +3,6 @@
 
 #include "NerdNet/layer/base_layer.h"
 #include "NerdNet/layer/variable_initializer.h"
-#include "NerdNet/layer/variable_shape.h"
 
 namespace nerd {
 namespace nn {
