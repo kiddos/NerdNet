@@ -1,7 +1,6 @@
 #ifndef FC_LAYER_H
 #define FC_LAYER_H
 
-#include "NerdNet/layer/variable_initializer.h"
 #include "NerdNet/layer/variable_layer.h"
 
 namespace nerd {
