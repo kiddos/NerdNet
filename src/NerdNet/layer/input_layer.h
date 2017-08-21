@@ -23,7 +23,7 @@ class InputLayer : public BaseLayer {
 
   virtual Tensor<float> ForwardProp();
   virtual Tensor<float> BackProp(const Tensor<float>& delta_tensor);
-  bool Init() override { return true; }
+  virtual bool Init();
 
  private:
   Tensor<float> input_tensor_;

@@ -41,5 +41,7 @@ Tensor<float> InputLayer::BackProp(const Tensor<float>& delta_tensor) {
   return delta_tensor;
 }
 
+bool InputLayer::Init() { return true; }
+
 } /* end of nn namespace */
 } /* end of nerd namespace */
