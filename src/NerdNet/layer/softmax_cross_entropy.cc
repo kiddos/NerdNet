@@ -30,7 +30,8 @@ Tensor<float> SoftmaxCrossEntropy::ForwardProp() {
   arma::Mat<float> fc_output;
   Tensor2Matrix(fc_output_tensor, fc_output);
 
-  arma::Mat<float> e = arma::exp(fc_output.each_col() - arma::max(fc_output, 1));
+  arma::Mat<float> e =
+      arma::exp(fc_output.each_col() - arma::max(fc_output, 1));
   output_ = e.each_col() / arma::sum(e, 1);
   Tensor<float> output_tensor;
   Matrix2Tensor(output_, output_tensor);
@@ -42,7 +43,7 @@ float SoftmaxCrossEntropy::ComputeCost() {
   Tensor2Matrix(final_result_tensor, final_result_);
   Tensor2Matrix(label_data_, label_);
 
-  arma::Mat<float> error = - label_ % arma::log(final_result_);
+  arma::Mat<float> error = -label_ % arma::log(final_result_);
   float cost = arma::accu(error);
   return cost;
 }
@@ -51,8 +52,7 @@ Tensor<float> SoftmaxCrossEntropy::ComputeDerivative() {
   return BackProp(Tensor<float>());
 }
 
-Tensor<float> SoftmaxCrossEntropy::BackProp(
-    const Tensor<float>&) {
+Tensor<float> SoftmaxCrossEntropy::BackProp(const Tensor<float>&) {
   arma::Mat<float> delta = final_result_ - label_;
   Tensor<float> next_delta_tensor;
   Matrix2Tensor(delta, next_delta_tensor);
