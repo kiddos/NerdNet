@@ -1,7 +1,5 @@
 #include "NerdNet/layer/mean_square_error.h"
 #include "NerdNet/convert.h"
-#include "NerdNet/except/input_exception.h"
-#include "NerdNet/except/nullptr_exception.h"
 
 namespace nerd {
 namespace nn {
