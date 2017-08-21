@@ -1,7 +1,5 @@
 #include "NerdNet/layer/softmax_cross_entropy.h"
 #include "NerdNet/convert.h"
-#include "NerdNet/except/input_exception.h"
-#include "NerdNet/except/nullptr_exception.h"
 
 namespace nerd {
 namespace nn {
