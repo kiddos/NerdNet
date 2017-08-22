@@ -1,10 +1,8 @@
 #include <gtest/gtest.h>
 
-#include "NerdNet/except/nullptr_exception.h"
-#include "NerdNet/layer/input_layer.h"
-#include "NerdNet/layer/mean_square_error.h"
-#include "NerdNet/layer/relu_layer.h"
 #include "NerdNet/convert.h"
+#include "NerdNet/except/nullptr_exception.h"
+#include "NerdNet/layers.h"
 
 using nerd::nn::VariableShape;
 using nerd::nn::InputLayer;

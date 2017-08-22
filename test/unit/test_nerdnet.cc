@@ -2,7 +2,7 @@
 #include <memory>
 
 #include "NerdNet/convert.h"
-#include "NerdNet/layer/layers.h"
+#include "NerdNet/layers.h"
 #include "NerdNet/nerd_net.h"
 
 using nerd::nn::NerdNet;

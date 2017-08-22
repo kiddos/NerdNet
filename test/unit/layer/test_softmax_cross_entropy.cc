@@ -2,7 +2,7 @@
 
 #include "NerdNet/convert.h"
 #include "NerdNet/except/nullptr_exception.h"
-#include "NerdNet/layer/layers.h"
+#include "NerdNet/layers.h"
 
 #include <chrono>
 #include <random>

@@ -2,9 +2,7 @@
 
 #include "NerdNet/convert.h"
 #include "NerdNet/except/nullptr_exception.h"
-#include "NerdNet/layer/input_layer.h"
-#include "NerdNet/layer/mean_square_error.h"
-#include "NerdNet/layer/tanh_layer.h"
+#include "NerdNet/layers.h"
 
 using nerd::nn::VariableShape;
 using nerd::nn::InputLayer;

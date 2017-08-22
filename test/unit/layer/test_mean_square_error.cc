@@ -2,8 +2,7 @@
 
 #include "NerdNet/convert.h"
 #include "NerdNet/except/nullptr_exception.h"
-#include "NerdNet/layer/input_layer.h"
-#include "NerdNet/layer/mean_square_error.h"
+#include "NerdNet/layers.h"
 
 using nerd::nn::BaseLayer;
 using nerd::nn::InputLayer;
@@ -15,8 +14,7 @@ using arma::Row;
 class MeanSquareErrorTest : public ::testing::Test {
  public:
   enum { INPUT_SIZE = 2, OUTPUT_SIZE = 6, DATA_SIZE = 4 };
-  MeanSquareErrorTest()
-      : error_layer_(nullptr, {INPUT_SIZE, OUTPUT_SIZE}) {}
+  MeanSquareErrorTest() : error_layer_(nullptr, {INPUT_SIZE, OUTPUT_SIZE}) {}
 
  protected:
   void SetUp() override {
