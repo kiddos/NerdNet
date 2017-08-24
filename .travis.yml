@@ -15,9 +15,17 @@ addons:
       - cmake
       - libarmadillo-dev
       - libboost-all-dev
+      - libqt5widgets5
+      - libqt5printsupport5
+      - libqcustomplot-dev
+      - libgtest-dev
+      - libopenblas-dev
 
 compiler:
   - gcc
+
+before_install:
+  - .travis/install_google_benchmark.sh
 
 script:
   - mkdir build
