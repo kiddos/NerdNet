@@ -6,10 +6,11 @@ namespace nerd {
 namespace nn {
 
 template <typename T>
-Tensor<T>::Tensor(T value) : shape_({0}), data_({value}) {}
+Tensor<T>::Tensor(T value) : push_index_(0), shape_({0}), data_({value}) {}
 
 template <typename T>
-Tensor<T>::Tensor(const std::vector<int>& shape) : shape_(shape) {
+Tensor<T>::Tensor(const std::vector<int>& shape)
+    : push_index_(0), shape_(shape) {
   int shape_size = shape.size();
   if (shape_size > 0) {
     int data_size = shape[0];
@@ -42,16 +43,19 @@ template <typename T>
 Tensor<T>& Tensor<T>::operator=(const Tensor<T>& tensor) {
   shape_ = tensor.shape();
 
-  int shape_size = tensor.shape().size();
-  int data_size = tensor[0];
-  for (int i = 1; i < shape_size; ++i) {
-    data_size *= tensor.shape()[i];
-  }
-
+  int data_size = tensor.data_.size();
   data_ = std::vector<T>(data_size);
   std::memcpy(&data_[0], tensor.data(), data_size * sizeof(T));
 
   return *this;
+}
+
+template <typename T>
+T Tensor<T>::operator<<(T value) {
+  data_[push_index_++] = value;
+  int data_size = data_.size();
+  if (push_index_ >= data_size) push_index_ = 0;
+  return value;
 }
 
 template class Tensor<float>;

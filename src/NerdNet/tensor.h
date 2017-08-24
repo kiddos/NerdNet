@@ -1,10 +1,10 @@
 #ifndef TENSOR_H
 #define TENSOR_H
 
-#include "NerdNet/variable_shape.h"
-
 #include <iostream>
 #include <vector>
+
+#include "NerdNet/variable_shape.h"
 
 namespace nerd {
 namespace nn {
@@ -21,12 +21,14 @@ class Tensor {
   Tensor(const Tensor<T>& tensor);
   Tensor<T>& operator=(const Tensor<T>& tensor);
 
+  T operator<<(T value);
   int operator[](int index) const { return shape_[index]; }
   std::vector<int> shape() const { return shape_; }
   const T* data() const { return &data_[0]; }
   T* mutable_data() { return &data_[0]; }
 
  private:
+  int push_index_;
   std::vector<int> shape_;
   std::vector<T> data_;
 };
