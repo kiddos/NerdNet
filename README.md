@@ -11,8 +11,7 @@ In order to build examples, optional dependencies need to be installed
 * [Armadillo](http://arma.sourceforge.net/)
 * [Boost](http://www.boost.org/)
 * [OpenBLAS](http://www.openblas.net/), ([github link](https://github.com/xianyi/OpenBLAS)) (Optional)
-* [OpenCV](http://opencv.org/) 3.x, ([github link](https://github.com/opencv/opencv)) (Optional)
-* [MathGL](http://mathgl.sourceforge.net/doc_en/Main.html) (Optional)
+* [Qt](https://www.qt.io/) 5.x
 
 ### Installing dependencies (Ubuntu 16.04)
 
@@ -34,22 +33,10 @@ sudo apt-get install libboost-all-dev
 sudo apt-get install libopenblas-dev
 ```
 
-* OpenCV
+* Qt components
 
 ```shell
-git clone -b 3.2.0 https://github.com/opencv/opencv
-cd opencv
-mkdir build
-cd build
-cmake -D CMAKE_INSTALL_PREFIX=/usr/local ..
-make -j
-sudo make install
-```
-
-* MathGL
-
-```shell
-sudo apt-get install libmgl-dev
+sudo apt-get install libqt5widget5 libqt5printsupport5 libqcustomplot
 ```
 
 ## Build
