@@ -28,6 +28,8 @@ if (GTEST_FOUND)
   # trainers
   add_executable(test_gradient_descent_trainer
     unit/trainer/test_gradient_descent_trainer.cc)
+  add_executable(test_sgd_trainer
+    unit/trainer/test_sgd_trainer.cc)
 
   add_test(InputLayerTest test_input_layer )
   add_test(FCLayerTest test_fc_layer)
@@ -46,6 +48,7 @@ if (GTEST_FOUND)
 
   add_test(NerdNetTest test_nerdnet)
   add_test(GradientDescentTrainerTest test_gradient_descent_trainer)
+  add_test(SGDTrainerTest test_sgd_trainer)
 endif ()
 
 find_library(BENCHMARK_LIBRARIES benchmark)
