@@ -1,18 +1,11 @@
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -O2 -g -std=c++11")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DDEBUG")
-set(CMAKE_CXX_COMPILER g++)
+include_directories(${CMAKE_SOURCE_DIR}/src)
+link_directories(${CMAKE_BINARY_DIR}/src)
+link_libraries(NerdNet)
 
-if (EXAMPLE_LIBS_FOUND)
-  message("--> 'example' will be build.")
-
-  include_directories(${CMAKE_SOURCE_DIR}/src)
-  link_directories(/usr/lib ${CMAKE_BINARY_DIR}/src)
-
-  add_executable(spiral spiral.cpp)
-  add_executable(xor xor_problem.cpp)
-
-  set(EXAMPLE_LIBS nnet armadillo ${OPENCV_LIBS} ${MATHGL_LIBS})
-
-  target_link_libraries(spiral ${EXAMPLE_LIBS})
-  target_link_libraries(xor ${EXAMPLE_LIBS})
-endif (EXAMPLE_LIBS_FOUND)
+find_package(Qt5Widgets)
+find_package(Qt5PrintSupport)
+find_package(QCustomPlot)
+if (Qt5Widgets_FOUND AND Qt5PrintSupport_FOUND AND QCustomPlot_FOUND)
+  message(STATUS "building exclusive or example...")
+  add_executable(exclusive_or exclusive_or/exclusive_or.cc)
+endif ()
