@@ -61,7 +61,7 @@ TEST_F(MeanSquareErrorTest, DerivativeTest) {
   Mat<float> test_input = test_data_;
   Mat<float> test_deriv(test_input.n_rows, test_input.n_cols);
   constexpr float delta = 1e-4;
-  constexpr float tol = 1e-1;
+  constexpr float tol = 3e-1;
   for (int i = 0; i < DATA_SIZE; ++i) {
     for (int j = 0; j < INPUT_SIZE; ++j) {
       test_input(i, j) += delta;
