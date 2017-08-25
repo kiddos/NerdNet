@@ -116,7 +116,6 @@ int main(int argc, char* argv[]) {
 
   QApplication app(argc, argv);
   PlotWindow window;
-  window.show();
 
   window.SetData(data_tensor, label_tensor,
                  {{PlotWindow::RED, PlotWindow::DISC},
@@ -125,5 +124,7 @@ int main(int argc, char* argv[]) {
   Tensor<float> prediction = nerdnet->Feed(grid);
 
   window.SetGridBoundary(prediction);
+
+  window.show();
   return app.exec();
 }
