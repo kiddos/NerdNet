@@ -21,7 +21,7 @@ find_package(Boost COMPONENTS system program_options REQUIRED)
 include_directories(${Boost_INCLUDE_DIRS})
 link_libraries(${Boost_LIBRARIES})
 
-file(GLOB_RECURSE NerdNet_SOURCE
+file(GLOB NerdNet_SOURCE
   NerdNet/except/**.h NerdNet/except/**.cc
   NerdNet/layer/**.h NerdNet/layer/**.cc
   NerdNet/trainer/**.h NerdNet/trainer/**.cc
