@@ -17,7 +17,7 @@ link_libraries(${OpenBLAS})
 
 # boost util
 ## Boost
-find_package(Boost COMPONENTS system REQUIRED)
+find_package(Boost COMPONENTS system program_options REQUIRED)
 include_directories(${Boost_INCLUDE_DIRS})
 link_libraries(${Boost_LIBRARIES})
 
@@ -26,38 +26,31 @@ file(GLOB_RECURSE NerdNet_SOURCE
   NerdNet/layer/**.h NerdNet/layer/**.cc
   NerdNet/trainer/**.h NerdNet/trainer/**.cc
   NerdNet/util/*.h NerdNet/util/*.cc
-  NerdNet/convert.*
-  NerdNet/nerd_net.*
-  NerdNet/tensor.*
-  NerdNet/variable_shape.*
-  *.cpp
-  *.h)
-
-find_package(OpenCV 3.0 COMPONENTS core highgui shape)
-if (OpenCV_FOUND)
-  message(STATUS "Using OpenCV")
-  link_libraries(${OpenCV_LIBS})
-
-  message(STATUS "Building Util...")
-  file(GLOB Util_SOURCE
-    NerdNet/util.*)
-  set(NerdNet_SOURCE ${NerdNet_SOURCE} ${Util_SOURCE})
-endif ()
+  NerdNet/*.h
+  NerdNet/*.cc)
 
 find_package(Qt5Widgets)
-if (Qt5Widgets_FOUND)
+find_package(Qt5PrintSupport)
+find_package(QCustomPlot)
+if (Qt5Widgets_FOUND AND Qt5PrintSupport_FOUND AND QCustomPlot_FOUND)
+  set(CMAKE_AUTOMOC ON)
   set(CMAKE_CXX_FLAGS_COVERAGE "${CMAKE_CXX_FLAGS_RELEASE} -fprofile-arcs -ftest-coverage")
-  get_target_property(QtWidget_location Qt5::Widgets LOCATION)
 
+  get_target_property(QtWidget_location Qt5::Widgets LOCATION)
   message(STATUS "QtWidget Version: ${Qt5Widgets_VERSION} at ${QtWidget_location}")
 
-  link_libraries(Qt5::Widgets)
-  set(CMAKE_AUTOMOC ON)
+  get_target_property(QtPrintSupport_location Qt5::PrintSupport LOCATION)
+  message(STATUS "QtPrintSupport Version: ${Qt5PrintSupport_VERSION} at ${QtPrintSupport_location}")
+
+  link_libraries(Qt5::Widgets Qt5::PrintSupport ${QCustomPlot_LIBRARIES})
+
+  qt5_wrap_ui(PLOT_UI_HEADERS NerdNet/util/qt/plot.ui)
 
   file(GLOB Widget_SOURCE
     NerdNet/util/qt/**.h
     NerdNet/util/qt/**.cc)
-  set(NerdNet_SOURCE ${NerdNet_SOURCE} ${Widget_SOURCE})
+  set(NerdNet_SOURCE ${NerdNet_SOURCE} ${Widget_SOURCE}
+    ${PLOT_UI_HEADERS})
 endif ()
 
 message(STATUS "NerdNet will be build.")
