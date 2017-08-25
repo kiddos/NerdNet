@@ -2,9 +2,7 @@
 #include <memory>
 
 #include "NerdNet/convert.h"
-#include "NerdNet/layer/fc_layer.h"
-#include "NerdNet/layer/mean_square_error.h"
-#include "NerdNet/layer/relu_layer.h"
+#include "NerdNet/layers.h"
 #include "NerdNet/nerd_net.h"
 #include "NerdNet/trainer/gradient_descent_trainer.h"
 
