@@ -36,5 +36,3 @@ script:
   - cd build
   - cmake ..
   - make -j8
-  - ./test/test_input_layer
-  - make test
