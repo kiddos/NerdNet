@@ -105,6 +105,7 @@ void PlotWindow::SetGridBoundary(const Tensor<float>& prediction) {
       }
     }
   }
+  plot_->replot();
 }
 
 void PlotWindow::PlotForeground(QCPGraph* graph, double x, double y,
