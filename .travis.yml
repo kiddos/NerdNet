@@ -28,6 +28,7 @@ compiler:
 
 before_install:
   - .travis/install_google_benchmark.sh
+  - .travis/install_armadillo_7x.sh
 
 script:
   - mkdir build
