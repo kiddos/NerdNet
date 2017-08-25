@@ -9,9 +9,6 @@ set(BUILD_SHARED_LIBS ON)
 
 enable_testing()
 
-include(cmake/find_headers.cmake)
-include(cmake/find_libraries.cmake)
-
 add_subdirectory(src)
 add_subdirectory(test)
 add_subdirectory(example)
