@@ -1,8 +1,9 @@
+include_directories(${CMAKE_SOURCE_DIR}/src)
+link_libraries(NerdNet)
+
 find_package(GTest)
 if (GTEST_FOUND)
   include_directories(${GTEST_INCLUDE_DIRS})
-  include_directories(${CMAKE_SOURCE_DIR}/src)
-  link_libraries(NerdNet)
   link_libraries(${GTEST_BOTH_LIBRARIES} pthread)
 
   add_executable(test_input_layer unit/layer/test_input_layer.cc)
@@ -53,12 +54,12 @@ if (BENCHMARK_LIBRARIES)
   link_libraries(${BENCHMARK_LIBRARIES} pthread)
 
   add_executable(benchmark_convert bench/benchmark_convert.cc)
+  add_test(ConvertBenchmark benchmark_convert)
 endif ()
 
 find_package(Qt5Widgets)
 find_package(Qt5PrintSupport)
 find_package(QCustomPlot)
 if (Qt5Widgets_FOUND AND Qt5PrintSupport_FOUND AND QCustomPlot_FOUND)
-  include_directories(${CMAKE_BINARY_DIR}/src)
   add_executable(test_plot_window util/qt/test_plot_window.cc)
 endif ()
