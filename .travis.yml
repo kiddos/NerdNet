@@ -15,6 +15,8 @@ addons:
       - cmake
       - libarmadillo-dev
       - libboost-all-dev
+      - qt5-default
+      - qt5-qmake
       - libqt5widgets5
       - libqt5printsupport5
       - libqcustomplot-dev
