@@ -1,7 +1,7 @@
 Nerual Network
 ==============
 
-[![Build Status](https://travis-ci.org/kiddos/nnet.svg?branch=master)](https://travis-ci.org/kiddos/nnet)
+[![Build Status](https://travis-ci.org/kiddos/NerdNet.svg?branch=master)](https://travis-ci.org/kiddos/NerdNet)
 
 
 ## Dependencies
