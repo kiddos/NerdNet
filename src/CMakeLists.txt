@@ -31,8 +31,8 @@ file(GLOB_RECURSE NerdNet_SOURCE
 
 find_package(Qt5Widgets)
 find_package(Qt5PrintSupport)
-find_package(QCustomPlot)
-if (Qt5Widgets_FOUND AND Qt5PrintSupport_FOUND AND QCustomPlot_FOUND)
+find_library(QCustomPlot_LIBRARIES qcustomplot)
+if (Qt5Widgets_FOUND AND Qt5PrintSupport_FOUND AND QCustomPlot_LIBRARIES)
   set(CMAKE_AUTOMOC ON)
   set(CMAKE_CXX_FLAGS_COVERAGE "${CMAKE_CXX_FLAGS_RELEASE} -fprofile-arcs -ftest-coverage")
 
@@ -42,6 +42,7 @@ if (Qt5Widgets_FOUND AND Qt5PrintSupport_FOUND AND QCustomPlot_FOUND)
   get_target_property(QtPrintSupport_location Qt5::PrintSupport LOCATION)
   message(STATUS "QtPrintSupport Version: ${Qt5PrintSupport_VERSION} at ${QtPrintSupport_location}")
 
+  message(STATUS "Found QCustomPlot: ${QCustomPlot_LIBRARIES}")
   link_libraries(Qt5::Widgets Qt5::PrintSupport ${QCustomPlot_LIBRARIES})
 
   qt5_wrap_ui(PLOT_UI_HEADERS NerdNet/util/qt/plot.ui)
