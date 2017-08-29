@@ -2,10 +2,15 @@ include_directories(${CMAKE_SOURCE_DIR}/src)
 link_directories(${CMAKE_BINARY_DIR}/src)
 link_libraries(NerdNet)
 
+message(STATUS "Examples:")
+
 find_package(Qt5Widgets)
 find_package(Qt5PrintSupport)
 find_library(QCustomPlot_LIBRARIES qcustomplot)
 if (Qt5Widgets_FOUND AND Qt5PrintSupport_FOUND AND QCustomPlot_LIBRARIES)
   message(STATUS "building exclusive or example...")
   add_executable(exclusive_or exclusive_or/exclusive_or.cc)
+
+  message(STATUS "building sprial example...")
+  add_executable(spiral spiral/spiral.cc)
 endif ()
