@@ -26,6 +26,8 @@ class FCLayer : public VariableLayer {
   arma::Row<float> bias_gradient() const { return b_grad_; }
   void set_weight(const arma::Mat<float>& w) { w_ = w; }
   void set_bias(const arma::Row<float>& b) { b_ = b; }
+  void set_weight_gradient(const arma::Mat<float>& wgrad) { w_grad_ = wgrad; }
+  void set_bias_gradient(const arma::Mat<float>& bgrad) { b_grad_ = bgrad; }
 
   Tensor<float> ForwardProp() override;
   Tensor<float> BackProp(const Tensor<float>& delta_tensor) override;
