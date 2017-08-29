@@ -18,7 +18,7 @@
 using nerd::nn::VariableShape;
 using nerd::nn::NerdNet;
 using nerd::nn::FCLayer;
-using nerd::nn::ReluLayer;
+using nerd::nn::SigmoidLayer;
 using nerd::nn::SoftmaxCrossEntropy;
 using nerd::nn::Tensor;
 using nerd::nn::trainer::GradientDescentTrainer;
@@ -69,12 +69,12 @@ int main(int argc, char** argv) {
                      "data size");
   desc.add_options()("noise", value<float>()->default_value(0.06),
                      "data noise");
-  desc.add_options()("hidden-size",
-    value<int>()->default_value(32), "hidden size");
-  desc.add_options()("learning-rate",
-    value<float>()->default_value(1e-3), "learning rate");
-  desc.add_options()("max-epoch",
-    value<int>()->default_value(20000), "max epoch to train");
+  desc.add_options()("hidden-size", value<int>()->default_value(32),
+                     "hidden size");
+  desc.add_options()("learning-rate", value<float>()->default_value(1e-3),
+                     "learning rate");
+  desc.add_options()("max-epoch", value<int>()->default_value(20000),
+                     "max epoch to train");
 
   variables_map vmap;
   store(parse_command_line(argc, argv, desc), vmap);
@@ -93,7 +93,7 @@ int main(int argc, char** argv) {
   int hidden_size = vmap["hidden-size"].as<int>();
   std::shared_ptr<NerdNet> nerdnet = std::make_shared<NerdNet>();
   nerdnet->AddLayer<FCLayer>(VariableShape{2, hidden_size});
-  nerdnet->AddLayer<ReluLayer>();
+  nerdnet->AddLayer<SigmoidLayer>();
   nerdnet->AddLayer<SoftmaxCrossEntropy>(VariableShape{hidden_size, 3});
 
   Tensor<float> data_tensor, label_tensor;
@@ -107,7 +107,8 @@ int main(int argc, char** argv) {
     float loss = trainer.Train(data_tensor, label_tensor);
     if (epoch % 1000 == 0) {
       Tensor<float> prediction_tensor = nerdnet->Feed(data_tensor);
-      std::cout << "\r" << epoch << ". loss: " << loss << ", accuracy: "
+      std::cout << "\r" << epoch << ". loss: " << loss / data_size
+                << ", accuracy: "
                 << Accuracy(prediction_tensor, label_tensor) * 100.0 << "%"
                 << std::flush;
     }
