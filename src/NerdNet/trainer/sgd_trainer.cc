@@ -29,7 +29,9 @@ float SGDTrainer::Train(const Tensor<float> data, const Tensor<float> label) {
     nerdnet_->cost_function()->ComputeDerivative();
     // update weights
     for (int i = 1; i < nerdnet_->layer_count(); ++i) {
-      nerdnet_->layer(i)->Update(learning_rate_);
+      if (nerdnet_->has_variable(i)) {
+        nerdnet_->layer(i)->Update(learning_rate_);
+      }
     }
   }
 
