@@ -60,13 +60,9 @@ target_include_directories(nnet
 
 target_link_libraries(nnet
   PUBLIC
-    ${ARMADILLO_LIBRARIES}
+    armadillo
     tensor
 )
-
-if(ARMADILLO_INCLUDE_DIRS)
-  target_include_directories(nnet PUBLIC ${ARMADILLO_INCLUDE_DIRS})
-endif()
 
 if(OpenMP_CXX_FOUND)
   target_link_libraries(nnet PUBLIC OpenMP::OpenMP_CXX)
