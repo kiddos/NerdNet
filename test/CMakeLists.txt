@@ -1,77 +1,74 @@
-enable_testing()
-# google test framework
+# GTest Framework
 find_package(GTest REQUIRED)
-include_directories(${GTEST_INCLUDE_DIRS})
-include_directories(${CMAKE_SOURCE_DIR}/src)
-set(CMAKE_INCLUDE_CURRENT_DIR on)
 
-if (TARGET tensor)
-  set(TEST_LIBS ${GTEST_BOTH_LIBRARIES} pthread tensor)
-  add_executable(test_tensor_shape tensor/test_tensor_shape.cpp)
-  target_link_libraries(test_tensor_shape ${TEST_LIBS})
-  add_test(TestTensorShapeObject test_tensor_shape)
+# Helper function to add unit tests
+function(add_nnet_test name source)
+  add_executable(${name} ${source})
+  target_link_libraries(${name} PRIVATE tensor nnet GTest::gtest GTest::gtest_main)
+  add_test(NAME ${name} COMMAND ${name})
+endfunction()
 
-  add_executable(test_tensor tensor/test_tensor.cpp)
-  target_link_libraries(test_tensor ${TEST_LIBS})
-  add_test(TestTensorObject test_tensor)
+# Tensor tests
+add_nnet_test(test_tensor_shape tensor/test_tensor_shape.cpp)
+add_nnet_test(test_tensor tensor/test_tensor.cpp)
+add_nnet_test(test_tensor_basic_ops tensor/ops/test_tensor_basic_ops.cpp)
+add_nnet_test(test_tensor_arg tensor/ops/test_tensor_arg.cpp)
+add_nnet_test(test_tensor_equal tensor/ops/test_tensor_equal.cpp)
+add_nnet_test(test_tensor_mathops tensor/ops/test_tensor_mathops.cpp)
+add_nnet_test(test_tensor_matmul tensor/ops/test_tensor_matmul.cpp)
+add_nnet_test(test_tensor_negate tensor/ops/test_tensor_negate.cpp)
+add_nnet_test(test_tensor_reduce tensor/ops/test_tensor_reduce.cpp)
 
-  # basic operations
-  add_executable(test_tensor_basic_ops tensor/ops/test_tensor_basic_ops.cpp)
-  target_link_libraries(test_tensor_basic_ops ${TEST_LIBS})
-  add_test(TestTensorBasicOps test_tensor_basic_ops)
+# Boost Unit Test Framework (Optional for legacy Boost tests)
+find_package(Boost COMPONENTS unit_test_framework QUIET)
+if(Boost_FOUND OR Boost_UNIT_TEST_FRAMEWORK_FOUND)
+  add_executable(act_test act_test.cpp)
+  target_link_libraries(act_test PRIVATE nnet Boost::unit_test_framework)
+  add_test(NAME act_test COMMAND act_test)
 
-  # argmax
-  add_executable(test_tensor_arg tensor/ops/test_tensor_arg.cpp)
-  target_link_libraries(test_tensor_arg ${TEST_LIBS})
-  add_test(TestTensorArg test_tensor_arg)
+  add_executable(layer_unit_test layer_unit_test.cpp)
+  target_link_libraries(layer_unit_test PRIVATE nnet Boost::unit_test_framework)
+  add_test(NAME layer_unit_test COMMAND layer_unit_test)
+else()
+  message(STATUS "Boost unit test framework not found. Skipping act_test and layer_unit_test.")
+endif()
 
-  # equal
-  add_executable(test_tensor_equal tensor/ops/test_tensor_equal.cpp)
-  target_link_libraries(test_tensor_equal ${TEST_LIBS})
-  add_test(TestTensorEqual test_tensor_equal)
+# OpenCV-dependent tests
+find_package(OpenCV QUIET)
+if(OpenCV_FOUND)
+  add_executable(convlayer_test convlayer_test.cpp)
+  target_link_libraries(convlayer_test PRIVATE nnet ${OpenCV_LIBS})
+  target_include_directories(convlayer_test PRIVATE ${OpenCV_INCLUDE_DIRS})
 
-  # basic math
-  add_executable(test_tensor_mathops tensor/ops/test_tensor_mathops.cpp)
-  target_link_libraries(test_tensor_mathops ${TEST_LIBS})
-  add_test(TestTensorMathOps test_tensor_mathops)
+  add_executable(normlayer_test normlayer_test.cpp gradient_checker.cpp)
+  target_link_libraries(normlayer_test PRIVATE nnet ${OpenCV_LIBS})
+  target_include_directories(normlayer_test PRIVATE ${OpenCV_INCLUDE_DIRS})
 
-  # matrix multiplication
-  add_executable(test_tensor_matmul tensor/ops/test_tensor_matmul.cpp)
-  target_link_libraries(test_tensor_matmul ${TEST_LIBS})
-  add_test(TestTensorMatMul test_tensor_matmul)
+  add_executable(model_test model_test.cpp gradient_checker.cpp)
+  target_link_libraries(model_test PRIVATE nnet ${OpenCV_LIBS} GTest::gtest GTest::gtest_main)
+  target_include_directories(model_test PRIVATE ${OpenCV_INCLUDE_DIRS})
+  add_test(NAME model_test COMMAND model_test)
+else()
+  message(STATUS "OpenCV not found. Skipping OpenCV-dependent tests (convlayer_test, normlayer_test, model_test).")
+endif()
 
-  # negation
-  add_executable(test_tensor_negate tensor/ops/test_tensor_negate.cpp)
-  target_link_libraries(test_tensor_negate ${TEST_LIBS})
-  add_test(TestTensorNegate test_tensor_negate)
+# Google Benchmark Framework (Optional)
+find_package(benchmark QUIET)
+if(benchmark_FOUND OR BENCHMARK_FOUND)
+  if(TARGET benchmark::benchmark)
+    set(BENCHMARK_TARGET benchmark::benchmark)
+  else()
+    set(BENCHMARK_TARGET ${BENCHMARK_LIBRARIES})
+  endif()
 
-  # reduction
-  add_executable(test_tensor_reduce tensor/ops/test_tensor_reduce.cpp)
-  target_link_libraries(test_tensor_reduce ${TEST_LIBS})
-  add_test(TestTensorReduce test_tensor_reduce)
-endif ()
+  function(add_nnet_benchmark name source)
+    add_executable(${name} ${source})
+    target_link_libraries(${name} PRIVATE tensor ${BENCHMARK_TARGET})
+  endfunction()
 
-find_library(BENCHMARK benchmark)
-if (BENCHMARK)
-  set(BENCHMARK_LIBS ${BENCHMARK} pthread tensor)
-
-  # basic operations
-  add_executable(benchmark_basic_ops tensor/ops/benchmark_tensor_basic_ops.cpp)
-  target_link_libraries(benchmark_basic_ops ${BENCHMARK_LIBS})
-
-  # math operations
-  add_executable(benchmark_math_ops tensor/ops/benchmark_tensor_mathops.cpp)
-  target_link_libraries(benchmark_math_ops ${BENCHMARK_LIBS})
-
-  # matrix multiplication
-  add_executable(benchmark_matmul tensor/ops/benchmark_tensor_matmul.cpp)
-  target_link_libraries(benchmark_matmul ${BENCHMARK_LIBS})
-
-  # reduction
-  add_executable(benchmark_reduction tensor/ops/benchmark_tensor_reduction.cpp)
-  target_link_libraries(benchmark_reduction ${BENCHMARK_LIBS})
-
-  # arg max/min
-  add_executable(benchmark_arg tensor/ops/benchmark_tensor_arg.cpp)
-  target_link_libraries(benchmark_arg ${BENCHMARK_LIBS})
-endif ()
+  add_nnet_benchmark(benchmark_basic_ops tensor/ops/benchmark_tensor_basic_ops.cpp)
+  add_nnet_benchmark(benchmark_math_ops tensor/ops/benchmark_tensor_mathops.cpp)
+  add_nnet_benchmark(benchmark_matmul tensor/ops/benchmark_tensor_matmul.cpp)
+  add_nnet_benchmark(benchmark_reduction tensor/ops/benchmark_tensor_reduction.cpp)
+  add_nnet_benchmark(benchmark_arg tensor/ops/benchmark_tensor_arg.cpp)
+endif()
